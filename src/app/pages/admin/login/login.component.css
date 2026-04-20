@@ -1,0 +1,317 @@
+/* =========================================================
+   LOGIN COMPONENT — Component-scoped styles
+   (Global keyframes & utility classes live in styles.css)
+========================================================== */
+
+/* ── Page shell ─────────────────────────────────────────── */
+.login-page-shell {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-bg-deep);
+  overflow: hidden;
+  padding: 1.5rem;
+}
+
+/* Subtle dot-grid texture */
+.login-bg-grid {
+  position: absolute;
+  inset: 0;
+  background-image: var(--mesh-pattern);
+  background-size: 32px 32px;
+  pointer-events: none;
+}
+
+/* Ambient orbs — physically grounded, NOT neon */
+.login-bg-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+  pointer-events: none;
+}
+.login-bg-orb--tl {
+  width: 480px; height: 480px;
+  top: -160px; left: -160px;
+  background: radial-gradient(circle, var(--orb-hue-1) 0%, transparent 70%);
+}
+.login-bg-orb--br {
+  width: 400px; height: 400px;
+  bottom: -120px; right: -100px;
+  background: radial-gradient(circle, var(--orb-hue-2) 0%, transparent 70%);
+}
+
+/* ── Glass card ─────────────────────────────────────────── */
+.login-card {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  max-width: 420px;
+  padding: 2.5rem 2.25rem;
+  border-radius: 20px;
+
+  /* Physically accurate glass: very low opacity + high blur */
+  background: var(--glass-bg);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  border: 1px solid var(--glass-border);
+
+  /* Subtle inner highlight on top edge — mimics real glass */
+  box-shadow: var(--glass-highlight), var(--glass-shadow);
+}
+
+/* ── Brand mark ─────────────────────────────────────────── */
+.login-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  margin-bottom: 2rem;
+}
+
+.login-brand__icon {
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  background: var(--color-accent);
+  display: flex; align-items: center; justify-content: center;
+  color: #fff;
+  flex-shrink: 0;
+  /* Hairline ambient shadow — not a heavy glow */
+  box-shadow: 0 2px 10px rgba(16, 185, 129, 0.3);
+}
+
+.login-brand__wordmark {
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--color-text-primary);
+}
+
+/* ── Headings ───────────────────────────────────────────── */
+.login-heading {
+  margin-bottom: 1.75rem;
+}
+
+.login-heading__title {
+  margin: 0 0 0.375rem;
+  font-family: var(--font-display);
+  font-size: 1.625rem;
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  line-height: 1.15;
+  color: var(--color-text-primary);
+}
+
+.login-heading__sub {
+  margin: 0;
+  font-size: 0.8125rem;
+  font-weight: 400;
+  color: var(--color-text-muted);
+  letter-spacing: 0.01em;
+}
+
+/* ── Form layout ────────────────────────────────────────── */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+/* NG-ZORRO form label override */
+::ng-deep .lf-label .ant-form-item-label > label {
+  font-family: var(--font-display) !important;
+  font-size: 0.65rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.1em !important;
+  color: var(--color-text-muted) !important;
+  text-transform: uppercase;
+}
+
+/* NG-ZORRO input group container */
+::ng-deep .lf-input-group.ant-input-affix-wrapper,
+::ng-deep .lf-input-group.ant-input-group-wrapper .ant-input-wrapper .ant-input-affix-wrapper,
+::ng-deep .lf-input-group.ant-input-affix-wrapper-lg {
+  background: var(--glass-bg) !important;
+  border: 1px solid var(--glass-border) !important;
+  border-radius: 10px !important;
+  box-shadow: none !important;
+  padding: 0 14px !important;
+  transition: border-color 0.25s ease, background 0.25s ease, box-shadow 0.25s ease !important;
+}
+
+::ng-deep .lf-input-group.ant-input-affix-wrapper:hover,
+::ng-deep .lf-input-group.ant-input-affix-wrapper-focused,
+::ng-deep .lf-input-group.ant-input-affix-wrapper:focus-within {
+  border-color: var(--color-accent-rim) !important;
+  background: var(--glass-bg-hover) !important;
+  box-shadow: 0 0 0 3px var(--color-accent-dim) !important;
+}
+
+/* Native <input> inside NG-ZORRO wrapper */
+.lf-native-input {
+  font-family: var(--font-display) !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  color: var(--color-text-primary) !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+  height: 40px;
+  letter-spacing: 0.01em;
+}
+
+.lf-native-input::placeholder {
+  color: var(--color-text-muted) !important;
+  font-weight: 400 !important;
+}
+
+.lf-native-input--password::placeholder {
+  letter-spacing: 0.04em !important;
+}
+
+/* OTP input — extra wide tracking */
+.lf-native-input--otp {
+  text-align: center !important;
+  font-size: 1.375rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.5em !important;
+}
+
+::ng-deep .lf-input-group--otp .ant-input-affix-wrapper {
+  justify-content: center;
+}
+
+/* Autofill override — prevents browser from painting a white bg */
+.lf-native-input:-webkit-autofill,
+.lf-native-input:-webkit-autofill:hover,
+.lf-native-input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 60px var(--color-bg-surface) inset !important;
+  -webkit-text-fill-color: var(--color-text-primary) !important;
+  transition: background-color 9999s ease !important;
+}
+
+/* NG-ZORRO error tip color */
+::ng-deep .ant-form-item-explain-error {
+  font-size: 0.72rem !important;
+  color: #ef4444 !important;
+  font-family: var(--font-display) !important;
+  letter-spacing: 0.01em !important;
+}
+
+/* ── Eye / suffix button ──────────────────────────────── */
+.lf-eye-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  color: var(--color-text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  transition: color 0.2s ease, background 0.2s ease;
+}
+.lf-eye-btn:hover {
+  color: var(--color-text-primary);
+  background: var(--glass-bg-hover);
+}
+
+/* ── Meta row (forgot password) ─────────────────────────── */
+.lf-meta {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: -0.25rem;
+  margin-bottom: 0.75rem;
+}
+
+/* ── Links ──────────────────────────────────────────────── */
+.lf-link {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-family: var(--font-display);
+  font-size: 0.76rem;
+  font-weight: 500;
+  color: var(--color-accent);
+  letter-spacing: 0.01em;
+  transition: opacity 0.2s ease;
+}
+.lf-link:hover { opacity: 0.75; }
+
+.lf-link--muted {
+  color: var(--color-text-muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.lf-link--muted:hover { color: var(--color-text-subtle); opacity: 1; }
+
+/* ── Primary button ─────────────────────────────────────── */
+.lf-btn-primary {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+
+  padding: 0.8125rem 1.5rem;
+  border-radius: 10px;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  cursor: pointer;
+
+  font-family: var(--font-display);
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: #fff;
+
+  background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.08) inset,
+    0 4px 16px rgba(16, 185, 129, 0.2);
+
+  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+  will-change: transform;
+}
+
+.lf-btn-primary:hover {
+  filter: brightness(1.08);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.1) inset,
+    0 6px 22px rgba(16, 185, 129, 0.28);
+}
+
+.lf-btn-primary:active {
+  transform: scale(0.97);
+  filter: brightness(0.97);
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.15);
+}
+
+/* ── OTP-specific decorations ──────────────────────────── */
+.otp-icon-wrap {
+  width: 52px; height: 52px;
+  border-radius: 14px;
+  background: var(--color-accent-dim);
+  border: 1px solid var(--color-accent-rim);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--color-accent);
+  margin: 0 auto 0;
+}
+
+.otp-back-row {
+  display: flex;
+  justify-content: center;
+  margin-top: 1.25rem;
+}
+
+/* ── Footer note ─────────────────────────────────────────── */
+.login-footer-note {
+  margin: 1.5rem 0 0;
+  font-size: 0.7rem;
+  text-align: center;
+  color: var(--color-text-muted);
+  letter-spacing: 0.025em;
+}

@@ -1,1 +1,240 @@
 /* You can add global styles to this file, and also import other style files */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* =============================================
+   GLOBAL DESIGN SYSTEM - Premium Admin Panel
+   (Supports Light / Dark themes dynamically)
+   ============================================= */
+
+:root {
+  --font-display: 'Inter', system-ui, -apple-system, sans-serif;
+
+  /* Default Dark Theme — Deep slate base, highly visible glass borders */
+  --color-bg-deep:      #0b1120;  /* Richer, slightly bluer slate for better contrast */
+  --color-bg-surface:   #0f172a;
+  --color-bg-elevated:  #1e293b;
+  --color-border:       rgba(255, 255, 255, 0.12); /* Increased visibility */
+  --color-border-hover: rgba(255, 255, 255, 0.22);
+  --color-border-strong:rgba(255, 255, 255, 0.35);
+
+  /* FLOWSPACE CYAN ACCENT */
+  --color-accent:       #06b6d4;  /* cyan-500 */
+  --color-accent-dim:   rgba(6, 182, 212, 0.15);
+  --color-accent-rim:   rgba(6, 182, 212, 0.4);
+
+  --color-text-primary: #f8fafc;   /* Purest white for max visibility */
+  --color-text-muted:   #cbd5e1;   /* Brighter muted text */
+  --color-text-subtle:  #94a3b8;
+
+  /* Glass layer variables */
+  --glass-bg:           rgba(255, 255, 255, 0.04);
+  --glass-bg-hover:     rgba(255, 255, 255, 0.08);
+  --glass-border:       rgba(255, 255, 255, 0.12);
+  --glass-border-light: rgba(255, 255, 255, 0.06);
+  --glass-shadow:       0 16px 40px rgba(0, 0, 0, 0.4);
+  --glass-highlight:    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+
+  /* Background Ambient Orbs */
+  --orb-hue-1: rgba(6, 182, 212, 0.15); /* matching cyan */
+  --orb-hue-2: rgba(99, 102, 241, 0.15); /* A touch of indigo instead of plain slate for wow factor */
+  --mesh-color: rgba(255, 255, 255, 0.03);
+}
+
+/* Light Theme Overrides */
+[data-theme="light"] {
+  --color-bg-deep:      #f0fdfa;  /* Very soft teal/slate mix for contrast */
+  --color-bg-surface:   #ffffff;
+  --color-bg-elevated:  #f1f5f9;
+  --color-border:       rgba(15, 23, 42, 0.1);
+  --color-border-hover: rgba(15, 23, 42, 0.2);
+  --color-border-strong:rgba(15, 23, 42, 0.4);
+
+  /* Darker cyan for light mode */
+  --color-accent:       #0891b2;  /* cyan-600 */
+  --color-accent-dim:   rgba(6, 182, 212, 0.15);
+  --color-accent-rim:   rgba(6, 182, 212, 0.4);
+
+  --color-text-primary: #0f172a;   /* Slate 900 */
+  --color-text-muted:   #475569;   /* Slate 600 */
+  --color-text-subtle:  #64748b;   /* Slate 500 */
+
+  /* Glass layer variables for light mode */
+  --glass-bg:           rgba(255, 255, 255, 0.75);
+  --glass-bg-hover:     rgba(255, 255, 255, 0.95);
+  --glass-border:       rgba(15, 23, 42, 0.08);
+  --glass-border-light: rgba(15, 23, 42, 0.05);
+  --glass-shadow:       0 12px 32px rgba(15, 23, 42, 0.06);
+  --glass-highlight:    inset 0 1px 0 rgba(255, 255, 255, 1);
+
+  /* Background Ambient Orbs (Stronger in Light Mode for Glassmorphism) */
+  --orb-hue-1: rgba(6, 182, 212, 0.25);
+  --orb-hue-2: rgba(99, 102, 241, 0.20); 
+  --mesh-color: rgba(15, 23, 42, 0.04);
+}
+
+/* Base */
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  margin: 0;
+  background-color: var(--color-bg-deep);
+  color: var(--color-text-primary);
+  font-family: var(--font-display);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.4s ease, color 0.4s ease;
+}
+
+/* =============================================
+   GLOBAL GLASSMORPHISM TABLES
+   ============================================= */
+
+.glass-table-container {
+  width: 100%;
+  overflow-x: auto;
+  border-radius: 16px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  padding: 1px; /* border inner spacing */
+}
+
+.glass-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  text-align: left;
+}
+
+.glass-table th {
+  padding: 1rem 1.25rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text-muted);
+  border-bottom: 2px solid var(--color-border);
+  background: rgba(var(--color-bg-surface), 0.3);
+  backdrop-filter: blur(10px);
+}
+
+.glass-table td {
+  padding: 1rem 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  border-bottom: 1px solid var(--glass-border-light);
+  transition: background-color 0.2s ease;
+}
+
+.glass-table tbody tr {
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.glass-table tbody tr:hover td {
+  background: var(--glass-bg-hover);
+  color: var(--color-accent);
+}
+
+.glass-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Generic label/tag in table */
+.glass-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.6rem;
+  border-radius: 99px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  background: var(--color-bg-elevated);
+  color: var(--color-text-primary);
+  border: 1px solid var(--glass-border);
+}
+
+.glass-tag--success {
+  background: var(--color-accent-dim);
+  color: var(--color-accent);
+  border-color: var(--color-accent-rim);
+}
+
+/* =============================================
+   GLOBAL KEYFRAME ANIMATIONS
+   ============================================= */
+
+@keyframes bg-appear {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes card-enter {
+  from { opacity: 0; transform: translateY(20px) scale(0.985); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes item-enter {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes sidebar-enter {
+  from { opacity: 0; transform: translateX(-20px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes header-enter {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.6; transform: scale(0.8); }
+}
+
+@keyframes step-fade-in {
+  from { opacity: 0; transform: translateX(18px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes step-fade-out {
+  from { opacity: 1; transform: translateX(0); }
+  to   { opacity: 0; transform: translateX(-18px); }
+}
+
+/* =============================================
+   GLOBAL UTILITY CLASSES
+   ============================================= */
+
+.animate-bg-appear   { animation: bg-appear   0.6s ease both; }
+.animate-card-enter  { animation: card-enter  0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both; }
+.animate-sidebar     { animation: sidebar-enter 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both; }
+.animate-header      { animation: header-enter  0.45s cubic-bezier(0.22, 1, 0.36, 1) 0.25s both; }
+.animate-main        { animation: item-enter    0.45s ease 0.35s both; }
+
+.stagger-1 { animation: item-enter 0.4s cubic-bezier(0.22, 1, 0.36, 1) 0.30s both; }
+.stagger-2 { animation: item-enter 0.4s cubic-bezier(0.22, 1, 0.36, 1) 0.42s both; }
+.stagger-3 { animation: item-enter 0.4s cubic-bezier(0.22, 1, 0.36, 1) 0.54s both; }
+.stagger-4 { animation: item-enter 0.4s cubic-bezier(0.22, 1, 0.36, 1) 0.66s both; }
+.stagger-5 { animation: item-enter 0.4s cubic-bezier(0.22, 1, 0.36, 1) 0.78s both; }
+.stagger-6 { animation: item-enter 0.4s cubic-bezier(0.22, 1, 0.36, 1) 0.90s both; }
+
+.step-animate-in  { animation: step-fade-in  0.4s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.step-animate-out { animation: step-fade-out 0.25s ease both; }
+
+.focus-ring:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--color-bg-deep), 0 0 0 4px var(--color-accent-rim);
+}
+
+.scrollbar-premium::-webkit-scrollbar        { width: 4px; }
+.scrollbar-premium::-webkit-scrollbar-track  { background: transparent; }
+.scrollbar-premium::-webkit-scrollbar-thumb  { background: var(--color-border-hover); border-radius: 99px; }
+.scrollbar-premium::-webkit-scrollbar-thumb:hover { background: var(--color-border-strong); }

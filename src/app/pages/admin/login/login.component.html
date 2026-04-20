@@ -1,0 +1,169 @@
+<!-- =========================================================
+  LOGIN COMPONENT — Premium Admin Portal
+  Design: deep-slate bg · refined glass card · emerald accent
+  Animations: bg-appear → card-enter → staggered items
+========================================================== -->
+<div class="login-page-shell animate-bg-appear">
+
+  <!-- Ambient background layers -->
+  <div class="login-bg-grid" aria-hidden="true"></div>
+  <div class="login-bg-orb login-bg-orb--tl" aria-hidden="true"></div>
+  <div class="login-bg-orb login-bg-orb--br" aria-hidden="true"></div>
+
+  <!-- Glass card -->
+  <div class="login-card animate-card-enter">
+
+    <!-- Brand mark -->
+    <div class="login-brand stagger-1">
+      <div class="login-brand__icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+          <path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+        </svg>
+      </div>
+      <span class="login-brand__wordmark">After Commerce Admin</span>
+    </div>
+
+    <!-- ─── LOGIN STEP ─────────────────────────────── -->
+    <div *ngIf="!isOtpStep">
+
+      <div class="login-heading stagger-2">
+        <h1 class="login-heading__title">Welcome back</h1>
+        <p class="login-heading__sub">Sign in to your admin portal</p>
+      </div>
+
+      <form nz-form [formGroup]="loginForm" (ngSubmit)="onLoginSubmit()" nzLayout="vertical"
+            class="login-form" novalidate autocomplete="off">
+
+        <!-- Email field -->
+        <nz-form-item class="stagger-3">
+          <nz-form-label [nzNoColon]="true" nzFor="email" class="lf-label">
+            EMAIL ADDRESS
+          </nz-form-label>
+          <nz-form-control nzErrorTip="Please enter a valid email address.">
+            <nz-input-group nzSize="large" class="lf-input-group">
+              <input nz-input type="email" formControlName="email" id="email"
+                     placeholder="admin@company.com"
+                     class="lf-native-input focus-ring" />
+            </nz-input-group>
+          </nz-form-control>
+        </nz-form-item>
+
+        <!-- Password field -->
+        <nz-form-item class="stagger-4">
+          <nz-form-label [nzNoColon]="true" nzFor="password" class="lf-label">
+            PASSWORD
+          </nz-form-label>
+          <nz-form-control nzErrorTip="Please enter your password.">
+            <nz-input-group nzSize="large" [nzSuffix]="suffixTmpl" class="lf-input-group">
+              <input nz-input [type]="passwordVisible ? 'text' : 'password'"
+                     formControlName="password" id="password"
+                     placeholder="••••••••••••"
+                     class="lf-native-input lf-native-input--password focus-ring" />
+            </nz-input-group>
+
+            <ng-template #suffixTmpl>
+              <button type="button" class="lf-eye-btn" (click)="passwordVisible = !passwordVisible"
+                      [attr.aria-label]="passwordVisible ? 'Hide password' : 'Show password'">
+                <!-- Eye open -->
+                <svg *ngIf="!passwordVisible" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+                <!-- Eye closed -->
+                <svg *ngIf="passwordVisible" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+                  <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+                  <line x1="1" y1="1" x2="23" y2="23"/>
+                </svg>
+              </button>
+            </ng-template>
+          </nz-form-control>
+        </nz-form-item>
+
+        <!-- Forgot password row -->
+        <div class="lf-meta stagger-5">
+          <button type="button" class="lf-link" (click)="forgotPassword()">Forgot password?</button>
+        </div>
+
+        <!-- Submit -->
+        <div class="stagger-6">
+          <button type="submit" id="login-submit-btn" class="lf-btn-primary">
+            <span>Continue</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="5" y1="12" x2="19" y2="12"/>
+              <polyline points="12 5 19 12 12 19"/>
+            </svg>
+          </button>
+        </div>
+
+      </form>
+
+      <!-- Divider -->
+      <p class="login-footer-note stagger-6">
+        Secure admin access &mdash; authorised users only
+      </p>
+
+    </div><!-- /login step -->
+
+    <!-- ─── OTP STEP ──────────────────────────────── -->
+    <div *ngIf="isOtpStep" class="step-animate-in">
+
+      <!-- Shield icon -->
+      <div class="otp-icon-wrap">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        </svg>
+      </div>
+
+      <div class="login-heading" style="margin-top: 1rem;">
+        <h1 class="login-heading__title">Two-factor auth</h1>
+        <p class="login-heading__sub">Enter the 6-digit code sent to your device.</p>
+      </div>
+
+      <form nz-form [formGroup]="otpForm" (ngSubmit)="onOtpSubmit()" nzLayout="vertical"
+            class="login-form" novalidate>
+
+        <nz-form-item>
+          <nz-form-label [nzNoColon]="true" nzFor="otp" class="lf-label">
+            VERIFICATION CODE
+          </nz-form-label>
+          <nz-form-control nzErrorTip="Please enter the 6-digit code.">
+            <nz-input-group nzSize="large" class="lf-input-group lf-input-group--otp">
+              <input nz-input type="text" inputmode="numeric" pattern="[0-9]*"
+                     formControlName="otp" id="otp"
+                     placeholder="000 000" maxlength="6"
+                     class="lf-native-input lf-native-input--otp focus-ring" />
+            </nz-input-group>
+          </nz-form-control>
+        </nz-form-item>
+
+        <button type="submit" id="otp-submit-btn" class="lf-btn-primary" style="margin-top: 0.5rem;">
+          <span>Verify &amp; Sign in</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+        </button>
+
+        <div class="otp-back-row">
+          <button type="button" class="lf-link lf-link--muted" (click)="goBackToLogin()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
+            </svg>
+            Back to login
+          </button>
+        </div>
+
+      </form>
+
+    </div><!-- /otp step -->
+
+  </div><!-- /glass card -->
+</div><!-- /page shell -->
