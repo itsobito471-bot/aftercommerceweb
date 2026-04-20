@@ -100,7 +100,7 @@ export class AppService {
   }
 
   //getme 
-  public getMe(){
+  public UserDetails(){
     return this.get('/api/admin/users/me')
   }
 

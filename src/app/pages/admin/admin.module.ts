@@ -14,7 +14,7 @@ import { AuthGuard } from 'src/app/guards/auth.guard';
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { 
-    path: 'main', 
+    path: '', 
     component: SideNavComponent, // This is the shell
     canActivate: [AuthGuard],    // Protects accessing the shell
     canActivateChild: [AuthGuard], // Protects all children loaded inside the shell

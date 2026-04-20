@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { AppService } from 'src/app/app.service';
 import Swal from 'sweetalert2';
 
@@ -17,8 +18,8 @@ export class LoginComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    public appService:AppService
-  
+    public appService:AppService,
+    public router:Router
   ) {}
 
   ngOnInit(): void {
@@ -63,6 +64,31 @@ export class LoginComponent implements OnInit {
 
         if(res?.token){
           localStorage.setItem('token',res?.token)
+
+          this.appService.UserDetails().subscribe((res:any)=>{
+            if(res?.success){
+
+              let userDetail =  btoa(encodeURIComponent(JSON.stringify(res?.data)))
+              localStorage.setItem('me',userDetail)
+
+              this.router.navigate(['/admin']);
+              
+
+            }else{
+              Swal.fire({
+                icon:'error',
+                title:"Error",
+                text:"User Details Not Found"
+              })
+            }
+            
+          },(error:any)=>{
+            Swal.fire({
+              icon:'error',
+              title:"Error",
+              text:error?.error?.message
+            })
+          })
 
 
         }
