@@ -1,5 +1,23 @@
-/* Layout Headers */
-.page-header {
+/* Page Breadcrumb / Label */
+.page-label-wrap {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 4px;
+  }
+  
+  .page-label-root {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-accent);
+  }
+  
+  .page-label-sep { color: var(--color-text-subtle); font-size: 10px; }
+  .page-label-current { font-size: 11px; font-weight: 500; color: var(--color-text-subtle); }
+  
+  .page-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -7,25 +25,16 @@
   }
   
   .page-title {
-    font-family: var(--font-display);
     font-size: 1.75rem;
     font-weight: 700;
     color: var(--color-text-primary);
-    margin: 0 0 0.25rem 0;
+    margin: 0;
     letter-spacing: -0.02em;
   }
   
-  .page-subtitle {
-    font-size: 0.875rem;
-    color: var(--color-text-muted);
-    margin: 0;
-  }
+  .page-subtitle { font-size: 0.875rem; color: var(--color-text-muted); }
   
-  .add-btn {
-    max-width: max-content;
-  }
-  
-  /* Metric Cards Grid */
+  /* Metrics Grid */
   .metrics-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -33,127 +42,34 @@
     margin-bottom: 2rem;
   }
   
-  .metric-card {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 1.25rem;
-  }
-  
+  .metric-card { display: flex; align-items: center; gap: 1rem; }
   .metric-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
+    width: 48px; height: 48px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
   }
+  .metric-value { font-size: 1.75rem; font-weight: 700; color: var(--color-text-primary); }
+  .metric-label { font-size: 0.75rem; font-weight: 600; color: var(--color-text-muted); text-transform: uppercase; }
   
-  .metric-data {
-    display: flex;
-    flex-direction: column;
-  }
+  /* Table Elements */
+  .table-toolbar { margin-bottom: 1.5rem; }
+  .search-box { position: relative; max-width: 350px; }
+  .search-box svg { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--color-text-muted); }
+  .search-input { padding-left: 2.75rem; width: 100%; }
   
-  .metric-label {
-    font-family: var(--font-display);
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: var(--color-text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-  }
-  
-  .metric-value {
-    font-family: var(--font-display);
-    font-size: 1.75rem;
-    font-weight: 700;
-    color: var(--color-text-primary);
-    line-height: 1.2;
-  }
-  
-  /* Table Toolbar */
-  .table-toolbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.5rem;
-  }
-  
-  .search-box {
-    position: relative;
-    width: 100%;
-    max-width: 350px;
-  }
-  
-  .search-box svg {
-    position: absolute;
-    left: 1rem;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--color-text-muted);
-  }
-  
-  .search-input {
-    padding-left: 2.75rem;
-  }
-  
-  /* Table Specifics */
-  .user-cell {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-  }
-  
+  .user-cell { display: flex; align-items: center; gap: 0.75rem; }
   .avatar {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
+    width: 32px; height: 32px; border-radius: 50%;
     background: linear-gradient(135deg, var(--color-accent), #818cf8);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.75rem;
-    font-weight: 700;
-    color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.75rem; font-weight: 700; color: #fff;
   }
   
-  .fw-600 {
-    font-weight: 600;
-  }
-  
-  .role-text {
-    text-transform: capitalize;
-    font-weight: 500;
-    color: var(--color-text-primary);
-  }
-  
-  /* Action Buttons */
   .action-btn {
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    padding: 6px;
-    border-radius: 6px;
-    color: var(--color-text-muted);
-    transition: all 0.2s ease;
-    margin-left: 0.25rem;
+    background: transparent; border: none; cursor: pointer; padding: 6px;
+    border-radius: 6px; color: var(--color-text-muted); transition: all 0.2s ease;
   }
+  .action-edit:hover { color: var(--color-accent); background: var(--color-accent-dim); }
+  .action-delete:hover { color: #ef4444; background: rgba(239, 68, 68, 0.1); }
   
-  .action-edit:hover {
-    background: rgba(56, 189, 248, 0.1);
-    color: var(--color-accent);
-  }
-  
-  .action-delete:hover {
-    background: rgba(239, 68, 68, 0.1);
-    color: #ef4444;
-  }
-  
-  /* States */
-  .loading-state, .empty-state {
-    text-align: center;
-    padding: 3rem 1rem;
-    color: var(--color-text-muted);
-    font-size: 0.875rem;
-  }
+  .fw-600 { font-weight: 600; }
+  .role-text { text-transform: capitalize; font-weight: 500; }

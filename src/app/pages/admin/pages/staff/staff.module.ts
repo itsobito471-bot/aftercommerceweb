@@ -5,6 +5,8 @@ import { StaffformComponent } from './staffform/staffform.component';
 import { RouterModule, Routes } from '@angular/router';
 import { AuthGuard } from 'src/app/guards/auth.guard';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { NzTableModule } from 'ng-zorro-antd/table';
+import { NzIconModule } from 'ng-zorro-antd/icon';
 
 
 const routes:Routes = [
@@ -26,7 +28,9 @@ const routes:Routes = [
     CommonModule,
     RouterModule.forChild(routes),
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    NzTableModule,
+    NzIconModule
   ]
 })
 export class StaffModule { }
