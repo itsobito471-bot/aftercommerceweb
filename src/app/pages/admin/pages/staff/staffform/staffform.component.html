@@ -1,0 +1,93 @@
+<div class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">{{ isEditMode ? 'Edit Staff Member' : 'Add Staff Member' }}</h1>
+      <p class="page-subtitle">
+        {{ isEditMode ? 'Update details and permissions.' : 'Create a new account and send an email invite.' }}
+      </p>
+    </div>
+    
+    <button type="button" class="action-btn back-btn" (click)="goBack()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="19" y1="12" x2="5" y2="12"></line>
+        <polyline points="12 19 5 12 12 5"></polyline>
+      </svg>
+      Back to Team
+    </button>
+  </div>
+  
+  <div class="glass-card form-container">
+    
+    <div *ngIf="isLoading" class="loading-overlay">
+      <div class="spinner"></div>
+      <p>Processing...</p>
+    </div>
+  
+    <form [formGroup]="staffForm" (ngSubmit)="onSubmit()">
+      
+      <div class="form-grid">
+        
+        <div class="glass-form-group">
+          <label class="glass-label">Full Name</label>
+          <input type="text" class="glass-input" formControlName="name" placeholder="John Doe">
+          <span class="error-text" *ngIf="staffForm.get('name')?.touched && staffForm.get('name')?.invalid">
+            Name is required.
+          </span>
+        </div>
+  
+        <div class="glass-form-group">
+          <label class="glass-label">Email Address</label>
+          <input type="email" class="glass-input" formControlName="email" placeholder="john@company.com">
+          <span class="error-text" *ngIf="staffForm.get('email')?.touched && staffForm.get('email')?.invalid">
+            A valid email is required.
+          </span>
+          <small class="helper-text" *ngIf="!isEditMode">An invite link will be sent here.</small>
+        </div>
+  
+        <div class="glass-form-group">
+          <label class="glass-label">Phone Number</label>
+          <input type="text" class="glass-input" formControlName="phone" placeholder="9876543210" maxlength="10">
+          <span class="error-text" *ngIf="staffForm.get('phone')?.touched && staffForm.get('phone')?.invalid">
+            A valid 10-digit phone number is required.
+          </span>
+        </div>
+  
+        <div class="glass-form-group">
+          <label class="glass-label">System Role</label>
+          <select class="glass-select" formControlName="role">
+            <option value="staff">Staff (Restricted Access)</option>
+            <option value="admin">Super Admin (Full Access)</option>
+          </select>
+        </div>
+  
+      </div>
+  
+      <div class="permissions-section" *ngIf="staffForm.get('role')?.value === 'staff'">
+        <label class="glass-label" style="margin-bottom: 1rem;">Module Permissions</label>
+        
+        <div class="permissions-grid">
+          <div class="permission-card" 
+               *ngFor="let perm of availablePermissions" 
+               [class.active]="hasPermission(perm.value)"
+               (click)="togglePermission(perm.value)">
+            
+            <div class="perm-checkbox">
+              <svg *ngIf="hasPermission(perm.value)" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            </div>
+            <span class="perm-label">{{ perm.label }}</span>
+          </div>
+        </div>
+      </div>
+  
+      <div class="form-actions">
+        <button type="submit" class="btn-primary submit-btn" [disabled]="isLoading">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+            <polyline points="17 21 17 13 7 13 7 21"></polyline>
+            <polyline points="7 3 7 8 15 8"></polyline>
+          </svg>
+          <span>{{ isEditMode ? 'Save Changes' : 'Create & Send Invite' }}</span>
+        </button>
+      </div>
+  
+    </form>
+  </div>

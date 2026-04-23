@@ -76,7 +76,6 @@
   display: flex; align-items: center; justify-content: center;
   color: #fff;
   flex-shrink: 0;
-  /* Hairline ambient shadow — not a heavy glow */
   box-shadow: 0 2px 10px rgba(16, 185, 129, 0.3);
 }
 
@@ -183,7 +182,7 @@
   justify-content: center;
 }
 
-/* Autofill override — prevents browser from painting a white bg */
+/* Autofill override */
 .lf-native-input:-webkit-autofill,
 .lf-native-input:-webkit-autofill:hover,
 .lf-native-input:-webkit-autofill:focus {
@@ -314,4 +313,37 @@
   text-align: center;
   color: var(--color-text-muted);
   letter-spacing: 0.025em;
+}
+
+/* ── Timer Row & State ─────────────────────────────────── */
+.otp-timer-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 1.25rem;
+  min-height: 24px; /* Prevents layout shift when it swaps to the button */
+}
+
+.otp-timer-text {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  letter-spacing: 0.02em;
+}
+
+.otp-timer-time {
+  color: var(--color-text-primary);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums; /* Keeps the numbers perfectly aligned as they tick down */
+  letter-spacing: 0.05em;
+  margin-left: 0.3rem;
+}
+
+/* Ensure the step animation is smooth when switching views */
+.step-animate-in {
+  animation: fadeSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes fadeSlideUp {
+  0% { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 1; transform: translateY(0); }
 }

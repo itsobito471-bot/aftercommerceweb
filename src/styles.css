@@ -238,3 +238,202 @@ html, body {
 .scrollbar-premium::-webkit-scrollbar-track  { background: transparent; }
 .scrollbar-premium::-webkit-scrollbar-thumb  { background: var(--color-border-hover); border-radius: 99px; }
 .scrollbar-premium::-webkit-scrollbar-thumb:hover { background: var(--color-border-strong); }
+
+
+
+/* =========================================================
+   GLOBAL COMPONENTS — AfterCommerce Glassmorphism
+   (Now fully powered by CSS Variables for Light/Dark mode)
+========================================================== */
+
+/* ── 1. Reusable Glass Cards ───────────────────────────── */
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(28px) saturate(1.5);
+  -webkit-backdrop-filter: blur(28px) saturate(1.5);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  box-shadow: var(--glass-shadow);
+  padding: 1.5rem;
+  transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.glass-card--hoverable:hover {
+  transform: translateY(-4px);
+  background: var(--glass-bg-hover);
+  border-color: var(--color-accent-rim);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+}
+
+/* ── 2. Global Data Tables ─────────────────────────────── */
+.glass-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  border-radius: 12px;
+  border: 1px solid var(--glass-border);
+  background: var(--glass-bg);
+  transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+.glass-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  text-align: left;
+}
+
+.glass-table th {
+  padding: 1rem 1.25rem;
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-text-subtle);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  border-bottom: 1px solid var(--glass-border);
+  
+  /* Uses your elevated background variable for slight contrast */
+  background: var(--color-bg-elevated); 
+  white-space: nowrap;
+  transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+.glass-table td {
+  padding: 1rem 1.25rem;
+  font-size: 0.875rem;
+  color: var(--color-text-primary);
+  border-bottom: 1px solid var(--glass-border-light);
+  vertical-align: middle;
+  transition: color 0.3s ease, border-color 0.3s ease;
+}
+
+.glass-table tbody tr {
+  transition: background 0.2s ease;
+}
+
+.glass-table tbody tr:hover {
+  background: var(--glass-bg-hover);
+}
+
+/* Status badges inside tables */
+.glass-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 50px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.glass-badge--active {
+  background: var(--color-accent-dim);
+  color: var(--color-accent);
+  border: 1px solid var(--color-accent-rim);
+}
+
+.glass-badge--inactive {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+/* ── 3. Global Form Inputs & Labels ────────────────────── */
+.glass-form-group {
+  margin-bottom: 1.25rem;
+}
+
+.glass-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.glass-input, 
+.glass-select, 
+.glass-textarea {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 10px;
+  color: var(--color-text-primary);
+  font-family: inherit;
+  font-size: 0.875rem;
+  outline: none;
+  transition: all 0.25s ease;
+}
+
+.glass-input::placeholder,
+.glass-textarea::placeholder {
+  color: var(--color-text-subtle);
+}
+
+.glass-input:focus, 
+.glass-select:focus, 
+.glass-textarea:focus {
+  border-color: var(--color-accent);
+  background: var(--color-bg-surface);
+  box-shadow: 0 0 0 3px var(--color-accent-dim);
+}
+
+
+
+/* ── 4. Global Buttons ─────────────────────────────────── */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1.25rem;
+  border-radius: 10px;
+  
+  /* Changed from accent-rim to solid accent so the border stays sharp on hover */
+  border: 1px solid var(--color-accent); 
+  background: var(--color-accent);
+  color: #ffffff; 
+  font-family: var(--font-display);
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  box-shadow: 0 4px 14px var(--color-accent-dim), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  
+  /* Increased duration slightly (0.2s -> 0.3s) for a smoother color fade */
+  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  white-space: nowrap;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  
+  /* --- THE COLOR SWAP --- */
+  background: transparent;
+  color: var(--color-accent);
+  
+  /* We remove the inset white highlight since the background is now transparent, 
+     but we keep your beautiful outer glow */
+  box-shadow: 0 6px 20px var(--color-accent-dim);
+}
+
+.btn-primary:active {
+  transform: translateY(0) scale(0.97);
+}
+
+/* Light theme slight adjustment for shadow intensity */
+[data-theme="light"] .btn-primary {
+  box-shadow: 0 4px 14px rgba(6, 182, 212, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+[data-theme="light"] .btn-primary:hover {
+  /* Ensure the swap works perfectly in light mode too */
+  background: transparent;
+  color: var(--color-accent);
+  box-shadow: 0 6px 20px rgba(6, 182, 212, 0.35);
+}

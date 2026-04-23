@@ -2,6 +2,8 @@ import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
+import { AppService } from 'src/app/app.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-side-nav',
@@ -14,6 +16,8 @@ export class SideNavComponent implements OnInit, OnDestroy {
   isLightTheme = true;
   windowWidth = window.innerWidth;
   currentPageTitle = 'Dashboard';
+
+  loggedInUserDetails :any
 
   // User info (replace with auth service data in production)
   userName = 'Alex Chen';
@@ -28,19 +32,21 @@ export class SideNavComponent implements OnInit, OnDestroy {
   }
 
   menuItems = [
-    { label: 'Dashboard', icon: 'dashboard', route: '/admin/dashboard' },
-    { label: 'Orders', icon: 'shopping-cart', route: '/admin/orders' },
-    { label: 'Products', icon: 'appstore', route: '/admin/products' },
-    { label: 'Customers', icon: 'team', route: '/admin/customers' },
-    { label: 'Revenue', icon: 'dollar-circle', route: '/admin/revenue' },
-    { label: 'Analytics', icon: 'bar-chart', route: '/admin/analytics' },
-    { label: 'Integrations', icon: 'api', route: '/admin/integrations' },
-    { label: 'Settings', icon: 'setting', route: '/admin/settings' },
+    { label: 'Dashboard', icon: 'dashboard', route: '/admin/home' },
+    { label: 'Course Catalog', icon: 'book', route: '/admin/courses' },
+    { label: 'Categories', icon: 'appstore', route: '/admin/categories' },
+    { label: 'Students', icon: 'user', route: '/admin/students' },
+    { label: 'Team Management', icon: 'team', route: '/admin/staff' },
+    { label: 'Affiliates & Payouts', icon: 'percentage', route: '/admin/affiliates' },
+    { label: 'Transactions', icon: 'dollar-circle', route: '/admin/transactions' }
   ];
 
   private routerSub!: Subscription;
 
-  constructor(private router: Router) { }
+  constructor(
+    private router: Router,
+    public appService:AppService
+  ) { }
 
   @HostListener('window:resize')
   onResize(): void {
@@ -83,6 +89,16 @@ export class SideNavComponent implements OnInit, OnDestroy {
       });
 
     this.updatePageTitle();
+    
+    this.loggedInUserDetails = this.appService.getMe();
+    console.log(this.loggedInUserDetails);
+
+    this.userName=this.loggedInUserDetails?.name
+    this.userRole = this.loggedInUserDetails?.role
+    console.log(this.loggedInUserDetails?.role,'this.loggedInUserDetails?.role')
+
+
+
   }
 
   ngOnDestroy(): void {
@@ -114,12 +130,48 @@ export class SideNavComponent implements OnInit, OnDestroy {
   }
 
   logout(): void {
-    // Clear persisted preferences on logout
-    localStorage.removeItem('ac-theme');
-    localStorage.removeItem('ac-sidebar-collapsed');
+    Swal.fire({
+      icon: 'question',
+      title: 'Are you sure you want to logout?',
+      showCancelButton: true,            // Shows the "Cancel" button
+      confirmButtonText: 'Yes, logout',  // Text for the confirm button
+      cancelButtonText: 'Cancel',        // Text for the cancel button
+      confirmButtonColor: '#ef4444',     // A nice red color for destructive actions (Tailwind red-500)
+    }).then((result) => {
+      
+      // result.isConfirmed is true ONLY if they click "Yes, logout"
+      if (result.isConfirmed) {
+        
+        // 1. Clear persisted preferences and tokens
+        localStorage.removeItem('ac-theme');
+        localStorage.removeItem('ac-sidebar-collapsed');
 
-    // Navigate to login — replace with your auth service call
-    this.router.navigate(['/login']);
+        // const token = localStorage.getItem('token');
+
+        localStorage.removeItem('me');
+        // localStorage.removeItem('token');
+
+        // 2. Call the backend logout API
+        this.appService.logout().subscribe({
+          next: (res: any) => {
+            console.log('Logged out successfully');
+            localStorage.removeItem('token');
+
+          },
+          error: (error: any) => {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: error?.error?.message || 'Something went wrong while logging out from the server.'
+            });
+          }
+        });
+
+        // 3. Navigate to login
+        this.router.navigate(['/admin/login']);
+      }
+      // If they click cancel, it does nothing and the modal just closes!
+    });
   }
 
   private updatePageTitle(): void {

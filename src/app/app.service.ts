@@ -74,15 +74,15 @@ export class AppService {
     if (isformData !== true) {
       headers = headers.set('content-type', 'application/json');
     }
-    if (localStorage.getItem('accountAccessToken') != null) {
+    if (localStorage.getItem('token') != null) {
       headers = headers.set(
         'Authorization',
-        'Bearer ' + localStorage.getItem('accountAccessToken')
+        'Bearer ' + localStorage.getItem('token')
       );
     } else {
       headers = headers.set(
         'Authorization',
-        'Bearer ' + localStorage.getItem('dupaccountAccessToken')
+        'Bearer ' + localStorage.getItem('token')
       );
     }
     return headers;
@@ -99,10 +99,78 @@ export class AppService {
     })
   }
 
+
+  public verify2FA(data:any,tempToken:any){
+    let headers = new HttpHeaders()
+    .set('X-Requested-With', 'XMLHttpRequest')
+      .set('Access-Control-Allow-Origin', '*')
+      .set('content-type', 'application/json')
+      .set('Authorization', 'Bearer ' + tempToken);
+
+    return this.http.post(this.apiEndpoint + '/api/admin/auth/login/2fa', data, { headers });
+  }
+
+  public completeSetup(data:any){
+    return this.post('/api/admin/auth/complete-setup', data)
+  }
+
   //getme 
   public UserDetails(){
     return this.get('/api/admin/users/me')
   }
 
+  public getMe(){
+    const meData = localStorage.getItem('me');
+    const dupMeData = localStorage.getItem('me');
+    if (meData != null) {
+      return JSON.parse(decodeURIComponent(atob(meData)));
+    } else if (dupMeData != null) {
+      return JSON.parse(decodeURIComponent(atob(dupMeData)));
+    } else {
+      this.navigateToLogin();
+      return null;
+    }
 
+  }
+
+
+
+  navigateToLogin() {
+    localStorage.removeItem('me');
+    localStorage.removeItem('token');
+    this.router.navigate(['/login']);
+  }
+
+  //logout api
+  public logout(){
+    return this.post('/api/admin/auth/logout','')
+  }
+
+
+
+  // Get all staff (uses the Base64 encoded ?q= JSON query)
+  public getStaffList(params: string = '') {
+    return this.get(`/api/admin/users${params}`); 
+  }
+
+  public getStaffById(id: string) {
+    return this.get(`/api/admin/users/${id}`);
+  }
+
+  public createStaff(data: any) {
+    return this.post('/api/admin/team', data);
+  }
+
+  public updateStaff(id: string, data: any) {
+    return this.put(`/api/admin/users/${id}`, data);
+  }
+
+  public deleteStaff(id: string) {
+    return this.delete(`/api/admin/users/${id}`);
+  }
+
+
+  public getAvailablePermissions() {
+    return this.get('/api/admin/permissions'); 
+  }
 }

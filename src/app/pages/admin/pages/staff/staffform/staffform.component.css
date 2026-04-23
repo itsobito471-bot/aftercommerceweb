@@ -1,0 +1,186 @@
+/* Layout Headers */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+  }
+  
+  .page-title {
+    font-family: var(--font-display);
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    margin: 0 0 0.25rem 0;
+    letter-spacing: -0.02em;
+  }
+  
+  .page-subtitle {
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+    margin: 0;
+  }
+  
+  .back-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    color: var(--color-text-primary);
+    font-family: var(--font-display);
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .back-btn:hover {
+    background: var(--glass-bg-hover);
+    border-color: var(--color-border-hover);
+    transform: translateX(-4px);
+  }
+  
+  /* Form Container */
+  .form-container {
+    position: relative;
+    width: 100%;
+  }
+  
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+  }
+  
+  @media (max-width: 768px) {
+    .form-grid {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+  }
+  
+  /* Validation Texts */
+  .error-text {
+    display: block;
+    font-size: 0.75rem;
+    color: #ef4444;
+    margin-top: 0.4rem;
+  }
+  
+  .helper-text {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--color-text-subtle);
+    margin-top: 0.4rem;
+  }
+  
+  /* Permissions Interactive Cards */
+  .permissions-section {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px dashed var(--glass-border);
+  }
+  
+  .permissions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+  }
+  
+  .permission-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 1rem;
+    border-radius: 10px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .permission-card:hover {
+    border-color: var(--color-border-hover);
+    background: var(--glass-bg-hover);
+  }
+  
+  .permission-card.active {
+    background: var(--color-accent-dim);
+    border-color: var(--color-accent-rim);
+  }
+  
+  .perm-checkbox {
+    width: 20px;
+    height: 20px;
+    border-radius: 6px;
+    border: 1.5px solid var(--color-border-strong);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-accent);
+    transition: all 0.2s ease;
+  }
+  
+  .permission-card.active .perm-checkbox {
+    border-color: var(--color-accent);
+    background: var(--color-accent-dim);
+  }
+  
+  .perm-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-text-primary);
+  }
+  
+  /* Submit Area */
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px dashed var(--glass-border);
+  }
+  
+  .submit-btn {
+    max-width: 250px;
+  }
+  
+  /* Loading State Overlay */
+  .loading-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(8, 12, 24, 0.7); /* Dark overlay */
+    backdrop-filter: blur(4px);
+    z-index: 10;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff; /* Explicitly white for dark overlay */
+    font-weight: 600;
+    transition: background 0.3s ease;
+  }
+  
+  /* Light Theme Override for Loading */
+  [data-theme="light"] .loading-overlay {
+    background: rgba(255, 255, 255, 0.7); /* Light overlay */
+    color: var(--color-text-primary);
+  }
+  
+  .spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid var(--glass-border-strong);
+    border-top-color: var(--color-accent);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 1rem;
+  }
+  
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
