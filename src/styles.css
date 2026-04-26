@@ -71,6 +71,112 @@ html, body {
   transition: background-color 0.4s ease, color 0.4s ease;
 }
 
+
+/* Page Breadcrumb / Label */
+.page-label-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.page-label-root {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-accent);
+}
+
+.page-label-sep { color: var(--color-text-subtle); font-size: 10px; }
+.page-label-current { font-size: 11px; font-weight: 500; color: var(--color-text-subtle); }
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.page-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.page-subtitle { font-size: 0.875rem; color: var(--color-text-muted); }
+
+/* Metrics Grid */
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.metric-card { display: flex; align-items: center; gap: 1rem; }
+.metric-icon {
+  width: 48px; height: 48px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+}
+.metric-value { font-size: 1.75rem; font-weight: 700; color: var(--color-text-primary); }
+.metric-label { font-size: 0.75rem; font-weight: 600; color: var(--color-text-muted); text-transform: uppercase; }
+
+/* Table Elements */
+.table-toolbar { margin-bottom: 1.5rem; }
+/* --- SEARCH BOX FIX --- */
+.search-box {
+  position: relative;
+  width: 100%;
+  max-width: 350px;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon {
+  position: absolute;
+  left: 16px; /* Position the icon 16px from the left edge */
+  color: var(--color-text-subtle);
+  pointer-events: none;
+  z-index: 10;
+  /* Ensures the icon stays centered vertically */
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.search-input {
+  /* This value MUST be larger than the icon width + left position */
+  /* 16px (left) + 18px (icon width) + 12px (gap) = 46px */
+  padding-left: 46px !important; 
+  width: 100%;
+}
+
+/* Optional: Slight glow to the icon when input is focused */
+.search-input:focus + .search-icon,
+.search-box:focus-within .search-icon {
+  color: var(--color-accent);
+}
+
+.user-cell { display: flex; align-items: center; gap: 0.75rem; }
+.avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-accent), #818cf8);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.75rem; font-weight: 700; color: #fff;
+}
+
+.action-btn {
+  background: transparent; border: none; cursor: pointer; padding: 6px;
+  border-radius: 6px; color: var(--color-text-muted); transition: all 0.2s ease;
+}
+.action-edit:hover { color: var(--color-accent); background: var(--color-accent-dim); }
+.action-delete:hover { color: #ef4444; background: rgba(239, 68, 68, 0.1); }
+
+.fw-600 { font-weight: 600; }
+.role-text { text-transform: capitalize; font-weight: 500; }
+
 /* ── 1. Glass Cards ── */
 .glass-card {
   background: var(--glass-bg);
@@ -228,3 +334,59 @@ html, body {
 
 @keyframes header-enter { from { opacity: 0; transform: translateY(-12px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes card-enter { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+
+/* ── 3. NG-ZORRO Table Glass Overrides (NUKED DIVIDERS) ── */
+
+/* Remove the vertical divider lines in the header once and for all */
+::ng-deep .glass-nz-table .ant-table-thead > tr > th::before {
+  display: none !important;
+  content: none !important;
+  background-color: transparent !important;
+}
+
+/* Force Table Background to be Transparent */
+::ng-deep .glass-nz-table .ant-table {
+  background: transparent !important;
+  color: var(--color-text-primary) !important;
+  border-radius: 12px !important;
+}
+
+/* Header Styling - No vertical lines, clean bottom border only */
+::ng-deep .glass-nz-table .ant-table-thead > tr > th {
+  background: var(--color-bg-elevated) !important;
+  color: var(--color-text-subtle) !important;
+  border-bottom: 1px solid var(--glass-border) !important;
+  border-right: none !important; /* Extra safety */
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* Body Cell Styling */
+::ng-deep .glass-nz-table .ant-table-tbody > tr > td {
+  border-bottom: 1px solid var(--glass-border-light) !important;
+  background: transparent !important;
+  transition: background 0.3s ease;
+}
+
+/* Fix "No Data" placeholder background */
+::ng-deep .glass-nz-table .ant-table-placeholder {
+  background: transparent !important;
+  border: none !important;
+}
+
+::ng-deep .glass-nz-table .ant-empty-normal {
+  color: var(--color-text-subtle) !important;
+  margin: 60px 0 !important;
+}
+
+/* Pagination Overrides */
+::ng-deep .glass-nz-table .ant-pagination-item,
+::ng-deep .glass-nz-table .ant-pagination-prev,
+::ng-deep .glass-nz-table .ant-pagination-next {
+  background: var(--glass-bg) !important;
+  border: 1px solid var(--glass-border) !important;
+  border-radius: 8px !important;
+}

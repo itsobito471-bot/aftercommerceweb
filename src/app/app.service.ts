@@ -173,4 +173,32 @@ export class AppService {
   public getAvailablePermissions() {
     return this.get('/api/admin/permissions'); 
   }
+
+
+  // ==========================================
+  // CATEGORY MANAGEMENT
+  // ==========================================
+
+  // Uses the /filter endpoint with Base64 ?q=
+  public getCategories(params: string = '') {
+    return this.get(`/api/admin/categories/filter${params}`);
+  }
+
+  public getCategoryById(id: string) {
+    // Note: If you don't have a specific GET /:id, 
+    // you can use the filter API with an ID or add one to the backend.
+    return this.get(`/api/admin/categories/filter?q=${btoa(JSON.stringify({search: id}))}`);
+  }
+
+  public createCategory(data: any) {
+    return this.post('/api/admin/categories', data);
+  }
+
+  public updateCategory(id: string, data: any) {
+    return this.put(`/api/admin/categories/${id}`, data);
+  }
+
+  public deleteCategory(id: string) {
+    return this.delete(`/api/admin/categories/${id}`);
+  }
 }

@@ -1,0 +1,30 @@
+<div class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">{{ isEditMode ? 'Edit Category' : 'Create Category' }}</h1>
+      <p class="page-subtitle">Define how courses are grouped in the storefront.</p>
+    </div>
+    <button class="back-btn" routerLink="../categories">
+      <span nz-icon nzType="arrow-left"></span> Back
+    </button>
+  </div>
+  
+  <div class="glass-card form-container">
+    <form [formGroup]="categoryForm" (ngSubmit)="onSubmit()">
+      <div class="glass-form-group">
+        <label class="glass-label">Category Name</label>
+        <input type="text" class="glass-input" formControlName="name" placeholder="e.g. Web Development">
+      </div>
+  
+      <div class="glass-form-group">
+        <label class="glass-label">Description (Optional)</label>
+        <textarea class="glass-input" formControlName="description" rows="4" placeholder="Briefly describe this category..."></textarea>
+      </div>
+  
+      <div class="form-actions">
+        <button type="submit" class="btn-primary" [disabled]="categoryForm.invalid || isLoading">
+          <span nz-icon [nzType]="isLoading ? 'loading' : 'save'"></span>
+          {{ isEditMode ? 'Update Category' : 'Create Category' }}
+        </button>
+      </div>
+    </form>
+  </div>

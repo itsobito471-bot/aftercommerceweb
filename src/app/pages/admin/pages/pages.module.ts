@@ -23,7 +23,13 @@ const routes: Routes = [
     path: 'profile',
     // Lazy load the Profile Module
     loadChildren: () => import('./profile/profile.module').then(m => m.ProfileModule)
-  }
+  },
+  {
+    path: 'courses',
+    // Lazy load the Profile Module
+    loadChildren: () => import('./course/course.module').then(m => m.CourseModule)
+  },
+
 ];
 
 @NgModule({

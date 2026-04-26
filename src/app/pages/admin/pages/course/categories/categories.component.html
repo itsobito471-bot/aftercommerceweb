@@ -1,0 +1,83 @@
+<div class="page-header animate-header">
+    <div class="header-content">
+        <div class="page-label-wrap">
+            <span class="page-label-root">Courses</span>
+            <span class="page-label-sep">›</span>
+            <span class="page-label-current">Categories</span>
+        </div>
+        <h1 class="page-title">Category Management</h1>
+        <p class="page-subtitle">Organize your courses into searchable groups.</p>
+    </div>
+
+    <button routerLink="../categories-form" class="btn-primary">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+        <span>Create Category</span>
+    </button>
+</div>
+
+<div class="glass-card animate-card-enter">
+    <div class="table-toolbar">
+        <div class="search-box">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" class="glass-input search-input" placeholder="Search categories..."
+                [(ngModel)]="searchQuery" (keyup.enter)="onSearch()">
+        </div>
+    </div>
+
+    <nz-table #categoryTable 
+              [nzData]="categories" 
+              [nzLoading]="isLoading" 
+              [nzFrontPagination]="false"
+              [nzTotal]="totalDocs"
+              [nzPageIndex]="page"
+              [nzPageSize]="pageSize"
+              [nzScroll]="{ y: '60vh' }"
+              (nzPageIndexChange)="onPageIndexChange($event)"
+              class="glass-nz-table">
+        <thead>
+            <tr>
+                <th nzWidth="25%">Category Name</th>
+                <th nzWidth="20%">URL Slug</th>
+                <th nzWidth="30%">Description</th>
+                <th nzWidth="10%">Status</th>
+                <th style="text-align: right;" nzWidth="15%">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let data of categoryTable.data">
+                <td>
+                    <div class="user-cell">
+                        <div class="avatar">
+                            <span nz-icon nzType="folder" nzTheme="outline"></span>
+                        </div>
+                        <span class="fw-600">{{ data.name }}</span>
+                    </div>
+                </td>
+                <td><code class="slug-text">{{ data.slug }}</code></td>
+                <td><span class="desc-text">{{ data.description || '—' }}</span></td>
+                <td>
+                    <span class="glass-badge"
+                        [ngClass]="data.is_active ? 'glass-badge--active' : 'glass-badge--inactive'">
+                        {{ data.is_active ? 'Active' : 'Inactive' }}
+                    </span>
+                </td>
+                <td style="text-align: right;">
+                    <button class="action-btn action-edit" (click)="editCategory(data._id)">
+                        <span nz-icon nzType="edit" nzTheme="outline"></span>
+                    </button>
+                    <button class="action-btn action-delete" (click)="toggleStatus(data)">
+                        <span nz-icon [nzType]="data.is_active ? 'eye-invisible' : 'eye'" nzTheme="outline"></span>
+                    </button>
+                </td>
+            </tr>
+        </tbody>
+    </nz-table>
+</div>

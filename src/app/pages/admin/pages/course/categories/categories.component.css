@@ -1,0 +1,33 @@
+/* Inherits header, search-box, and action-btn styles from your reference */
+
+.slug-text {
+    background: var(--color-accent-dim);
+    color: var(--color-accent);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.desc-text {
+    color: var(--color-text-muted);
+    font-size: 13px;
+    display: block;
+    max-width: 250px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Specific color for the folder icon avatar */
+.avatar {
+    background: linear-gradient(135deg, var(--color-accent), #34d399) !important;
+}
+
+.fw-600 {
+    font-weight: 600;
+}
+
+.text-muted {
+    color: var(--color-text-muted);
+}
