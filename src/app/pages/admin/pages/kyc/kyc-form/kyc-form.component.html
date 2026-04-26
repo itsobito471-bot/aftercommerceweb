@@ -1,0 +1,57 @@
+<div class="page-header animate-header">
+    <div class="header-content">
+        <h1 class="page-title">{{ isEditMode ? 'Edit Field' : 'Create Custom Field' }}</h1>
+        <p class="page-subtitle">Define a new question for the student onboarding process.</p>
+    </div>
+    <button class="action-btn" routerLink="../kyc-list" style="padding: 8px 16px; border: 1px solid var(--glass-border);">
+        <span nz-icon nzType="arrow-left"></span> Back to List
+    </button>
+</div>
+
+<div class="glass-card animate-card-enter" style="max-width: 600px;">
+    <form [formGroup]="fieldForm" (ngSubmit)="onSubmit()">
+        
+        <div class="glass-form-group" style="margin-bottom: 1.5rem;">
+            <label class="glass-label">Question / Label</label>
+            <input type="text" class="glass-input" formControlName="label" placeholder="e.g., Upload Government ID">
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+            <div class="glass-form-group">
+                <label class="glass-label">Input Type</label>
+                <select class="glass-select" formControlName="input_type">
+                    <option value="TEXT">Short Text</option>
+                    <option value="TEXTAREA">Long Paragraph</option>
+                    <option value="NUMBER">Number / Phone</option>
+                    <option value="DATE">Date Picker</option>
+                    <option value="FILE">Document Upload (PDF/Image)</option>
+                    <option value="DROPDOWN">Dropdown Menu</option>
+                </select>
+            </div>
+
+            <div class="glass-form-group">
+                <label class="glass-label">Display Order</label>
+                <input type="number" class="glass-input" formControlName="order_index" placeholder="e.g., 1">
+            </div>
+        </div>
+
+        <div class="glass-form-group" *ngIf="fieldForm.get('input_type')?.value === 'DROPDOWN'" style="margin-bottom: 1.5rem;">
+            <label class="glass-label">Dropdown Options (Comma separated)</label>
+            <textarea class="glass-input" formControlName="optionsText" rows="3" 
+                      placeholder="e.g., Undergraduate, Postgraduate, Working Professional"></textarea>
+            <span style="font-size: 11px; color: var(--color-text-subtle); margin-top: 4px; display: block;">
+                Separate each option with a comma.
+            </span>
+        </div>
+
+        <div class="glass-form-group" style="display: flex; align-items: center; gap: 10px; margin-bottom: 2rem;">
+            <input type="checkbox" formControlName="is_required" id="reqCheck" style="width: 16px; height: 16px; accent-color: var(--color-accent);">
+            <label for="reqCheck" style="color: var(--color-text-primary); cursor: pointer; font-size: 14px;">This field is mandatory for students to complete.</label>
+        </div>
+
+        <button type="submit" class="btn-primary" style="width: 100%;" [disabled]="fieldForm.invalid || isLoading">
+            <span nz-icon [nzType]="isLoading ? 'loading' : 'save'"></span>
+            {{ isEditMode ? 'Update Field' : 'Save Field' }}
+        </button>
+    </form>
+</div>

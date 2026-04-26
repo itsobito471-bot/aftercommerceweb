@@ -565,6 +565,20 @@
   }
 }
 
+@media (max-width: 420px) {
+  .topbar__right {
+    gap: 6px;
+  }
+
+  .topbar__search {
+    padding: 6px 10px;
+  }
+
+  .topbar__search-input {
+    width: 88px;
+  }
+}
+
 /* Notification dot */
 .topbar__notif-wrap {
   position: relative;

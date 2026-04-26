@@ -29,6 +29,11 @@ const routes: Routes = [
     // Lazy load the Profile Module
     loadChildren: () => import('./course/course.module').then(m => m.CourseModule)
   },
+  {
+    path: 'kyc',
+    // Lazy load the Profile Module
+    loadChildren: () => import('./kyc/kyc.module').then(m => m.KycModule)
+  },
 
 ];
 

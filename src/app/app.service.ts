@@ -201,4 +201,23 @@ export class AppService {
   public deleteCategory(id: string) {
     return this.delete(`/api/admin/categories/${id}`);
   }
+
+
+
+
+  // ==========================================
+  // DYNAMIC FORM BUILDER (KYC)
+  // ==========================================
+
+  public getKycFields() {
+    return this.get('/api/admin/kyc-fields');
+  }
+
+  public createKycField(data: any) {
+    return this.post('/api/admin/kyc-fields', data);
+  }
+
+  public updateKycField(id: string, data: any) {
+    return this.put(`/api/admin/kyc-fields/${id}`, data);
+  }
 }

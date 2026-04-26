@@ -48,7 +48,7 @@
       <ul class="sidebar__nav-list">
         <li *ngFor="let item of menuItems; let i = index" class="sidebar__nav-item" [class]="'stagger-' + (i + 1)">
           <a [routerLink]="item.route" routerLinkActive="sidebar__link--active"
-            [routerLinkActiveOptions]="{exact: false}" class="sidebar__link group"
+            [routerLinkActiveOptions]="{exact: true}" class="sidebar__link group"
             [class.sidebar__link--icon-only]="isSidebarCollapsed && windowWidth >= 768"
             [title]="isSidebarCollapsed ? item.label : ''" (click)="closeMobileSidebar()">
             <span class="sidebar__link-icon">
