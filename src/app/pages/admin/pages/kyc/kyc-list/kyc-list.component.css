@@ -1,0 +1,208 @@
+.form-preview-envelope {
+    max-width: 700px;
+    margin: 0 auto;
+    position: relative;
+    padding-bottom: 4rem;
+}
+
+/* Header Card (Top Border) */
+.form-preview-header {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-top: 8px solid var(--color-accent);
+    border-radius: 12px;
+    padding: 1.5rem 2rem;
+    margin-bottom: 1.25rem;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+}
+
+.preview-title {
+    margin: 0 0 6px 0;
+    color: var(--color-text-primary);
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.preview-subtitle {
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+}
+
+/* Field Card (Left Border) */
+.preview-field-card {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-left: 6px solid var(--color-accent);
+    border-radius: 12px;
+    padding: 1.5rem 2rem;
+    margin-bottom: 1.25rem;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+    transition: all 0.2s ease;
+}
+
+.preview-field-card:hover {
+    box-shadow: 0 8px 15px rgba(0,0,0,0.05);
+    border-color: var(--color-border-strong);
+}
+
+.card-header-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.field-preview-label {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-text-primary);
+}
+
+.required-asterisk {
+    color: #ef4444;
+    margin-left: 4px;
+}
+
+.field-preview-desc {
+    margin: -0.5rem 0 1rem 0;
+    font-size: 0.8rem;
+    color: var(--color-text-subtle);
+}
+
+/* The Action Pill */
+.action-pill {
+    display: flex;
+    align-items: center;
+    background: transparent;
+    border: 1px solid var(--glass-border-strong);
+    border-radius: 8px;
+    padding: 2px 6px;
+    gap: 6px;
+}
+
+.order-text {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--color-text-muted);
+    padding-right: 6px;
+    border-right: 1px solid var(--glass-border-strong);
+}
+
+.icon-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: var(--color-text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    border-radius: 4px;
+    transition: 0.2s;
+}
+
+.icon-btn:hover {
+    color: var(--color-accent);
+    background: var(--glass-bg-hover);
+}
+
+.icon-btn.active-icon {
+    color: #3b82f6; /* Blue tint for disabled state as seen in mockup */
+}
+
+/* Faux Inputs */
+.faux-input {
+    width: 100%;
+    background: var(--glass-bg-hover);
+    border: 1px solid var(--glass-border-light);
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+    color: var(--color-text-subtle);
+    font-family: inherit;
+    cursor: not-allowed;
+}
+
+.faux-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.faux-file {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1.5rem;
+    border-style: dashed;
+    border-color: var(--glass-border-strong);
+}
+
+/* Inactive State Styling */
+.inactive-field {
+    opacity: 0.6;
+    border-left-color: var(--glass-border-strong);
+}
+
+.inactive-tag {
+    font-size: 0.7rem;
+    color: #ef4444;
+    font-weight: 600;
+    margin-left: 8px;
+    text-transform: uppercase;
+}
+
+/* Drag Handle Grip (Hidden by default, shown on card hover) */
+.drag-handle-grip {
+    position: absolute;
+    left: -18px; 
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--color-text-subtle);
+    cursor: grab;
+    padding: 10px;
+    opacity: 0;
+    transition: opacity 0.2s ease, left 0.2s ease;
+}
+
+.preview-field-card:hover .drag-handle-grip {
+    opacity: 1;
+    left: 4px; /* Slides in neatly next to the green border */
+}
+
+.drag-handle-grip:active {
+    cursor: grabbing;
+}
+
+/* Push padding so text doesn't overlap the grip */
+.preview-field-card {
+    padding-left: 2.2rem !important; 
+    position: relative; /* Essential for the absolute grip */
+}
+
+/* Angular CDK Drag Classes (Makes it look pretty while dragging) */
+.cdk-drag-preview {
+    box-sizing: border-box;
+    border-radius: 12px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15) !important;
+    border: 1px solid var(--color-accent) !important;
+    border-left: 6px solid var(--color-accent) !important;
+    background: var(--color-bg-elevated) !important;
+    z-index: 1000;
+}
+
+.cdk-drag-placeholder {
+    opacity: 0.4;
+    border: 2px dashed var(--color-border-strong) !important;
+    background: transparent !important;
+    border-left: none !important;
+}
+
+.cdk-drag-animating {
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.cdk-drop-list-dragging .preview-field-card:not(.cdk-drag-placeholder) {
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}

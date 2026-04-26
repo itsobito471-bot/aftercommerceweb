@@ -1,68 +1,80 @@
 <div class="page-header animate-header">
     <div class="header-content">
-        <div class="page-label-wrap">
-            <span class="page-label-root">Settings</span>
-            <span class="page-label-sep">›</span>
-            <span class="page-label-current">Onboarding Fields</span>
-        </div>
-        <h1 class="page-title">Dynamic Form Builder</h1>
-        <p class="page-subtitle">Create custom KYC and profile fields for student onboarding.</p>
+        <h1 class="page-title">Onboarding Form Preview</h1>
+        <p class="page-subtitle">Drag and drop questions to reorder your student onboarding flow.</p>
     </div>
 
-    <button routerLink="../kyc-form" class="btn-primary">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-            stroke-linecap="round" stroke-linejoin="round">
-            <line x1="12" y1="5" x2="12" y2="19"></line>
-            <line x1="5" y1="12" x2="19" y2="12"></line>
-        </svg>
-        <span>Add New Field</span>
+    <button routerLink="kyc-form" class="btn-primary">
+        <span nz-icon nzType="plus"></span> Add New Field
     </button>
 </div>
 
-<div class="glass-card animate-card-enter">
-    <nz-table #kycTable 
-              [nzData]="fields" 
-              [nzLoading]="isLoading" 
-              [nzFrontPagination]="true"
-              [nzPageSize]="10"
-              class="glass-nz-table">
-        <thead>
-            <tr>
-                <th nzWidth="10%">Order</th>
-                <th nzWidth="30%">Field Label</th>
-                <th nzWidth="20%">Input Type</th>
-                <th nzWidth="15%">Requirement</th>
-                <th nzWidth="15%">Status</th>
-                <th nzWidth="10%" style="text-align: right;">Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr *ngFor="let data of kycTable.data">
-                <td><span class="fw-600 text-muted">#{{ data.order_index }}</span></td>
-                <td><span class="fw-600">{{ data.label }}</span></td>
-                <td>
-                    <code class="slug-text" style="font-size: 10px;">{{ data.input_type }}</code>
-                </td>
-                <td>
-                    <span [style.color]="data.is_required ? 'var(--color-accent)' : 'var(--color-text-subtle)'" class="fw-600">
-                        {{ data.is_required ? 'Mandatory' : 'Optional' }}
-                    </span>
-                </td>
-                <td>
-                    <span class="glass-badge"
-                        [ngClass]="data.is_active ? 'glass-badge--active' : 'glass-badge--inactive'">
-                        {{ data.is_active ? 'Active' : 'Inactive' }}
-                    </span>
-                </td>
-                <td style="text-align: right;">
-                    <button class="action-btn action-edit" (click)="editField(data._id)">
-                        <span nz-icon nzType="edit" nzTheme="outline"></span>
+<div class="form-preview-envelope animate-card-enter">
+    
+    <div *ngIf="isLoading || isSavingOrder" class="loading-overlay" style="border-radius: 12px;">
+        <div class="spinner"></div>
+        <p *ngIf="isSavingOrder" style="margin-top: 10px; font-weight: 600;">Saving Order...</p>
+    </div>
+
+    <div class="form-preview-header">
+        <h3 class="preview-title">Student KYC Setup</h3>
+        <p class="preview-subtitle">Please complete your profile to access the course catalog.</p>
+    </div>
+
+    <div *ngIf="!isLoading && fields.length === 0" class="glass-card" style="text-align: center; padding: 3rem;">
+        <p style="color: var(--color-text-muted);">No fields created yet.</p>
+    </div>
+
+    <div cdkDropList (cdkDropListDropped)="drop($event)">
+
+        <div *ngFor="let field of fields" cdkDrag class="preview-field-card" [class.inactive-field]="!field.is_active">
+            
+            <div class="drag-handle-grip" cdkDragHandle title="Drag to reorder">
+                <span nz-icon nzType="holder"></span>
+            </div>
+
+            <div class="card-header-flex">
+                <label class="field-preview-label">
+                    {{ field.label }} 
+                    <span *ngIf="field.is_required" class="required-asterisk">*</span>
+                    <span *ngIf="!field.is_active" class="inactive-tag">(Hidden)</span>
+                </label>
+
+                <div class="action-pill">
+                    <span class="order-text">#{{ field.order_index }}</span>
+                    <button class="icon-btn" (click)="editField(field._id)" title="Edit Field">
+                        <span nz-icon nzType="edit"></span>
                     </button>
-                    <button class="action-btn action-delete" (click)="toggleStatus(data)">
-                        <span nz-icon [nzType]="data.is_active ? 'eye-invisible' : 'eye'" nzTheme="outline"></span>
+                    <button class="icon-btn" (click)="toggleStatus(field)" [title]="field.is_active ? 'Hide Field' : 'Show Field'" [class.active-icon]="!field.is_active">
+                        <span nz-icon [nzType]="field.is_active ? 'eye' : 'eye-invisible'"></span>
                     </button>
-                </td>
-            </tr>
-        </tbody>
-    </nz-table>
+                </div>
+            </div>
+            
+            <p *ngIf="field.description" class="field-preview-desc">
+                {{ field.description }}
+            </p>
+
+            <div class="fake-input-wrapper">
+                <input *ngIf="field.input_type === 'TEXT' || field.input_type === 'NUMBER'" type="text" class="faux-input" disabled placeholder="Short answer text...">
+                
+                <textarea *ngIf="field.input_type === 'TEXTAREA'" class="faux-input" disabled rows="3" placeholder="Long answer text..."></textarea>
+                
+                <select *ngIf="field.input_type === 'DROPDOWN'" class="faux-input" disabled>
+                    <option value="" disabled selected>Select an option...</option>
+                </select>
+
+                <div *ngIf="field.input_type === 'DATE'" class="faux-input faux-flex">
+                    <span>dd/mm/yyyy</span>
+                    <span nz-icon nzType="calendar"></span>
+                </div>
+
+                <div *ngIf="field.input_type === 'FILE'" class="faux-input faux-file">
+                    <span nz-icon nzType="upload" style="font-size: 20px;"></span>
+                    <span style="margin-left: 10px;">Upload Document / Image</span>
+                </div>
+            </div>
+        </div>
+        
+    </div>
 </div>

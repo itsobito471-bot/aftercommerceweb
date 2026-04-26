@@ -1,3 +1,4 @@
+import { Location } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -19,7 +20,8 @@ export class CategoryFormComponent implements OnInit {
     private fb: FormBuilder,
     private appService: AppService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private location:Location
   ) {}
 
   ngOnInit(): void {
@@ -38,18 +40,24 @@ export class CategoryFormComponent implements OnInit {
 
   loadCategory(): void {
     this.isLoading = true;
-    // We use the filter API to find the specific category
-    const q = btoa(JSON.stringify({ search: this.categoryId }));
-    this.appService.getCategories(`?q=${q}`).subscribe((res: any) => {
-      if (res.success && res.data.length > 0) {
-        const cat = res.data[0];
-        this.categoryForm.patchValue({
-          name: cat.name,
-          description: cat.description,
-          is_active: cat.is_active
-        });
+    
+    // 🔥 Clean, direct API call by ID
+    this.appService.getCategoryById(this.categoryId!).subscribe({
+      next: (res: any) => {
+        if (res.success && res.data) {
+          const cat = res.data;
+          this.categoryForm.patchValue({
+            name: cat.name,
+            description: cat.description || '',
+            is_active: cat.is_active
+          });
+        }
+        this.isLoading = false;
+      },
+      error: () => {
+        this.isLoading = false;
+        Swal.fire('Error', 'Could not load category details.', 'error');
       }
-      this.isLoading = false;
     });
   }
 
@@ -70,5 +78,10 @@ export class CategoryFormComponent implements OnInit {
         this.router.navigate(['/admin/courses/categories']);
       });
     }
+  }
+
+  Back(){
+    this.location.back();
+    
   }
 }

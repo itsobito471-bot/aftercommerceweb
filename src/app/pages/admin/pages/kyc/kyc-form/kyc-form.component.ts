@@ -19,7 +19,7 @@ export class KycFormComponent implements OnInit {
     private appService: AppService,
     private route: ActivatedRoute,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.fieldForm = this.fb.group({
@@ -27,7 +27,7 @@ export class KycFormComponent implements OnInit {
       input_type: ['TEXT', Validators.required],
       order_index: [1, Validators.required],
       is_required: [true],
-      optionsText: [''] // A temporary text field to handle the comma-separated options
+      optionsText: ['']
     });
 
     this.fieldId = this.route.snapshot.paramMap.get('id');
@@ -38,18 +38,24 @@ export class KycFormComponent implements OnInit {
   }
 
   loadField(): void {
-    // In a real app, you might have a getById API, or you can filter from the list
-    this.appService.getKycFields().subscribe((res: any) => {
-      const field = res.data.find((f: any) => f._id === this.fieldId);
-      if (field) {
-        this.fieldForm.patchValue({
-          label: field.label,
-          input_type: field.input_type,
-          order_index: field.order_index,
-          is_required: field.is_required,
-          optionsText: field.options ? field.options.join(', ') : ''
-        });
-      }
+    this.isLoading = true;
+
+    this.appService.getKycFieldById(this.fieldId!).subscribe({
+      next: (res: any) => {
+        if (res.success && res.data) {
+          const field = res.data;
+          this.fieldForm.patchValue({
+            label: field.label,
+            description: field.description || '',
+            input_type: field.input_type,
+            order_index: field.order_index,
+            is_required: field.is_required,
+            optionsText: field.options ? field.options.join(', ') : ''
+          });
+        }
+        this.isLoading = false;
+      },
+      error: () => this.isLoading = false
     });
   }
 
@@ -59,7 +65,6 @@ export class KycFormComponent implements OnInit {
     this.isLoading = true;
     const formValue = this.fieldForm.value;
 
-    // Convert the comma-separated text back into an array for MongoDB
     let optionsArray: string[] = [];
     if (formValue.input_type === 'DROPDOWN' && formValue.optionsText) {
       optionsArray = formValue.optionsText.split(',').map((opt: string) => opt.trim()).filter((opt: string) => opt.length > 0);
@@ -73,16 +78,35 @@ export class KycFormComponent implements OnInit {
       options: optionsArray
     };
 
-    if (this.isEditMode && this.fieldId) {
-      this.appService.updateKycField(this.fieldId, payload).subscribe(() => {
-        Swal.fire({ title: 'Updated', text: 'Field updated successfully', icon: 'success', background: '#1e293b', color: '#f8fafc' });
-        this.router.navigate(['/admin/settings/kyc-list']);
-      });
-    } else {
-      this.appService.createKycField(payload).subscribe(() => {
-        Swal.fire({ title: 'Created', text: 'New onboarding field added', icon: 'success', background: '#1e293b', color: '#f8fafc' });
-        this.router.navigate(['/admin/settings/kyc-list']);
-      });
-    }
+    const request =
+      this.isEditMode && this.fieldId
+        ? this.appService.updateKycField(this.fieldId, payload)
+        : this.appService.createKycField(payload);
+
+    request.subscribe({
+      next: () => {
+        // FIXED SWAL STYLING
+        Swal.fire({
+          title: 'Success!',
+          text: 'Field saved successfully.',
+          icon: 'success',
+          background: 'var(--glass-bg)',
+          color: 'var(--color-text-primary)',
+          confirmButtonColor: '#10b981' // A nice green to match your theme's buttons
+        });
+        this.router.navigate(['/admin/kyc']);
+      },
+      error: () => {
+        this.isLoading = false;
+        // FIXED ERROR SWAL STYLING TOO
+        Swal.fire({
+          title: 'Error',
+          text: 'Failed to save field.',
+          icon: 'error',
+          background: 'var(--glass-bg)',
+          color: 'var(--color-text-primary)'
+        });
+      }
+    });
   }
 }

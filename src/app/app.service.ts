@@ -185,9 +185,8 @@ export class AppService {
   }
 
   public getCategoryById(id: string) {
-    // Note: If you don't have a specific GET /:id, 
-    // you can use the filter API with an ID or add one to the backend.
-    return this.get(`/api/admin/categories/filter?q=${btoa(JSON.stringify({search: id}))}`);
+    return this.get(`/api/admin/categories/${id}`); 
+    // ^ Adjust the URL prefix if your categories live under '/api/admin/course/categories' etc.
   }
 
   public createCategory(data: any) {
@@ -209,15 +208,20 @@ export class AppService {
   // DYNAMIC FORM BUILDER (KYC)
   // ==========================================
 
+
   public getKycFields() {
-    return this.get('/api/admin/kyc-fields');
+    return this.get('/api/admin/kyc/kyc-fields');
   }
 
   public createKycField(data: any) {
-    return this.post('/api/admin/kyc-fields', data);
+    return this.post('/api/admin/kyc/kyc-fields', data);
   }
 
   public updateKycField(id: string, data: any) {
-    return this.put(`/api/admin/kyc-fields/${id}`, data);
+    return this.put(`/api/admin/kyc/kyc-fields/${id}`, data);
+  }
+
+  public getKycFieldById(id: string) {
+    return this.get(`/api/admin/kyc/kyc-fields/${id}`);
   }
 }
