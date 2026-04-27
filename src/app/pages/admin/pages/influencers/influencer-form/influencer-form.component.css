@@ -1,0 +1,45 @@
+.form-divider {
+    border: none;
+    border-top: 1px dashed var(--glass-border-strong);
+    margin: 2rem 0 1.5rem 0;
+}
+
+.input-with-icon {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-with-icon .suffix {
+    position: absolute;
+    right: 15px;
+    font-weight: 700;
+    color: var(--color-text-subtle);
+}
+
+.custom-checkbox {
+    width: 18px; 
+    height: 18px; 
+    accent-color: var(--color-accent); 
+    cursor: pointer;
+}
+
+.helper-text {
+    font-size: 11px;
+    color: var(--color-text-subtle);
+    display: block;
+    margin-top: 4px;
+}
+
+/* Ensure grids are responsive */
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+@media (max-width: 768px) {
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+}

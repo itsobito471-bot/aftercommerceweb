@@ -224,4 +224,31 @@ export class AppService {
   public getKycFieldById(id: string) {
     return this.get(`/api/admin/kyc/kyc-fields/${id}`);
   }
+
+
+  // ==========================================
+  // INFLUENCER / AFFILIATE MANAGEMENT
+  // ==========================================
+
+  public getInfluencers() {
+    return this.get('/api/admin/influencer');
+  }
+
+  public getInfluencerById(id: string) {
+    return this.get(`/api/admin/influencer/${id}`);
+  }
+
+  public createInfluencer(data: any) {
+    return this.post('/api/admin/influencer', data);
+  }
+
+  public updateInfluencer(id: string, data: any) {
+    return this.put(`/api/admin/influencer/${id}`, data);
+  }
+
+
+  // app.service.ts
+  public getInfluencersFilter(q: string) {
+    return this.get(`/api/admin/influencer/filter?q=${q}`);
+  }
 }

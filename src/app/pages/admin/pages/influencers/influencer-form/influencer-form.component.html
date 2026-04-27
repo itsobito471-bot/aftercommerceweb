@@ -1,0 +1,85 @@
+<div class="page-header animate-header">
+    <div class="header-content">
+        <h1 class="page-title">{{ isEditMode ? 'Edit Influencer' : 'Configure New Influencer' }}</h1>
+        <p class="page-subtitle">Setup referral codes and financial percentages for your affiliate partners.</p>
+    </div>
+    <button class="back-btn" (click)="Back()">
+        <span nz-icon nzType="arrow-left"></span> Back to List
+    </button>
+</div>
+
+<div class="glass-card form-container animate-card-enter" style="width: 100%;">
+    
+    <div *ngIf="isLoading" class="loading-overlay">
+        <div class="spinner"></div>
+        <p>Processing...</p>
+    </div>
+
+    <form [formGroup]="influencerForm" (ngSubmit)="onSubmit()">
+        
+        <div class="form-grid">
+            <div class="glass-form-group">
+                <label class="glass-label">Full Name</label>
+                <input type="text" class="glass-input" formControlName="name" placeholder="Influencer's real name">
+            </div>
+
+            <div class="glass-form-group">
+                <label class="glass-label">Email Address</label>
+                <input type="email" class="glass-input" formControlName="email" placeholder="contact@influencer.com">
+                <span class="helper-text" *ngIf="isEditMode">Email cannot be changed after account creation.</span>
+            </div>
+        </div>
+
+        <div class="form-grid" style="margin-top: 1.5rem;">
+            <div class="glass-form-group">
+                <label class="glass-label">Phone Number</label>
+                <input type="tel" class="glass-input" formControlName="phone" placeholder="+1 (555) 000-0000">
+            </div>
+
+            <div class="glass-form-group">
+                <label class="glass-label">Unique Referral Code</label>
+                <input type="text" 
+                       class="glass-input" 
+                       formControlName="referral_code" 
+                       readonly 
+                       placeholder="Auto-generated..." 
+                       style="text-transform: uppercase; font-weight: 700; letter-spacing: 1px; cursor: not-allowed; background-color: rgba(255, 255, 255, 0.02);">
+                <span class="helper-text">This code is automatically generated based on the name and discount.</span>
+            </div>
+        </div>
+
+        <div class="form-grid" style="margin-top: 1.5rem;">
+            <div class="glass-form-group">
+                <label class="glass-label">Student Discount (%)</label>
+                <div class="input-with-icon">
+                    <input type="number" class="glass-input" formControlName="discount_percentage">
+                    <span class="suffix">%</span>
+                </div>
+            </div>
+
+            <div class="glass-form-group">
+                <label class="glass-label">Influencer Commission (%)</label>
+                <div class="input-with-icon">
+                    <input type="number" class="glass-input" formControlName="commission_percentage">
+                    <span class="suffix">%</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="glass-form-group" style="display: flex; align-items: center; gap: 10px; margin-top: 1.5rem;">
+            <input type="checkbox" formControlName="is_active" id="activeCheck" class="custom-checkbox">
+            <label for="activeCheck" style="color: var(--color-text-primary); cursor: pointer; font-size: 14px; font-weight: 600;">
+                Account is Active and Referral Code is valid
+            </label>
+        </div>
+
+        <hr class="form-divider">
+
+        <div style="display: flex; justify-content: flex-end;">
+            <button type="submit" class="btn-primary" [disabled]="influencerForm.invalid || isLoading">
+                <span nz-icon [nzType]="isLoading ? 'loading' : 'save'"></span>
+                {{ isEditMode ? 'Update Configuration' : 'Create & Send Credentials' }}
+            </button>
+        </div>
+    </form>
+</div>

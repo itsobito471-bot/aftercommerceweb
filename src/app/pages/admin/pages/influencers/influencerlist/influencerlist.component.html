@@ -1,0 +1,109 @@
+<div class="page-header animate-header">
+    <div class="header-content">
+        <div class="page-label-wrap">
+            <span class="page-label-root">Partners</span>
+            <span class="page-label-sep">›</span>
+            <span class="page-label-current">Influencers</span>
+        </div>
+        <h1 class="page-title">Influencer Management</h1>
+        <p class="page-subtitle">Organize and track your affiliate partners and their commissions.</p>
+    </div>
+
+    <button routerLink="form" class="btn-primary">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+        <span>Add Influencer</span>
+    </button>
+</div>
+
+<div class="metrics-grid">
+    </div>
+
+<div class="glass-card animate-card-enter">
+    <div class="table-toolbar">
+        <div class="search-box">
+            <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" class="glass-input search-input" placeholder="Search influencers..."
+                [(ngModel)]="searchValue" (keyup.enter)="onSearch()">
+        </div>
+    </div>
+
+    <nz-table #influencerTable 
+              [nzData]="influencers" 
+              [nzLoading]="isLoading" 
+              [nzTotal]="total"
+              [(nzPageIndex)]="pageIndex"
+              [(nzPageSize)]="pageSize"
+              [nzFrontPagination]="false"
+              (nzPageIndexChange)="onPageIndexChange($event)"
+              (nzPageSizeChange)="onPageSizeChange($event)"
+              [nzScroll]="{ x: '1000px', y: '60vh' }" 
+              class="glass-nz-table">
+            <thead>
+                <tr>
+                    <th nzWidth="25%">Influencer Name</th>
+                    <th nzWidth="15%">Referral Code</th>
+                    <th nzWidth="15%">Rates (Disc / Comm)</th>
+                    <th nzWidth="20%">Performance</th>
+                    <th nzWidth="10%">Status</th>
+                    <th nzWidth="15%" style="text-align: right;">Actions</th>
+                </tr>
+            </thead>
+        <tbody>
+            <tr *ngFor="let data of influencerTable.data">
+                
+                <td>
+                    <div class="user-cell">
+                        <div class="avatar">{{ data.name.charAt(0) | uppercase }}</div>
+                        <div style="display: flex; flex-direction: column;">
+                            <span class="fw-600">{{ data.name }}</span>
+                            <span class="text-muted" style="font-size: 12px; margin-top: 2px;">{{ data.email }}</span>
+                        </div>
+                    </div>
+                </td>
+
+                <td>
+                    <span style="background: var(--color-accent); color: #fff; padding: 4px 10px; border-radius: 6px; font-weight: 700; font-size: 12px; letter-spacing: 1px;">
+                        {{ data.influencer_profile?.referral_code || 'N/A' }}
+                    </span>
+                </td>
+
+                <td>
+                    <span class="role-text" style="font-weight: 600;">
+                        {{ data.influencer_profile?.discount_percentage }}% / {{ data.influencer_profile?.commission_percentage }}%
+                    </span>
+                </td>
+
+                <td>
+                    <div style="display: flex; flex-direction: column; gap: 2px;">
+                        <span class="text-muted" style="font-size: 13px;">{{ data.influencer_profile?.metrics?.total_referrals || 0 }} Users</span>
+                        <span class="fw-600" style="color: #10b981; font-size: 13px;">₹{{ data.influencer_profile?.metrics?.total_earnings || 0 }}</span>
+                    </div>
+                </td>
+
+                <td>
+                    <span class="glass-badge"
+                        [ngClass]="data.is_active ? 'glass-badge--active' : 'glass-badge--inactive'">
+                        {{ data.is_active ? 'Active' : 'Inactive' }}
+                    </span>
+                </td>
+
+                <td style="text-align: right;">
+                    <button class="action-btn action-edit" (click)="editInfluencer(data._id)" title="Edit">
+                        <span nz-icon nzType="edit" nzTheme="outline"></span>
+                    </button>
+                    <button class="action-btn action-delete" (click)="toggleStatus(data)" [title]="data.is_active ? 'Deactivate' : 'Activate'">
+                        <span nz-icon [nzType]="data.is_active ? 'stop' : 'check-circle'" nzTheme="outline"></span>
+                    </button>
+                </td>
+            </tr>
+        </tbody>
+    </nz-table>
+</div>
