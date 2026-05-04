@@ -7,59 +7,107 @@
    ========================================================= */
 
 :root {
-  --font-display: 'Inter', system-ui, -apple-system, sans-serif;
+  /* ── After Commerce — core palette ── */
+  --color-brand-blue:   #2B4788;
+  --color-deep-blue:    #1E3494;
+  --color-sky-blue:     #4A63CC;
+  --color-navy-dark:    #1A1A2E;
+  --color-off-white:    #F5F2EF;
+  --color-cta:          #FF6B35;
+  --color-success:      #0F9D58;
+  --color-white:        #FFFFFF;
 
-  /* ── Dark Theme Variables ── */
-  --color-bg-deep:      #0b1120;
-  --color-bg-surface:   #0f172a;
-  --color-bg-elevated:  #1e293b;
+  --font-display: 'Poppins', sans-serif;
+
+  /* ── Radii (subtle geometric, 6–10px) ── */
+  --radius-sm:          6px;
+  --radius-md:          8px;
+  --radius-lg:          10px;
+  --radius-card:        var(--radius-md);
+  --radius-button:      var(--radius-md);
+
+  /* ── Typography scale ── */
+  --text-display-size:  48px;
+  --text-display-lh:    1.1;
+  --text-h1-size:       35px;
+  --text-h1-lh:         1.15;
+  --text-h2-size:       24px;
+  --text-h2-lh:         1.25;
+  --text-h3-size:       17px;
+  --text-h3-lh:         1.3;
+  --text-body-min:      14px;
+  --text-body-lh:       1.5;
+  --font-weight-heading: 700;
+
+  /* ── Icon stroke ── */
+  --icon-stroke-width:  2px;
+  --icon-stroke-join:   round;
+
+  /* ── Dark theme (Dark Navy base) ── */
+  --color-bg-deep:      var(--color-navy-dark);
+  --color-bg-surface:   #222238;
+  --color-bg-elevated:  #2a2a44;
   --color-border:       rgba(255, 255, 255, 0.12);
   --color-border-hover: rgba(255, 255, 255, 0.22);
   --color-border-strong:rgba(255, 255, 255, 0.35);
 
-  /* NEW EMERALD ACCENT */
-  --color-accent:       #10b981;  /* Emerald-500 */
-  --color-accent-dim:   rgba(16, 185, 129, 0.15);
-  --color-accent-rim:   rgba(16, 185, 129, 0.4);
+  /* Brand blue = active / standard brand chrome */
+  --color-accent:       var(--color-brand-blue);
+  --color-accent-dim:   rgba(43, 71, 136, 0.22);
+  --color-accent-rim:   rgba(43, 71, 136, 0.45);
+  --color-cta-dim:      rgba(255, 107, 53, 0.22);
+  --color-cta-rim:      rgba(255, 107, 53, 0.45);
 
-  --color-text-primary: #f8fafc;
-  --color-text-muted:   #cbd5e1;
-  --color-text-subtle:  #94a3b8;
+  --color-text-primary: var(--color-off-white);
+  --color-text-muted:   rgba(245, 242, 239, 0.78);
+  --color-text-subtle:  rgba(245, 242, 239, 0.55);
 
-  --glass-bg:           rgba(255, 255, 255, 0.04);
-  --glass-bg-hover:     rgba(255, 255, 255, 0.08);
+  --glass-bg:           rgba(255, 255, 255, 0.05);
+  --glass-bg-hover:     rgba(255, 255, 255, 0.1);
   --glass-border:       rgba(255, 255, 255, 0.12);
-  --glass-border-light: rgba(255, 255, 255, 0.06);
-  --glass-shadow:       0 16px 40px rgba(0, 0, 0, 0.4);
-  
-  --orb-hue-1: rgba(16, 185, 129, 0.15); 
-  --orb-hue-2: rgba(99, 102, 241, 0.12);
-  --mesh-color: rgba(255, 255, 255, 0.03);
+  --glass-border-light: rgba(255, 255, 255, 0.07);
+  --glass-shadow:       0 16px 40px rgba(0, 0, 0, 0.45);
+
+  --orb-hue-1: rgba(43, 71, 136, 0.2);
+  --orb-hue-2: rgba(255, 107, 53, 0.12);
+  --mesh-color: rgba(255, 255, 255, 0.04);
 }
 
 [data-theme="light"] {
-  --color-bg-deep:      #f0fdfa;
-  --color-bg-surface:   #ffffff;
-  --color-bg-elevated:  #f1f5f9;
-  --color-border:       rgba(15, 23, 42, 0.1);
-  --color-border-hover: rgba(15, 23, 42, 0.2);
-  --color-border-strong:rgba(15, 23, 42, 0.4);
+  --color-bg-deep:      var(--color-off-white);
+  --color-bg-surface:   var(--color-white);
+  --color-bg-elevated:  #ebe6e1;
+  --color-border:       rgba(26, 26, 46, 0.1);
+  --color-border-hover: rgba(26, 26, 46, 0.2);
+  --color-border-strong:rgba(26, 26, 46, 0.35);
 
-  /* Emerald-600 for contrast */
-  --color-accent:       #059669;  
-  --color-text-primary: #0f172a;
-  --color-text-muted:   #475569;
-  --color-text-subtle:  #64748b;
+  --color-accent:       var(--color-brand-blue);
+  --color-accent-dim:   rgba(43, 71, 136, 0.12);
+  --color-accent-rim:   rgba(43, 71, 136, 0.35);
+  --color-cta-dim:      rgba(255, 107, 53, 0.15);
+  --color-cta-rim:      rgba(255, 107, 53, 0.35);
 
-  --glass-bg:           rgba(255, 255, 255, 0.75);
-  --glass-bg-hover:     rgba(255, 255, 255, 0.95);
-  --glass-border:       rgba(15, 23, 42, 0.08);
-  --glass-border-light: rgba(15, 23, 42, 0.05);
-  --glass-shadow:       0 12px 32px rgba(15, 23, 42, 0.06);
+  --color-text-primary: var(--color-navy-dark);
+  --color-text-muted:   #3d3d55;
+  --color-text-subtle:  #5c5c72;
+
+  --glass-bg:           rgba(255, 255, 255, 0.82);
+  --glass-bg-hover:     rgba(255, 255, 255, 0.96);
+  --glass-border:       rgba(26, 26, 46, 0.08);
+  --glass-border-light: rgba(26, 26, 46, 0.05);
+  --glass-shadow:       0 12px 32px rgba(26, 26, 46, 0.08);
+
+  --orb-hue-1: rgba(43, 71, 136, 0.08);
+  --orb-hue-2: rgba(255, 107, 53, 0.06);
+  --mesh-color: rgba(26, 26, 46, 0.03);
 }
 
 /* ── Base Reset ── */
 *, *::before, *::after { box-sizing: border-box; }
+
+html {
+  font-size: 16px;
+}
 
 html, body {
   height: 100%;
@@ -67,8 +115,47 @@ html, body {
   background-color: var(--color-bg-deep);
   color: var(--color-text-primary);
   font-family: var(--font-display);
+  font-size: var(--text-body-min);
+  line-height: var(--text-body-lh);
   -webkit-font-smoothing: antialiased;
   transition: background-color 0.4s ease, color 0.4s ease;
+}
+
+/* ── After Commerce — typographic utilities ── */
+.type-display {
+  font-family: var(--font-display);
+  font-size: var(--text-display-size);
+  line-height: var(--text-display-lh);
+  font-weight: var(--font-weight-heading);
+}
+
+.type-h1 {
+  font-family: var(--font-display);
+  font-size: var(--text-h1-size);
+  line-height: var(--text-h1-lh);
+  font-weight: var(--font-weight-heading);
+}
+
+.type-h2 {
+  font-family: var(--font-display);
+  font-size: var(--text-h2-size);
+  line-height: var(--text-h2-lh);
+  font-weight: var(--font-weight-heading);
+}
+
+.type-h3 {
+  font-family: var(--font-display);
+  font-size: var(--text-h3-size);
+  line-height: var(--text-h3-lh);
+  font-weight: var(--font-weight-heading);
+}
+
+/* Outline icons: 2px stroke + rounded stroke joins (2px corner feel) */
+app-root svg[fill="none"],
+app-root svg:not([fill]) {
+  stroke-width: var(--icon-stroke-width);
+  stroke-linecap: round;
+  stroke-linejoin: var(--icon-stroke-join);
 }
 
 
@@ -99,14 +186,15 @@ html, body {
 }
 
 .page-title {
-  font-size: 1.75rem;
-  font-weight: 700;
+  font-size: var(--text-h1-size);
+  line-height: var(--text-h1-lh);
+  font-weight: var(--font-weight-heading);
   color: var(--color-text-primary);
   margin: 0;
   letter-spacing: -0.02em;
 }
 
-.page-subtitle { font-size: 0.875rem; color: var(--color-text-muted); }
+.page-subtitle { font-size: var(--text-body-min); line-height: var(--text-body-lh); color: var(--color-text-muted); }
 
 /* Metrics Grid */
 .metrics-grid {
@@ -118,11 +206,11 @@ html, body {
 
 .metric-card { display: flex; align-items: center; gap: 1rem; }
 .metric-icon {
-  width: 48px; height: 48px; border-radius: 12px;
+  width: 48px; height: 48px; border-radius: var(--radius-lg);
   display: flex; align-items: center; justify-content: center;
 }
 .metric-value { font-size: 1.75rem; font-weight: 700; color: var(--color-text-primary); }
-.metric-label { font-size: 0.75rem; font-weight: 600; color: var(--color-text-muted); text-transform: uppercase; }
+.metric-label { font-size: 0.75rem; font-weight: 600; color: var(--color-text-muted); }
 
 /* Table Elements */
 .table-toolbar { margin-bottom: 1.5rem; }
@@ -162,7 +250,7 @@ html, body {
 .user-cell { display: flex; align-items: center; gap: 0.75rem; }
 .avatar {
   width: 32px; height: 32px; border-radius: 50%;
-  background: linear-gradient(135deg, var(--color-accent), #818cf8);
+  background: linear-gradient(135deg, var(--color-brand-blue), var(--color-sky-blue));
   display: flex; align-items: center; justify-content: center;
   font-size: 0.75rem; font-weight: 700; color: #fff;
 }
@@ -183,7 +271,7 @@ html, body {
   backdrop-filter: blur(28px) saturate(1.5);
   -webkit-backdrop-filter: blur(28px) saturate(1.5);
   border: 1px solid var(--glass-border);
-  border-radius: 16px;
+  border-radius: var(--radius-card);
   box-shadow: var(--glass-shadow);
   padding: 1.5rem;
   transition: all 0.3s ease;
@@ -196,22 +284,22 @@ html, body {
   justify-content: center;
   gap: 0.5rem;
   padding: 0.65rem 1.25rem;
-  border-radius: 10px;
-  border: 1px solid var(--color-accent); 
-  background: var(--color-accent);
-  color: #ffffff; 
+  border-radius: var(--radius-button);
+  border: 1px solid var(--color-cta);
+  background: var(--color-cta);
+  color: var(--color-white);
   font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 4px 14px var(--color-accent-dim);
+  box-shadow: 0 4px 14px var(--color-cta-dim);
   transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
   white-space: nowrap;
 }
 
 .btn-primary:hover {
   background: transparent;
-  color: var(--color-accent);
+  color: var(--color-cta);
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px var(--color-accent-dim);
+  box-shadow: 0 6px 20px var(--color-cta-dim);
 }
 
 .btn-primary:active {
@@ -222,7 +310,7 @@ html, body {
 .glass-nz-table .ant-table {
   background: transparent !important;
   color: var(--color-text-primary) !important;
-  border-radius: 12px !important;
+  border-radius: var(--radius-lg) !important;
   overflow: hidden;
 }
 
@@ -246,8 +334,7 @@ html, body {
   border-bottom: 1px solid var(--glass-border) !important;
   font-size: 0.75rem;
   font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.02em;
 }
 
 .glass-nz-table .ant-table-tbody > tr > td {
@@ -314,7 +401,7 @@ html, body {
   padding: 0.75rem 1rem;
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
-  border-radius: 10px;
+  border-radius: var(--radius-lg);
   color: var(--color-text-primary);
   outline: none;
   transition: all 0.25s ease;
@@ -350,7 +437,7 @@ html, body {
 ::ng-deep .glass-nz-table .ant-table {
   background: transparent !important;
   color: var(--color-text-primary) !important;
-  border-radius: 12px !important;
+  border-radius: var(--radius-lg) !important;
 }
 
 /* Header Styling - No vertical lines, clean bottom border only */
@@ -361,8 +448,7 @@ html, body {
   border-right: none !important; /* Extra safety */
   font-size: 0.75rem;
   font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.02em;
 }
 
 /* Body Cell Styling */
@@ -490,7 +576,7 @@ html, body {
   background: rgba(8, 12, 24, 0.7); 
   backdrop-filter: blur(4px);
   z-index: 10;
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -526,7 +612,7 @@ html, body {
   /* Reduce card padding so content fits */
   .glass-card {
     padding: 1rem;
-    border-radius: 14px;
+    border-radius: var(--radius-lg);
   }
 
   /* Page headers: keep structure, allow wrapping */
@@ -537,7 +623,7 @@ html, body {
   }
 
   .page-title {
-    font-size: 1.35rem;
+    font-size: clamp(1.5rem, 5vw, var(--text-h1-size));
   }
 
   /* Buttons should not force horizontal overflow */
@@ -593,7 +679,7 @@ html, body {
 
 @media (max-width: 420px) {
   .page-title {
-    font-size: 1.25rem;
+    font-size: clamp(1.35rem, 6vw, var(--text-h1-size));
   }
 
   .metric-value {
@@ -612,7 +698,7 @@ html, body {
 .glass-nz-select .ant-select-selector {
   background: var(--glass-bg) !important;
   border: 1px solid var(--glass-border) !important;
-  border-radius: 10px !important;
+  border-radius: var(--radius-lg) !important;
   height: 40px !important; /* Matches your glass-input height */
   align-items: center;
   box-shadow: none !important;
@@ -646,7 +732,7 @@ html, body {
   background: var(--glass-bg) !important;
   backdrop-filter: blur(28px) saturate(1.5);
   border: 1px solid var(--glass-border) !important;
-  border-radius: 10px !important;
+  border-radius: var(--radius-lg) !important;
   padding: 4px !important;
 }
 

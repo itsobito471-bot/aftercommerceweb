@@ -19,9 +19,9 @@
     text-overflow: ellipsis;
 }
 
-/* Specific color for the folder icon avatar */
+/* Folder icon avatar — After Commerce brand (blue → sky blue) */
 .avatar {
-    background: linear-gradient(135deg, var(--color-accent), #34d399) !important;
+    background: linear-gradient(135deg, var(--color-brand-blue), var(--color-sky-blue)) !important;
 }
 
 .fw-600 {
