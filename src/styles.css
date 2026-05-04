@@ -604,3 +604,67 @@ html, body {
     max-height: 46vh;
   }
 }
+
+
+/* ── Global Ng-Zorro Select Glass Styling ── */
+
+/* 1. The main input box */
+.glass-nz-select .ant-select-selector {
+  background: var(--glass-bg) !important;
+  border: 1px solid var(--glass-border) !important;
+  border-radius: 10px !important;
+  height: 40px !important; /* Matches your glass-input height */
+  align-items: center;
+  box-shadow: none !important;
+  transition: all 0.25s ease !important;
+}
+
+/* Fix the text color and centering inside the select */
+.glass-nz-select .ant-select-selection-item {
+  color: var(--color-text-primary) !important;
+  line-height: 38px !important;
+}
+
+/* The dropdown arrow color */
+.glass-nz-select .ant-select-arrow {
+  color: var(--color-text-subtle) !important;
+}
+
+/* Hover & Focus States (Matches your glass-input focus) */
+.glass-nz-select:hover .ant-select-selector {
+  border-color: var(--color-accent) !important;
+}
+
+.glass-nz-select.ant-select-focused .ant-select-selector {
+  border-color: var(--color-accent) !important;
+  background: var(--color-bg-surface) !important;
+  box-shadow: 0 0 0 3px var(--color-accent-dim) !important;
+}
+
+/* 2. The Floating Dropdown Menu */
+.ant-select-dropdown {
+  background: var(--glass-bg) !important;
+  backdrop-filter: blur(28px) saturate(1.5);
+  border: 1px solid var(--glass-border) !important;
+  border-radius: 10px !important;
+  padding: 4px !important;
+}
+
+/* Individual items in the dropdown */
+.ant-select-item {
+  color: var(--color-text-primary) !important;
+  border-radius: 6px !important;
+  margin-bottom: 2px;
+}
+
+/* Hovering over an item */
+.ant-select-item-option-active:not(.ant-select-item-option-disabled) {
+  background: var(--glass-bg-hover) !important;
+}
+
+/* The currently selected item */
+.ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
+  background: var(--color-accent-dim) !important;
+  color: var(--color-accent) !important;
+  font-weight: 600 !important;
+}
