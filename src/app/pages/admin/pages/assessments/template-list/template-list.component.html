@@ -37,6 +37,7 @@
         </div>
     </div>
 
+    <!-- FIX: Removed y: '60vh' from nzScroll. Global CSS handles it cleanly now! -->
     <nz-table #templateTable 
               [nzData]="templatesList" 
               [nzLoading]="isLoading" 
@@ -45,7 +46,7 @@
               [nzPageIndex]="pageIndex"
               [nzPageSize]="pageSize"
               (nzQueryParams)="onQueryParamsChange($event)"
-              [nzScroll]="{ x: '1000px', y: '60vh' }"
+              [nzScroll]="{ x: '800px' }"
               class="glass-nz-table">
         <thead>
             <tr>
@@ -53,16 +54,16 @@
                 <th nzWidth="15%">Type</th>
                 <th nzWidth="15%">Duration</th>
                 <th nzWidth="15%">Passing Score</th>
-                <th nzWidth="25%" style="text-align: right;">Actions</th>
+                <!-- FIX: Used nzAlign for perfect Ng-Zorro right-alignment -->
+                <th nzWidth="25%" nzAlign="right">Actions</th>
             </tr>
         </thead>
         <tbody>
             <tr *ngFor="let data of templateTable.data">
                 <td>
-                    <span class="fw-600" style="color: white;">{{ data.title }}</span>
+                    <span class="fw-600">{{ data.title }}</span>
                 </td>
                 
-                <!-- Using your global badge system. Reusing 'active' for QUIZ and 'inactive' for SURVEY as a clean fallback -->
                 <td>
                     <span class="glass-badge" [ngClass]="data.type === 'QUIZ' ? 'glass-badge--active' : 'glass-badge--inactive'">
                         {{ data.type }}
@@ -79,21 +80,24 @@
                     <span *ngIf="!data.passing_score">N/A</span>
                 </td>
 
-                <td style="text-align: right;">
-                    <!-- Edit Settings -->
-                    <button class="action-btn action-edit" nz-tooltip nzTooltipTitle="Edit Settings" (click)="editTemplateSetup(data._id)">
-                        <span nz-icon nzType="setting" nzTheme="outline"></span>
-                    </button>
-                    
-                    <!-- Build Questions (Reusing edit class but applying a green override for distinction) -->
-                    <button class="action-btn action-edit" style="color: #52c41a; background: rgba(82, 196, 26, 0.1); margin-left: 8px;" nz-tooltip nzTooltipTitle="Manage Questions" (click)="openQuestionBuilder(data._id)">
-                        <span nz-icon nzType="form" nzTheme="outline"></span>
-                    </button>
-                    
-                    <!-- Delete -->
-                    <button class="action-btn action-delete" style="margin-left: 8px;" nz-tooltip nzTooltipTitle="Delete" (click)="deleteTemplate(data._id)">
-                        <span nz-icon nzType="delete" nzTheme="outline"></span>
-                    </button>
+                <!-- FIX: Wrapped buttons in a flexbox for perfect vertical centering and spacing -->
+                <td nzAlign="right">
+                    <div style="display: flex; justify-content: flex-end; gap: 8px; align-items: center;">
+                        <!-- Edit Settings -->
+                        <button class="action-btn action-edit" nz-tooltip nzTooltipTitle="Edit Settings" (click)="editTemplateSetup(data._id)">
+                            <span nz-icon nzType="setting" nzTheme="outline"></span>
+                        </button>
+                        
+                        <!-- Build Questions (Now uses 'Growth Green' from your brand book) -->
+                        <button class="action-btn action-edit" style="color: #0F9D58; background: rgba(15, 157, 88, 0.1);" nz-tooltip nzTooltipTitle="Manage Questions" (click)="openQuestionBuilder(data._id)">
+                            <span nz-icon nzType="form" nzTheme="outline"></span>
+                        </button>
+                        
+                        <!-- Delete -->
+                        <button class="action-btn action-delete" nz-tooltip nzTooltipTitle="Delete" (click)="deleteTemplate(data._id)">
+                            <span nz-icon nzType="delete" nzTheme="outline"></span>
+                        </button>
+                    </div>
                 </td>
             </tr>
         </tbody>

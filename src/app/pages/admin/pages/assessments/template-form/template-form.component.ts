@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AppService } from 'src/app/app.service';
 import { NzMessageService } from 'ng-zorro-antd/message';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-template-form',
@@ -21,7 +22,8 @@ export class TemplateFormComponent implements OnInit {
     private appService: AppService,
     private router: Router,
     private route: ActivatedRoute,
-    private msg: NzMessageService
+    private msg: NzMessageService,
+    private location:Location
   ) {}
 
   ngOnInit(): void {
@@ -116,5 +118,9 @@ export class TemplateFormComponent implements OnInit {
 
   cancel(): void {
     this.router.navigate(['/admin/assessment-templates']);
+  }
+
+  Back(){
+    this.location.back();
   }
 }

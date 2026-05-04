@@ -1,0 +1,6 @@
+/* Ensure the textarea matches the glass-input design but allows vertical resizing */
+textarea.glass-input {
+    resize: vertical;
+    min-height: 80px;
+    line-height: 1.5;
+}

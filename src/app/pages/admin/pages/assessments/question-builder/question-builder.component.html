@@ -1,1 +1,127 @@
-<p>question-builder works!</p>
+<div class="page-header animate-header">
+    <div class="header-content">
+        <div class="page-label-wrap">
+            <span class="page-label-root">Templates</span>
+            <span class="page-label-sep">›</span>
+            <span class="page-label-root" style="cursor:pointer;" routerLink="/admin/assessment-templates">Assessment Templates</span>
+            <span class="page-label-sep">›</span>
+            <span class="page-label-current">Builder</span>
+        </div>
+        <h1 class="page-title">Question Builder</h1>
+        <p class="page-subtitle">Designing: <strong style="color: var(--color-accent);">{{ templateTitle }}</strong></p>
+    </div>
+
+    <!-- Right side header actions -->
+    <div style="display: flex; gap: 16px; align-items: center;">
+        <div class="glass-badge glass-badge--active" style="font-size: 14px; padding: 8px 16px;">
+            Total Score: {{ getTotalScore() }} Pts
+        </div>
+        <button class="back-btn" (click)="goBack()">
+            <span nz-icon nzType="setting"></span> Back to Settings
+        </button>
+    </div>
+</div>
+
+<div class="form-container" style="max-width: 900px; margin: 0 auto; position: relative;">
+    
+    <div *ngIf="isFetching" class="loading-overlay">
+        <div class="spinner"></div>
+        <span>Loading questions...</span>
+    </div>
+
+    <form [formGroup]="builderForm" *ngIf="!isFetching">
+        
+        <!-- MAIN QUESTION LOOP -->
+        <div formArrayName="questions">
+            <div *ngFor="let question of questions.controls; let qIndex=index" [formGroupName]="qIndex" 
+                 class="glass-card animate-card-enter" style="margin-bottom: 24px; padding: 24px;">
+                
+                <!-- Card Header: Title & Actions -->
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--glass-border-light); padding-bottom: 16px; margin-bottom: 16px;">
+                    <h3 style="margin: 0; font-size: 1.1rem; color: var(--color-text-primary);">Question {{ qIndex + 1 }}</h3>
+                    <button type="button" class="action-btn action-delete" nz-tooltip nzTooltipTitle="Remove Question" (click)="removeQuestion(qIndex)">
+                        <i nz-icon nzType="delete" nzTheme="outline"></i>
+                    </button>
+                </div>
+
+                <!-- Row 1: Type & Points -->
+                <div nz-row [nzGutter]="24">
+                    <div nz-col nzSpan="24" nzMd="16">
+                        <div class="glass-form-group">
+                            <label class="glass-label">Question Type</label>
+                            <nz-select class="glass-nz-select" formControlName="input_type" style="width: 100%;" (ngModelChange)="onTypeChange(qIndex)">
+                                <nz-option nzValue="MCQ" nzLabel="Multiple Choice (MCQ)"></nz-option>
+                                <nz-option nzValue="CHECKBOX" nzLabel="Multiple Select (Checkbox)"></nz-option>
+                                <nz-option nzValue="TEXT_SHORT" nzLabel="Short Text / Essay"></nz-option>
+                            </nz-select>
+                        </div>
+                    </div>
+                    <div nz-col nzSpan="24" nzMd="8">
+                        <div class="glass-form-group">
+                            <label class="glass-label">Points</label>
+                            <input type="number" class="glass-input" formControlName="points" min="0" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Row 2: Question Text -->
+                <div class="glass-form-group">
+                    <label class="glass-label">Question Text <span style="color: #ef4444;">*</span></label>
+                    <textarea class="glass-input" formControlName="label" rows="2" placeholder="Type your question here..."></textarea>
+                </div>
+
+                <!-- DYNAMIC AREA: Options (Only shows if MCQ or CHECKBOX) -->
+                <div *ngIf="question.get('input_type')?.value === 'MCQ' || question.get('input_type')?.value === 'CHECKBOX'" 
+                     style="background: rgba(0,0,0,0.15); padding: 16px; border-radius: 12px; border: 1px solid var(--glass-border-light);">
+                    
+                    <label class="glass-label" style="margin-bottom: 12px;">Answer Options</label>
+                    
+                    <div formArrayName="options_config">
+                        <div *ngFor="let opt of getOptions(qIndex).controls; let optIndex=index" [formGroupName]="optIndex" 
+                             style="display: flex; gap: 12px; align-items: center; margin-bottom: 12px;">
+                            
+                            <!-- Identifier (A, B, C) -->
+                            <div style="width: 36px; height: 36px; display: flex; justify-content: center; align-items: center; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 8px; color: var(--color-accent); font-weight: bold;">
+                                {{ opt.get('id')?.value }}
+                            </div>
+
+                            <!-- Option Text -->
+                            <input type="text" class="glass-input" formControlName="text" placeholder="Option text" style="flex: 1;" />
+                            
+                            <!-- Mark as Correct Checkbox -->
+                            <label nz-checkbox formControlName="isCorrect" style="color: var(--color-text-subtle);">
+                                Correct
+                            </label>
+
+                            <!-- Remove Option Button -->
+                            <button type="button" class="action-btn action-delete" (click)="removeOption(qIndex, optIndex)" *ngIf="getOptions(qIndex).length > 2">
+                                <i nz-icon nzType="close"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <button type="button" class="btn-primary" style="background: transparent; border-color: var(--color-text-subtle); color: var(--color-text-subtle); padding: 4px 12px; font-size: 12px; margin-top: 8px;" (click)="addOption(qIndex)">
+                        + Add Option
+                    </button>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Add Question Button with clear margin to prevent overlaps -->
+        <div style="text-align: center; margin: 40px 0 120px 0;">
+            <button type="button" class="btn-primary" style="background: var(--glass-bg); border-color: var(--color-accent); color: var(--color-accent);" (click)="addQuestion()">
+                <i nz-icon nzType="plus"></i> Add Another Question
+            </button>
+        </div>
+
+        <!-- Sticky Footer for Save with Glass effect and border -->
+        <div class="form-actions" style="position: sticky; bottom: 0; background: var(--glass-bg); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); padding: 24px 0; z-index: 50; border-top: 1px solid var(--glass-border); margin-top: 0; display: flex; justify-content: center;">
+            <button type="button" class="btn-primary submit-btn" [disabled]="isLoading" (click)="saveQuestions()" style="width: 100%; max-width: 300px; box-shadow: 0 8px 24px var(--color-accent-dim);">
+                <span>Save All Questions</span>
+                <div *ngIf="isLoading" class="spinner" style="width: 18px; height: 18px; border-width: 2px; margin: 0 0 0 8px;"></div>
+            </button>
+        </div>
+
+    </form>
+</div>

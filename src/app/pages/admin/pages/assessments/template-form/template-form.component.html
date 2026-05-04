@@ -10,9 +10,15 @@
         <h1 class="page-title">{{ isEditMode ? 'Edit Template Settings' : 'Create New Template' }}</h1>
         <p class="page-subtitle">Set up the basic rules and configuration for your assessment.</p>
     </div>
+
+
+
+    <button class="back-btn" (click)="Back()">
+        <span nz-icon nzType="arrow-left"></span> Back to List
+    </button>
 </div>
 
-<div class="glass-card animate-card-enter form-container" style="max-width: 900px;">
+<div class="glass-card animate-card-enter form-container" style="max-width: 100%;">
 
     <!-- Global Loading Overlay -->
     <div *ngIf="isFetching" class="loading-overlay">
@@ -74,7 +80,7 @@
 
         <!-- Global Form Actions -->
         <div class="form-actions">
-            <button type="button" class="back-btn" (click)="cancel()">Cancel</button>
+            <!-- <button type="button" class="back-btn" (click)="cancel()">Cancel</button> -->
             <button type="submit" class="btn-primary submit-btn" [disabled]="isLoading">
                 <span>{{ isEditMode ? 'Save Changes' : 'Save & Continue to Questions' }}</span>
                 <i nz-icon nzType="arrow-right" *ngIf="!isEditMode && !isLoading"></i>
