@@ -39,6 +39,11 @@ const routes: Routes = [
     // Lazy load the Profile Module
     loadChildren: () => import('./influencers/influencers.module').then(m => m.InfluencersModule)
   },
+  {
+    path: 'assessment-templates',
+    // Lazy load the Profile Module
+    loadChildren: () => import('./assessments/assessments.module').then(m => m.AssessmentsModule)
+  },
 
 ];
 

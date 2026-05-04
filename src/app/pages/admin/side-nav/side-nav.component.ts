@@ -35,6 +35,7 @@ export class SideNavComponent implements OnInit, OnDestroy {
     { label: 'Dashboard', icon: 'dashboard', route: '/admin/home' },
     { label: 'Students', icon: 'user', route: '/admin/students' },
     { label: 'Kyc', icon: 'form', route: '/admin/kyc' },
+    { label: 'Assessment Templates', icon: 'node-collapse', route: '/admin/assessment-templates' },
     { label: 'Categories', icon: 'appstore', route: '/admin/courses/categories' },
     { label: 'Course Catalog', icon: 'book', route: '/admin/courses' },
     { label: 'Team Management', icon: 'team', route: '/admin/staff' },

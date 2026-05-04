@@ -251,4 +251,43 @@ export class AppService {
   public getInfluencersFilter(q: string) {
     return this.get(`/api/admin/influencer/filter?q=${q}`);
   }
+
+
+
+  // ==========================================
+  // ASSESSMENT TEMPLATES (PHASE 1)
+  // ==========================================
+
+  public getAssessmentTemplates(params: string = '') {
+    return this.get(`/api/admin/assessments${params}`);
+  }
+
+  public getAssessmentTemplateById(id: string) {
+    return this.get(`/api/admin/assessments/${id}`);
+  }
+
+  public createAssessmentTemplate(data: any) {
+    return this.post('/api/admin/assessments', data);
+  }
+
+  public updateAssessmentTemplate(id: string, data: any) {
+    return this.put(`/api/admin/assessments/${id}`, data);
+  }
+
+  public deleteAssessmentTemplate(id: string) {
+    return this.delete(`/api/admin/assessments/${id}`);
+  }
+
+  // ==========================================
+  // ASSESSMENT TEMPLATE FIELDS / QUESTIONS (PHASE 2)
+  // ==========================================
+
+  public getTemplateFields(templateId: string) {
+    return this.get(`/api/admin/assessments/${templateId}/fields`);
+  }
+
+  public syncTemplateFields(templateId: string, data: any) {
+    // Expecting data to be { fields: [...] }
+    return this.put(`/api/admin/assessments/${templateId}/fields/sync`, data);
+  }
 }
