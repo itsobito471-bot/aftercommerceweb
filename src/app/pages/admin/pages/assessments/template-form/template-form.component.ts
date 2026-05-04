@@ -83,7 +83,8 @@ export class TemplateFormComponent implements OnInit {
             this.isLoading = false;
             if (res && res.success) {
               this.msg.success('Template updated successfully.');
-              this.router.navigate(['/admin/assessment-templates']);
+              // WIZARD FLOW: Push them to Step 2 (Questions) instead of back to the list!
+              this.router.navigate(['/admin/assessment-templates', this.templateId, 'builder']);
             }
           },
           error: (err) => this.handleError(err)
@@ -94,6 +95,7 @@ export class TemplateFormComponent implements OnInit {
             this.isLoading = false;
             if (res && res.success) {
               this.msg.success('Template created! Now add your questions.');
+              // This is already perfectly routing to Step 2
               this.router.navigate(['/admin/assessment-templates', res.data._id, 'builder']);
             }
           },

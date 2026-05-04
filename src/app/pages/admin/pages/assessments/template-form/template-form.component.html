@@ -80,10 +80,10 @@
 
         <!-- Global Form Actions -->
         <div class="form-actions">
-            <!-- <button type="button" class="back-btn" (click)="cancel()">Cancel</button> -->
             <button type="submit" class="btn-primary submit-btn" [disabled]="isLoading">
-                <span>{{ isEditMode ? 'Save Changes' : 'Save & Continue to Questions' }}</span>
-                <i nz-icon nzType="arrow-right" *ngIf="!isEditMode && !isLoading"></i>
+                <!-- WIZARD FLOW: Always indicate they are moving to the next step -->
+                <span>Save & Continue to Questions</span>
+                <i nz-icon nzType="arrow-right" *ngIf="!isLoading"></i>
                 <div *ngIf="isLoading" class="spinner" style="width: 18px; height: 18px; border-width: 2px; margin: 0 0 0 8px;"></div>
             </button>
         </div>
