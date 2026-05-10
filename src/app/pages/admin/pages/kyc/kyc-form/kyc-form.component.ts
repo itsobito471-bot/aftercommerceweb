@@ -1,3 +1,4 @@
+import { Location } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -18,7 +19,8 @@ export class KycFormComponent implements OnInit {
     private fb: FormBuilder,
     private appService: AppService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private location:Location
   ) { }
 
   ngOnInit(): void {
@@ -108,5 +110,11 @@ export class KycFormComponent implements OnInit {
         });
       }
     });
+  }
+
+
+  back(){
+    this.location.back();
+
   }
 }

@@ -754,3 +754,43 @@ app-root svg:not([fill]) {
   color: var(--color-accent) !important;
   font-weight: 600 !important;
 }
+
+@media (max-width: 768px) {
+  .form-grid,
+  .metrics-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .nz-row {
+    width: 100%;
+  }
+
+  .nz-row > .ant-col,
+  .nz-row > [class*="ant-col-"] {
+    flex: 0 0 100%;
+    max-width: 100%;
+    width: 100%;
+  }
+
+  .page-header {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .glass-card {
+    padding: 16px;
+  }
+
+  .form-actions {
+    flex-wrap: wrap;
+  }
+
+  .form-actions .submit-btn,
+  .form-actions .back-btn {
+    width: 100%;
+  }
+
+  .glass-nz-table .ant-table-content {
+    overflow-x: auto !important;
+  }
+}

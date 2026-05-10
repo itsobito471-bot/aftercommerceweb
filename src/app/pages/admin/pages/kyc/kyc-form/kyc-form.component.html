@@ -3,7 +3,7 @@
         <h1 class="page-title">{{ isEditMode ? 'Edit Field' : 'Create Custom Field' }}</h1>
         <p class="page-subtitle">Configure the specific inputs for your student onboarding.</p>
     </div>
-    <button class="back-btn" routerLink="../">
+    <button class="back-btn" (click)="back()">
         <span nz-icon nzType="arrow-left"></span> Back to Preview
     </button>
 </div>
