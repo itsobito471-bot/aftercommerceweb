@@ -122,9 +122,9 @@ export default function KycFieldFormPage({ params }: { params: { id?: string[] }
         <button 
           type="button" 
           onClick={() => router.push('/admin/kyc')}
-          className="flex items-center gap-2 border border-[var(--glass-border)] bg-[var(--color-bg-surface)] px-4 py-2 text-xs font-bold text-[var(--color-text-primary)] rounded-lg shadow-sm hover:bg-[var(--glass-bg-hover)] transition-all select-none active:scale-98"
+          className="action-btn back-btn"
         >
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <line x1="19" y1="12" x2="5" y2="12"></line>
             <polyline points="12 19 5 12 12 5"></polyline>
           </svg>
@@ -133,7 +133,7 @@ export default function KycFieldFormPage({ params }: { params: { id?: string[] }
       </div>
 
       {/* Form Card Container */}
-      <div className="bg-[var(--color-bg-surface)] border border-[var(--glass-border)] rounded-xl shadow-lg p-8 form-container animate-card-enter max-w-2xl relative">
+      <div className="bg-[var(--color-bg-surface)] border border-[var(--glass-border)] rounded-xl shadow-md p-8 form-container animate-card-enter max-w-3xl relative">
         
         {/* Processing Spinner Overlay */}
         {isLoading && (
@@ -230,7 +230,7 @@ export default function KycFieldFormPage({ params }: { params: { id?: string[] }
               checked={isRequired}
               onChange={(e) => setIsRequired(e.target.checked)}
               id="isRequiredCheck" 
-              className="h-5 w-5 cursor-pointer rounded border-slate-300 dark:border-slate-700 text-[#1E3494] focus:ring-[#1E3494] transition-colors"
+              className="h-5 w-5 cursor-pointer rounded border-slate-350 dark:border-slate-700 text-[#1E3494] focus:ring-[#1E3494] transition-colors"
             />
             <label htmlFor="isRequiredCheck" className="text-sm font-bold text-[var(--color-text-primary)] cursor-pointer">
               Mandatory Field (Students cannot skip this)
@@ -238,7 +238,7 @@ export default function KycFieldFormPage({ params }: { params: { id?: string[] }
           </div>
 
           {/* Divider */}
-          <div className="border-t border-dashed border-slate-200 dark:border-slate-700/60 my-6"></div>
+          <div className="border-t border-dashed border-[var(--glass-border)] my-6"></div>
 
           {/* Submit Button */}
           <div className="flex justify-end select-none">

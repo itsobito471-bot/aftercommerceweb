@@ -12,10 +12,35 @@ export default function AdminNotFoundPage() {
   const router = useRouter();
 
   return (
-    <div className="flex flex-col items-center justify-center py-12 animate-fade-in select-none">
+    <div className="space-y-6 animate-fade-in max-w-7xl select-none">
       
-      {/* Glassmorphic 404 Card inside layout container */}
-      <div className="glass-card text-center max-w-md p-10 rounded-2xl shadow-xl flex flex-col items-center bg-[var(--glass-bg)] border border-[var(--glass-border)] backdrop-blur-xl">
+      {/* Page Header */}
+      <div className="page-header select-none">
+        <div className="header-content">
+          <div className="page-label-wrap">
+            <span className="page-label-root">Error</span>
+            <span className="page-label-sep">›</span>
+            <span className="page-label-current">404</span>
+          </div>
+          <h1 className="page-title text-[var(--color-text-primary)] font-bold tracking-tight">
+            Content Not Found
+          </h1>
+          <p className="page-subtitle text-slate-500 mt-1">
+            The requested page does not exist or has been moved.
+          </p>
+        </div>
+        
+        <button 
+          type="button" 
+          onClick={() => router.push('/admin')}
+          className="flex items-center gap-2 border border-[var(--glass-border)] bg-[var(--color-bg-surface)] px-4 py-2 text-xs font-bold text-[var(--color-text-primary)] rounded-lg shadow-sm hover:bg-[var(--glass-bg-hover)] transition-all select-none active:scale-98 cursor-pointer"
+        >
+          Back to Dashboard
+        </button>
+      </div>
+
+      {/* Main Card */}
+      <div className="glass-card rounded-2xl shadow-xl animate-card-enter bg-[var(--color-bg-surface)] border border-[var(--glass-border)] flex flex-col items-center justify-center p-10 min-h-[500px] md:min-h-[600px]">
         
         {/* Mascot Element */}
         <div className="flex flex-col items-center mb-6">
@@ -31,18 +56,18 @@ export default function AdminNotFoundPage() {
         <h1 className="text-6xl font-extrabold tracking-tight bg-gradient-to-r from-orange-400 to-[#FF6B35] bg-clip-text text-transparent">
           404
         </h1>
-        <h2 className="text-lg font-bold text-[var(--color-text-primary)] mt-3">
-          Content Not Found
+        <h2 className="text-lg font-bold text-[var(--color-text-primary)] mt-3 text-center">
+          Page Not Found
         </h2>
-        <p className="text-xs text-[var(--color-text-muted)] leading-relaxed mt-2.5 max-w-xs">
+        <p className="text-xs text-[var(--color-text-muted)] text-center leading-relaxed mt-2.5 max-w-xs">
           The dashboard guide scanned this admin directory, but the requested page does not exist or has been moved.
         </p>
 
         {/* Dashed Separator */}
-        <div className="w-full border-t border-dashed border-[var(--glass-border)] my-6"></div>
+        <div className="w-full max-w-xs border-t border-dashed border-[var(--glass-border)] my-6"></div>
 
         {/* Action Buttons */}
-        <div className="flex gap-3 w-full justify-center">
+        <div className="flex gap-3 w-full max-w-xs justify-center">
           <button
             type="button"
             onClick={() => router.back()}
