@@ -20,12 +20,12 @@
     <div class="sidebar__brand">
       <img
         *ngIf="(isSidebarCollapsed && windowWidth >= 768) && !isMobileOpen"
-        src="assets/images/logo-icon.png"
+        src="assets/images/logo-icon.svg"
         alt="After Commerce"
         class="sidebar__brand-logo"
       />
       <div *ngIf="(!isSidebarCollapsed && windowWidth >= 768) || isMobileOpen" class="sidebar__brand-text">
-        <img src="assets/images/logo.png" alt="After Commerce" class="sidebar__brand-logo" />
+        <img src="assets/images/logo-icon.svg" alt="After Commerce" class="sidebar__brand-logo" />
       </div>
 
       <button class="sidebar__mobile-close ml-auto" *ngIf="isMobileOpen" (click)="closeMobileSidebar()">
