@@ -278,7 +278,7 @@ app-root svg:not([fill]) {
   transition: all 0.3s ease;
 }
 
-/* ── 2. Primary Button (Color Swap) ── */
+/* ── 2. Primary Button (Vibrant Orange Premium styling) ── */
 .btn-primary {
   display: inline-flex;
   align-items: center;
@@ -286,28 +286,114 @@ app-root svg:not([fill]) {
   gap: 0.5rem;
   padding: 0.65rem 1.25rem;
   border-radius: var(--radius-button);
-  border: 1px solid var(--color-cta);
-  background: linear-gradient(180deg, #FF7A4C 0%, var(--color-cta) 55%, #F04F18 100%);
+  border: 2px solid transparent;
+  background: linear-gradient(135deg, #FF7D47 0%, var(--color-cta) 100%);
   color: var(--color-white);
   font-weight: 600;
   cursor: pointer;
-  box-shadow:
-    0 14px 30px rgba(255, 107, 53, 0.28),
-    0 6px 0 rgba(0, 0, 0, 0.18),
-    inset 0 1px 0 rgba(255, 255, 255, 0.28);
+  box-shadow: 0 8px 20px rgba(255, 107, 53, 0.25);
   transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
   white-space: nowrap;
 }
 
 .btn-primary:hover {
-  background: transparent;
-  color: var(--color-cta);
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px var(--color-cta-dim);
+  background: var(--color-off-white) !important;
+  color: var(--color-cta) !important;
+  border-color: var(--color-cta) !important;
+  box-shadow: 0 10px 25px rgba(255, 107, 53, 0.15);
 }
 
 .btn-primary:active {
-  transform: translateY(0) scale(0.97);
+  transform: translateY(0);
+  box-shadow: 0 4px 10px rgba(255, 107, 53, 0.2);
+  scale: 0.98;
+}
+
+/* ── 3. Standard Glass Table styling (React markup matches) ── */
+.glass-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: transparent;
+}
+
+.glass-table th {
+  background: var(--color-bg-elevated) !important;
+  color: var(--color-text-subtle) !important;
+  border-bottom: 1px solid var(--glass-border) !important;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  padding: 14px 24px;
+  text-align: left;
+}
+
+.glass-table th:first-child {
+  border-top-left-radius: 8px;
+  border-bottom-left-radius: 8px;
+}
+
+.glass-table th:last-child {
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
+  text-align: right;
+}
+
+.glass-table td {
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--glass-border-light) !important;
+  background: transparent !important;
+  color: var(--color-text-primary) !important;
+  font-weight: 500;
+  vertical-align: middle;
+}
+
+.glass-table td:last-child {
+  text-align: right;
+}
+
+.glass-table tbody tr {
+  transition: background 0.25s ease;
+}
+
+.glass-table tbody tr:hover td {
+  background: var(--glass-bg-hover) !important;
+}
+
+/* ── 3a. Custom Pagination Buttons ── */
+.glass-pagination-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid var(--glass-border);
+  background: var(--glass-bg);
+  color: var(--color-text-primary);
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.glass-pagination-btn:hover:not(:disabled) {
+  border-color: var(--color-accent);
+  background: var(--color-bg-surface);
+  color: var(--color-accent);
+  box-shadow: 0 4px 12px var(--color-accent-dim);
+}
+
+.glass-pagination-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.glass-pagination-btn--active {
+  border-color: var(--color-accent) !important;
+  background: var(--color-accent-dim) !important;
+  color: var(--color-accent) !important;
 }
 
 /* ── 3. NG-ZORRO Table Glass Overrides ── */

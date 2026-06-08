@@ -104,7 +104,7 @@ export default function StaffListPage() {
   };
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-6 animate-fade-in max-w-7xl">
       
       {/* Page Header */}
       <div className="page-header animate-header">
@@ -210,9 +210,9 @@ export default function StaffListPage() {
               No staff members found matching parameters.
             </div>
           ) : (
-            <table className="w-full text-left border-collapse">
+            <table className="glass-table">
               <thead>
-                <tr className="border-b border-slate-800/80 bg-slate-900/60 text-xs font-bold uppercase tracking-wider text-slate-400 select-none">
+                <tr className="select-none">
                   <th className="px-6 py-4">Name</th>
                   <th className="px-6 py-4">Email Address</th>
                   <th className="px-6 py-4">Role</th>
@@ -222,24 +222,24 @@ export default function StaffListPage() {
               </thead>
               <tbody className="divide-y divide-slate-800/40 text-sm">
                 {staffList.map((staff) => (
-                  <tr key={staff._id} className="hover:bg-slate-900/25 transition-colors">
+                  <tr key={staff._id} className="transition-colors">
                     {/* Name cell with Avatar */}
                     <td className="px-6 py-4">
                       <div className="user-cell">
                         <div className="avatar select-none">
                           {staff.name.charAt(0).toUpperCase()}
                         </div>
-                        <span className="font-semibold text-slate-200">{staff.name}</span>
+                        <span className="font-semibold text-[var(--color-text-primary)]">{staff.name}</span>
                       </div>
                     </td>
 
                     {/* Email cell */}
-                    <td className="px-6 py-4 text-slate-400">
+                    <td className="px-6 py-4 text-[var(--color-text-muted)]">
                       {staff.email}
                     </td>
 
                     {/* Role badge cell */}
-                    <td className="px-6 py-4 text-slate-300 capitalize">
+                    <td className="px-6 py-4 text-[var(--color-text-muted)] capitalize">
                       {staff.role.replace('_', ' ')}
                     </td>
 

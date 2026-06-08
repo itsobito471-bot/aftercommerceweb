@@ -180,7 +180,7 @@ export default function StaffFormPage({ params }: { params: { id?: string[] } })
   };
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-6 animate-fade-in max-w-7xl">
       
       {/* Page Header */}
       <div className="page-header select-none">

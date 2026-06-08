@@ -5,6 +5,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { getAdminProfile } from '../../../services/adminApi';
 import { User } from '../../../types/admin-lms';
 import { useCharacterStore, CharacterEmotion } from '../../../store/characterStore';
+import logoIcon from '@/assets/images/logo-icon.svg';
 
 // Supported emotional states for the guide mascot
 const emotionColorMap: Record<CharacterEmotion, string> = {
@@ -338,13 +339,19 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       >
         {/* Brand Header */}
         <div className="sidebar__brand">
-          <div className="sidebar__logo-icon">
-            <span className="text-sm font-bold text-white">L</span>
-          </div>
-          {(!isSidebarCollapsed || windowWidth < 768) && (
+          {isSidebarCollapsed && windowWidth >= 768 ? (
+            <img 
+              src={logoIcon.src} 
+              alt="After Commerce" 
+              className="sidebar__brand-logo-collapsed h-8 w-auto object-contain mx-auto" 
+            />
+          ) : (
             <div className="sidebar__brand-text select-none">
-              <span className="sidebar__logo-text">AfterCommerce</span>
-              <span className="sidebar__logo-subtext">LMS Platform</span>
+              <img 
+                src={logoIcon.src} 
+                alt="After Commerce" 
+                className="sidebar__brand-logo h-8 w-auto object-contain" 
+              />
             </div>
           )}
           
