@@ -186,7 +186,7 @@ export default function StaffFormPage({ params }: { params: { id?: string[] } })
       <div className="page-header select-none">
         <div className="header-content">
           <h1 className="page-title">{isEditMode ? 'Edit Staff Member' : 'Add Staff Member'}</h1>
-          <p className="page-subtitle text-slate-400">
+          <p className="page-subtitle text-[var(--color-text-muted)]">
             {isEditMode 
               ? 'Update account details, role, and module permissions.' 
               : 'Create a new administrative account and send an email invite link.'}
@@ -296,7 +296,7 @@ export default function StaffFormPage({ params }: { params: { id?: string[] } })
 
           {/* Module Permissions Grid (rendered only for RESTRICTED staff roles) */}
           {role === 'staff' && (
-            <div className="permissions-section border-t border-slate-800/40 pt-6 animate-fade-in">
+            <div className="permissions-section border-t border-dashed border-[var(--glass-border)] pt-6 animate-fade-in">
               <label className="glass-label mb-4 block select-none">Module Permissions</label>
               
               <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 md:grid-cols-4">
@@ -306,12 +306,16 @@ export default function StaffFormPage({ params }: { params: { id?: string[] } })
                     <div 
                       key={perm.value} 
                       onClick={() => togglePermission(perm.value)}
-                      className={`flex cursor-pointer items-center gap-3 rounded-xl border border-slate-800/80 bg-slate-950/20 p-3 select-none hover:bg-slate-900/40 hover:border-slate-700/60 transition-all ${
-                        isActive ? 'border-indigo-500/50 bg-indigo-500/5 shadow-md shadow-indigo-500/5' : ''
+                      className={`flex cursor-pointer items-center gap-3 rounded-xl border p-3 select-none transition-all ${
+                        isActive 
+                          ? 'border-[var(--color-accent)] bg-[var(--color-accent-dim)]' 
+                          : 'border-[var(--glass-border-strong)] bg-[var(--glass-bg)] hover:bg-[var(--glass-bg-hover)]'
                       }`}
                     >
-                      <div className={`flex h-4 w-4 shrink-0 items-center justify-center rounded border border-slate-700 transition-colors ${
-                        isActive ? 'bg-indigo-600 border-indigo-500 text-white' : 'bg-slate-950/40'
+                      <div className={`flex h-5 w-5 shrink-0 items-center justify-center rounded border transition-colors ${
+                        isActive 
+                          ? 'bg-[var(--color-accent)] border-[var(--color-accent)] text-white' 
+                          : 'bg-transparent border-[var(--glass-border-strong)]'
                       }`}>
                         {isActive && (
                           <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
@@ -319,7 +323,7 @@ export default function StaffFormPage({ params }: { params: { id?: string[] } })
                           </svg>
                         )}
                       </div>
-                      <span className="text-xs font-semibold text-slate-350 truncate">{perm.label}</span>
+                      <span className="text-xs font-semibold text-[var(--color-text-primary)] truncate">{perm.label}</span>
                     </div>
                   );
                 })}

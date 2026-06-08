@@ -213,11 +213,10 @@ export const createCourse = async (payload: Partial<Course>): Promise<Course> =>
 // 4. CATEGORY MANAGEMENT
 // ==========================================
 
-export const getCategories = async (params = ''): Promise<{ success: boolean; data: Category[] }> => {
-  const response = await adminApi.get<{ success: boolean; data: Category[] }>(`/api/admin/categories/filter${params}`);
+export const getCategories = async (params = ''): Promise<PaginatedResponse<Category>> => {
+  const response = await adminApi.get<PaginatedResponse<Category>>(`/api/admin/categories/filter${params}`);
   return response.data;
 };
-
 export const getCategoryById = async (id: string): Promise<{ success: boolean; data: Category }> => {
   const response = await adminApi.get<{ success: boolean; data: Category }>(`/api/admin/categories/${id}`);
   return response.data;

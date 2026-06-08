@@ -89,6 +89,7 @@ export interface Category {
   name: string;
   slug: string;
   is_active: boolean;
+  description?: string;
   createdAt: string;
   updatedAt: string;
 }

@@ -220,7 +220,7 @@ export default function StaffListPage() {
                   <th className="px-6 py-4 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800/40 text-sm">
+              <tbody className="divide-y divide-[var(--glass-border-light)] text-sm">
                 {staffList.map((staff) => (
                   <tr key={staff._id} className="transition-colors">
                     {/* Name cell with Avatar */}
@@ -290,10 +290,10 @@ export default function StaffListPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
           <div 
             onClick={() => setPendingDeleteStaff(null)}
-            className="absolute inset-0 bg-slate-950/70 backdrop-blur-md"
+            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
           ></div>
           
-          <div className="relative w-full max-w-sm rounded-2xl border border-slate-800/80 bg-slate-900/90 p-6 shadow-2xl backdrop-blur-xl animate-card-enter">
+          <div className="relative w-full max-w-sm rounded-2xl border border-[var(--glass-border)] bg-[var(--color-bg-surface)] p-6 shadow-2xl backdrop-blur-xl animate-card-enter">
             <div className="flex flex-col items-center text-center">
               <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-500/10 text-red-500">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -303,9 +303,9 @@ export default function StaffListPage() {
                 </svg>
               </div>
               
-              <h3 className="mt-4 text-lg font-bold text-white">Confirm Removal</h3>
-              <p className="mt-2 text-sm text-slate-400">
-                Are you sure you want to remove <strong className="text-white">{pendingDeleteStaff.name}</strong> from the administrative team? This action is destructive.
+              <h3 className="mt-4 text-lg font-bold text-[var(--color-text-primary)]">Confirm Removal</h3>
+              <p className="mt-2 text-sm text-[var(--color-text-muted)]">
+                Are you sure you want to remove <strong className="text-[var(--color-text-primary)]">{pendingDeleteStaff.name}</strong> from the administrative team? This action is destructive.
               </p>
             </div>
 
@@ -313,14 +313,14 @@ export default function StaffListPage() {
               <button
                 onClick={() => setPendingDeleteStaff(null)}
                 disabled={isDeleting}
-                className="flex-1 rounded-lg border border-slate-800 bg-slate-950/30 py-2.5 text-sm font-semibold text-slate-300 hover:bg-slate-800/60 transition-all disabled:opacity-50"
+                className="flex-1 rounded-lg border border-[var(--glass-border)] bg-transparent py-2.5 text-sm font-semibold text-[var(--color-text-muted)] hover:bg-[var(--glass-bg-hover)] transition-all disabled:opacity-50"
               >
                 Cancel
               </button>
               <button
                 onClick={executeDelete}
                 disabled={isDeleting}
-                className="flex-1 rounded-lg bg-red-600 py-2.5 text-sm font-semibold text-white shadow-lg shadow-red-600/15 hover:bg-red-700 active:scale-98 transition-all disabled:opacity-50"
+                className="flex-1 rounded-lg bg-[#ef4444] py-2.5 text-sm font-semibold text-white shadow-lg shadow-red-600/15 hover:bg-[#dc2626] active:scale-98 transition-all disabled:opacity-50"
               >
                 {isDeleting ? 'Removing...' : 'Yes, remove them'}
               </button>

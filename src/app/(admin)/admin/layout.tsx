@@ -2,25 +2,10 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
+import Link from 'next/link';
 import { getAdminProfile } from '../../../services/adminApi';
 import { User } from '../../../types/admin-lms';
-import { useCharacterStore, CharacterEmotion } from '../../../store/characterStore';
 import logoIcon from '@/assets/images/logo-icon.svg';
-
-// Supported emotional states for the guide mascot
-const emotionColorMap: Record<CharacterEmotion, string> = {
-  idle: 'from-indigo-400 to-indigo-600 shadow-indigo-500/50',
-  thinking: 'from-amber-400 to-orange-500 shadow-amber-500/50',
-  celebrating: 'from-emerald-400 to-teal-500 shadow-emerald-500/50',
-  helper: 'from-sky-400 to-blue-600 shadow-sky-500/50',
-};
-
-const emotionEmojiMap: Record<CharacterEmotion, string> = {
-  idle: '🤖',
-  thinking: '🤔',
-  celebrating: '🎉',
-  helper: '💡',
-};
 
 /**
  * LMS Administrative Layout
@@ -43,8 +28,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   // Custom react modal for premium logout confirmation (replaces SweetAlert2 dependency)
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
-  // Mascot Zustand Store hooks
-  const { isVisible, emotion, speechText, setEmotion, speak, hide, show } = useCharacterStore();
 
   // Navigation Links structure mirroring Angular menuItems
   const menuItems = [
@@ -200,7 +183,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     let active = true;
     async function checkAuth() {
       try {
-        setEmotion('thinking');
         const userProfile = await getAdminProfile();
         
         if (!active) return;
@@ -212,16 +194,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
         setProfile(userProfile);
         setAuthLoading(false);
-        setEmotion('idle');
-
-        if (userProfile.role === 'super_admin') {
-          speak('Welcome Super Admin! System telemetry is stable. Database connections fully operational.', 6000);
-        } else {
-          speak(`Welcome back, ${userProfile.name}! Dashboard initialized. Let's make some progress!`, 5000);
-        }
       } catch (err) {
         if (!active) return;
-        setEmotion('idle');
         router.push('/admin-login');
       }
     }
@@ -230,23 +204,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     return () => {
       active = false;
     };
-  }, [router, setEmotion, speak]);
-
-  // Contextual Mascot prompts based on active paths
-  useEffect(() => {
-    if (authLoading) return;
-    
-    if (currentPath.includes('/courses')) {
-      setEmotion('helper');
-      speak('Viewing the Courses list. Here you can search, filter drafts/published shells, or create new courses.', 6000);
-    } else if (currentPath.includes('/kyc')) {
-      setEmotion('helper');
-      speak('Viewing KYC submissions. Please review user documents thoroughly before approving or rejecting.', 6000);
-    } else if (currentPath.includes('/staff')) {
-      setEmotion('helper');
-      speak('Managing team members and students. Ensure permissions are set following the principle of least privilege.', 6000);
-    }
-  }, [currentPath, authLoading, setEmotion, speak]);
+  }, [router]);
 
   // Collapsible toggle helper
   const toggleSidebar = () => {
@@ -346,12 +304,15 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               className="sidebar__brand-logo-collapsed h-8 w-auto object-contain mx-auto" 
             />
           ) : (
-            <div className="sidebar__brand-text select-none">
+            <div className="sidebar__brand-text select-none flex items-center gap-2.5">
               <img 
                 src={logoIcon.src} 
                 alt="After Commerce" 
-                className="sidebar__brand-logo h-8 w-auto object-contain" 
+                className="sidebar__brand-logo h-7 w-auto object-contain" 
               />
+              <span className="text-[11px] font-bold uppercase tracking-wider text-[var(--color-text-muted)] border-l border-[var(--glass-border)] pl-2.5 leading-none">
+                Admin Panel
+              </span>
             </div>
           )}
           
@@ -385,7 +346,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
               return (
                 <li key={item.route} className={`sidebar__nav-item stagger-${index + 1}`}>
-                  <a
+                  <Link
                     href={item.route}
                     title={isSidebarCollapsed && windowWidth >= 768 ? item.label : ''}
                     onClick={() => setIsMobileOpen(false)}
@@ -397,7 +358,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     {(!isSidebarCollapsed || windowWidth < 768) && (
                       <span className="sidebar__link-label">{item.label}</span>
                     )}
-                  </a>
+                  </Link>
                 </li>
               );
             })}
@@ -407,7 +368,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         {/* Sidebar Footer Operations */}
         <div className="sidebar__footer">
           {/* Settings shortcut */}
-          <a 
+          <Link 
             href="/admin/settings"
             className={`sidebar__footer-action ${
               isSidebarCollapsed && windowWidth >= 768 ? 'sidebar__footer-action--icon-only' : ''
@@ -422,10 +383,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             {(!isSidebarCollapsed || windowWidth < 768) && (
               <span className="sidebar__link-label">Settings</span>
             )}
-          </a>
+          </Link>
 
           {/* Profile Shortcut */}
-          <a 
+          <Link 
             href="/admin/profile"
             className={`sidebar__footer-action ${
               isSidebarCollapsed && windowWidth >= 768 ? 'sidebar__footer-action--icon-only' : ''
@@ -440,7 +401,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             {(!isSidebarCollapsed || windowWidth < 768) && (
               <span className="sidebar__link-label">My Profile</span>
             )}
-          </a>
+          </Link>
 
           {/* Logout button */}
           <button 
@@ -556,64 +517,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </main>
       </div>
 
-      {/* 4. APP CHARACTER MASCOT FLOAT GUIDE */}
-      {isVisible && (
-        <div className="fixed bottom-6 right-6 z-50 flex max-w-sm flex-col items-end gap-3 filter drop-shadow-2xl transition-all duration-300">
-          
-          {/* Speech Bubble */}
-          {speechText && (
-            <div className="relative rounded-2xl border border-slate-800/80 bg-slate-900/90 p-4 text-xs leading-relaxed text-slate-300 shadow-xl max-w-xs md:max-w-sm backdrop-blur-md animate-fade-in">
-              <p>{speechText}</p>
-              <div className="absolute -bottom-1.5 right-6 h-3 w-3 rotate-45 border-r border-b border-slate-800/80 bg-slate-900"></div>
-              
-              <button 
-                onClick={() => speak('')}
-                className="absolute top-1.5 right-1.5 text-slate-500 hover:text-slate-350 transition-colors"
-                title="Dismiss speech"
-              >
-                <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-          )}
-
-          {/* Guide Mascot Sphere */}
-          <div className="flex items-center gap-2">
-            <button
-              onClick={hide}
-              className="flex h-8 w-8 items-center justify-center rounded-full border border-slate-800/60 bg-slate-900 text-slate-500 hover:bg-slate-800 hover:text-slate-300 transition-all shadow-md backdrop-blur-md"
-              title="Hide assistant guide"
-            >
-              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-
-            <div 
-              onClick={() => {
-                setEmotion('celebrating');
-                speak("Whoa! You tapped me! I'm here to assist your administrative workflow. Need something specific?", 4000);
-              }}
-              className={`flex h-14 w-14 cursor-pointer items-center justify-center rounded-full bg-gradient-to-tr shadow-lg transition-transform duration-300 hover:scale-110 active:scale-95 animate-bounce ${emotionColorMap[emotion]}`}
-              title="Click for options"
-            >
-              <span className="text-3xl select-none">{emotionEmojiMap[emotion]}</span>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Floating launcher trigger if mascot is hidden */}
-      {!isVisible && (
-        <button
-          onClick={show}
-          className="fixed bottom-6 right-6 z-50 flex h-10 w-10 items-center justify-center rounded-full border border-indigo-500/20 bg-indigo-600 text-white shadow-lg shadow-indigo-600/20 hover:bg-indigo-700 hover:scale-105 transition-all"
-          title="Show assistant guide"
-        >
-          <span className="text-xl">🤖</span>
-        </button>
-      )}
 
       {/* 5. CONFIRMATION LOGOUT MODAL */}
       {showLogoutModal && (
@@ -621,22 +524,22 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           {/* Modal Backdrop */}
           <div 
             onClick={() => setShowLogoutModal(false)}
-            className="absolute inset-0 bg-slate-950/70 backdrop-blur-md"
+            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
           ></div>
           
           {/* Modal Box */}
-          <div className="relative w-full max-w-sm rounded-2xl border border-slate-800/80 bg-slate-900/90 p-6 shadow-2xl backdrop-blur-xl animate-card-enter">
+          <div className="relative w-full max-w-sm rounded-2xl border border-[var(--glass-border)] bg-[var(--color-bg-surface)] p-6 shadow-2xl backdrop-blur-xl animate-card-enter">
             <div className="flex flex-col items-center text-center">
               <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-500/10 text-red-500">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+                  <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
                   <line x1="12" y1="9" x2="12" y2="13" />
                   <line x1="12" y1="17" x2="12.01" y2="17" />
                 </svg>
               </div>
               
-              <h3 className="mt-4 text-lg font-bold text-white">Confirm Logout</h3>
-              <p className="mt-2 text-sm text-slate-450">
+              <h3 className="mt-4 text-lg font-bold text-[var(--color-text-primary)]">Confirm Logout</h3>
+              <p className="mt-2 text-sm text-[var(--color-text-muted)]">
                 Are you sure you want to log out of your session?
               </p>
             </div>
@@ -644,13 +547,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <div className="mt-6 flex gap-3">
               <button
                 onClick={() => setShowLogoutModal(false)}
-                className="flex-1 rounded-lg border border-slate-800 bg-slate-950/30 py-2.5 text-sm font-semibold text-slate-300 hover:bg-slate-800/60 transition-all"
+                className="flex-1 rounded-lg border border-[var(--glass-border)] bg-transparent py-2.5 text-sm font-semibold text-[var(--color-text-muted)] hover:bg-[var(--glass-bg-hover)] transition-all"
               >
                 Cancel
               </button>
               <button
                 onClick={executeLogout}
-                className="flex-1 rounded-lg bg-red-600 py-2.5 text-sm font-semibold text-white shadow-lg shadow-red-600/15 hover:bg-red-700 active:scale-98 transition-all"
+                className="flex-1 rounded-lg bg-[#ef4444] py-2.5 text-sm font-semibold text-white shadow-lg shadow-red-600/15 hover:bg-[#dc2626] active:scale-98 transition-all"
               >
                 Yes, logout
               </button>
