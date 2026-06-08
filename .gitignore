@@ -40,3 +40,14 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
+
+# Next.js
+/.next/
+/out/
+
+# Local env files
+.env*.local
+
+# Production build output
+/build
+
