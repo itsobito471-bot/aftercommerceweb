@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -46,7 +47,7 @@
   /* ── Dark theme (Dark Navy base) ── */
   --color-bg-deep:      var(--color-navy-dark);
   --color-bg-surface:   #222238;
-  --color-bg-elevated:  #2a2a44;
+  --color-bg-elevated:  var(--color-deep-blue);
   --color-border:       rgba(255, 255, 255, 0.12);
   --color-border-hover: rgba(255, 255, 255, 0.22);
   --color-border-strong:rgba(255, 255, 255, 0.35);
@@ -286,11 +287,14 @@ app-root svg:not([fill]) {
   padding: 0.65rem 1.25rem;
   border-radius: var(--radius-button);
   border: 1px solid var(--color-cta);
-  background: var(--color-cta);
+  background: linear-gradient(180deg, #FF7A4C 0%, var(--color-cta) 55%, #F04F18 100%);
   color: var(--color-white);
   font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 4px 14px var(--color-cta-dim);
+  box-shadow:
+    0 14px 30px rgba(255, 107, 53, 0.28),
+    0 6px 0 rgba(0, 0, 0, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.28);
   transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
   white-space: nowrap;
 }
