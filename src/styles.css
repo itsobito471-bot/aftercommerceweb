@@ -1302,6 +1302,17 @@ app-root svg:not([fill]) {
   transform: translateX(2px);
 }
 
+.sidebar__footer-action--active {
+  background: rgba(var(--color-accent-rgb), 0.1);
+  color: var(--color-accent);
+  border-color: rgba(var(--color-accent-rgb), 0.2);
+}
+
+[data-theme="light"] .sidebar__footer-action--active {
+  background: rgba(var(--color-accent-rgb), 0.08);
+  border-color: rgba(var(--color-accent-rgb), 0.15);
+}
+
 .sidebar__footer-action--logout {
   color: #f87171;
   opacity: 0.88;

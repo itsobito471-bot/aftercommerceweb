@@ -169,16 +169,17 @@ export default function AdminDashboardPage() {
   useEffect(() => {
     getDashboardStats()
       .then((data) => {
-        setAdmin(data.admin);
-        setCourses(data.courses);
-        setTotalCourses(data.totalCourses);
-        setPublished(data.publishedCourses);
-        setCategories(data.categories);
-        setTotalCats(data.totalCats);
-        setStaff(data.staff);
-        setKycCount(data.kycCount);
-        setAssessCount(data.assessCount);
-        setInfluencers(data.influencers);
+        if (!data) return;
+        setAdmin(data.admin || null);
+        setCourses(data.courses || []);
+        setTotalCourses(data.totalCourses || 0);
+        setPublished(data.publishedCourses || 0);
+        setCategories(data.categories || []);
+        setTotalCats(data.totalCats || 0);
+        setStaff(data.staff || []);
+        setKycCount(data.kycCount || 0);
+        setAssessCount(data.assessCount || 0);
+        setInfluencers(data.influencers || []);
       })
       .catch((err) => console.error('Dashboard load error:', err))
       .finally(() => setLoading(false));

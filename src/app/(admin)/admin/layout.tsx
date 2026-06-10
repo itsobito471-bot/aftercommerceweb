@@ -349,13 +349,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           
           <ul className="sidebar__nav-list">
             {menuItems.map((item, index) => {
-              // Custom matching route check (home maps to /admin root)
-              // To prevent parent routes from matching child routes (e.g., /admin/courses and /admin/courses/categories)
-              // we check for exact match or startsWith + '/'
-              const isActive = 
-                item.route === '/admin' 
-                  ? currentPath === '/admin' 
-                  : currentPath === item.route || currentPath.startsWith(item.route + '/');
+              // Find the best match (longest route) so we don't highlight both parent and child
+              const bestMatch = menuItems
+                .filter(m => currentPath === m.route || currentPath.startsWith(m.route + '/'))
+                .sort((a, b) => b.route.length - a.route.length)[0];
+              
+              const isActive = item.route === '/admin'
+                ? currentPath === '/admin'
+                : bestMatch?.route === item.route;
 
               return (
                 <li key={item.route} className={`sidebar__nav-item stagger-${index + 1}`}>
@@ -384,6 +385,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <Link 
             href="/admin/settings"
             className={`sidebar__footer-action ${
+              currentPath === '/admin/settings' ? 'sidebar__footer-action--active' : ''
+            } ${
               isSidebarCollapsed && windowWidth >= 768 ? 'sidebar__footer-action--icon-only' : ''
             }`}
           >
@@ -402,6 +405,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <Link 
             href="/admin/profile"
             className={`sidebar__footer-action ${
+              currentPath === '/admin/profile' ? 'sidebar__footer-action--active' : ''
+            } ${
               isSidebarCollapsed && windowWidth >= 768 ? 'sidebar__footer-action--icon-only' : ''
             }`}
           >

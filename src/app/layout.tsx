@@ -2,8 +2,13 @@ import React from 'react';
 import '../styles.css';
 
 export const metadata = {
-  title: 'LMS Enterprise Admin Dashboard',
-  description: 'Decoupled Next.js Admin Panel for Learning Management System',
+  title: 'After Commerce',
+  description: 'Enterprise Admin Dashboard for the After Commerce ecosystem. Manage courses, categories, affiliates, and more.',
+  keywords: ['After Commerce', 'Admin Dashboard', 'LMS', 'E-commerce'],
+  authors: [{ name: 'After Commerce Team' }],
+  icons: {
+    icon: '/icon.svg',
+  },
 };
 
 /**
