@@ -2497,12 +2497,13 @@ app-root svg:not([fill]) {
 .db-welcome-av {
   width: 54px; height: 54px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--color-accent), var(--color-cta));
+  background: linear-gradient(135deg, var(--color-brand-blue), var(--color-sky-blue));
   color: #fff;
   display: flex; align-items: center; justify-content: center;
   font-size: 1.1rem; font-weight: 800; letter-spacing: -0.02em;
   flex-shrink: 0;
   box-shadow: 0 0 0 3px rgba(255,255,255,0.15), 0 4px 16px rgba(0,0,0,0.2);
+  object-fit: cover;
 }
 
 .db-welcome-body { flex: 1; min-width: 160px; }

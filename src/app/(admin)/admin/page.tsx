@@ -2,19 +2,22 @@
 
 import React, { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
-import { getDashboardStats } from '../../../services/adminApi';
+import { getDashboardStats, getDocumentUrl } from '../../../services/adminApi';
 import { Course, User, Category } from '../../../types/admin-lms';
 
 /* ─────────────── Scroll reveal ─────────────── */
 function useReveal(threshold = 0.06) {
-  const ref = useRef<HTMLDivElement>(null);
   const [v, setV] = useState(false);
-  useEffect(() => {
-    const el = ref.current; if (!el) return;
-    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setV(true); obs.disconnect(); } }, { threshold });
+  const ref = React.useCallback((el: HTMLDivElement | null) => {
+    if (!el) return;
+    const obs = new IntersectionObserver(([e]) => { 
+      if (e.isIntersecting) { 
+        setV(true); 
+        obs.disconnect(); 
+      } 
+    }, { threshold });
     obs.observe(el); 
     const fallback = setTimeout(() => setV(true), 300); // Safety fallback
-    return () => { obs.disconnect(); clearTimeout(fallback); };
   }, [threshold]);
   return { ref, visible: v };
 }
@@ -163,6 +166,8 @@ export default function AdminDashboardPage() {
   const [influencers,     setInfluencers]     = useState<any[]>([]);
   const [loading,         setLoading]         = useState(true);
   const [now,             setNow]             = useState(new Date());
+  const [avatarUrl,       setAvatarUrl]       = useState<string | null>(null);
+  const [influencerAvatarUrl, setInfluencerAvatarUrl] = useState<string | null>(null);
 
   useEffect(() => { const t = setInterval(() => setNow(new Date()), 60_000); return () => clearInterval(t); }, []);
 
@@ -180,6 +185,16 @@ export default function AdminDashboardPage() {
         setKycCount(data.kycCount || 0);
         setAssessCount(data.assessCount || 0);
         setInfluencers(data.influencers || []);
+
+        if (data.admin && data.admin.avatar_doc_id) {
+          getDocumentUrl(data.admin.avatar_doc_id)
+            .then(res => {
+              if (res.success && res.data && res.data.url) {
+                setAvatarUrl(res.data.url);
+              }
+            })
+            .catch(console.error);
+        }
       })
       .catch((err) => console.error('Dashboard load error:', err))
       .finally(() => setLoading(false));
@@ -219,6 +234,15 @@ export default function AdminDashboardPage() {
   )[0] ?? null;
   const topStaff = staff.filter(s => s.role !== 'super_admin')[0] ?? staff[0] ?? null;
 
+  // Fetch top influencer avatar if present
+  useEffect(() => {
+    if (topInfluencer?.avatar_doc_id) {
+      getDocumentUrl(topInfluencer.avatar_doc_id)
+        .then(res => { if (res.success && res.data?.url) setInfluencerAvatarUrl(res.data.url); })
+        .catch(console.error);
+    }
+  }, [topInfluencer?.avatar_doc_id]);
+
   if (loading) {
     return (
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '1rem' }}>
@@ -235,7 +259,11 @@ export default function AdminDashboardPage() {
       {/* ══ 1. WELCOME ══ */}
       <div ref={rWelcome.ref} className="db-welcome" style={{ opacity: rWelcome.visible ? 1 : 0, transform: rWelcome.visible ? 'none' : 'translateY(-14px)' }}>
         {/* Avatar */}
-        <div className="db-welcome-av">{initials}</div>
+        {avatarUrl ? (
+          <img src={avatarUrl} alt="Profile Avatar" className="db-welcome-av" />
+        ) : (
+          <div className="db-welcome-av">{initials}</div>
+        )}
 
         {/* Text */}
         <div className="db-welcome-body">
@@ -359,10 +387,17 @@ export default function AdminDashboardPage() {
           {/* 👑 Top Influencer */}
           <div className="db-top-inf">
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.75rem' }}>
-              {topInfluencer
-                ? <Av name={topInfluencer.name} size={40} hue={280}/>
-                : <div className="db-inf-av-empty">—</div>
-              }
+              {topInfluencer ? (
+                influencerAvatarUrl ? (
+                  <img src={influencerAvatarUrl} alt="Affiliate Avatar" className="db-welcome-av" style={{ width: 40, height: 40, fontSize: '0.85rem' }} />
+                ) : (
+                  <div className="db-welcome-av" style={{ width: 40, height: 40, fontSize: '0.85rem' }}>
+                    {topInfluencer.name?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || 'AF'}
+                  </div>
+                )
+              ) : (
+                <div className="db-inf-av-empty">—</div>
+              )}
               <div style={{ flex: 1, minWidth: 0 }}>
                 <p className="db-inf-badge-label">👑 Top Affiliate</p>
                 <p className="db-inf-name">{topInfluencer?.name ?? 'No affiliates yet'}</p>
@@ -561,7 +596,11 @@ export default function AdminDashboardPage() {
               <Link href="/admin/profile" className="db-link-pill">Edit →</Link>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.875rem', marginBottom: '1rem' }}>
-              <Av name={admin?.name ?? 'AD'} size={44} hue={220}/>
+              {avatarUrl ? (
+                <img src={avatarUrl} alt="Profile Avatar" className="db-welcome-av" style={{ width: 44, height: 44, fontSize: '0.95rem' }} />
+              ) : (
+                <div className="db-welcome-av" style={{ width: 44, height: 44, fontSize: '0.95rem' }}>{initials}</div>
+              )}
               <div>
                 <p style={{ fontWeight: 700, color: 'var(--color-text-primary)', margin: 0, fontSize: '0.9rem' }}>{admin?.name}</p>
                 <p style={{ color: 'var(--color-text-subtle)', margin: 0, fontSize: '0.72rem' }}>{admin?.email}</p>
