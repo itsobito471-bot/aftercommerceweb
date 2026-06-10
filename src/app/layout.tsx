@@ -2,7 +2,7 @@ import React from 'react';
 import '../styles.css';
 
 export const metadata = {
-  title: 'After Commerce',
+  title: 'After Commerce - The Complete Learning Platform',
   description: 'Enterprise Admin Dashboard for the After Commerce ecosystem. Manage courses, categories, affiliates, and more.',
   keywords: ['After Commerce', 'Admin Dashboard', 'LMS', 'E-commerce'],
   authors: [{ name: 'After Commerce Team' }],

@@ -12,6 +12,7 @@ import {
   disable2FAProfile
 } from '@/services/adminApi';
 import { User } from '@/types/admin-lms';
+import ConfirmModal from '@/components/ConfirmModal';
 
 export default function ProfileSettingsPage() {
   const router = useRouter();
@@ -30,6 +31,8 @@ export default function ProfileSettingsPage() {
   const [twoFactorCode, setTwoFactorCode] = useState('');
   const [isSettingUp2FA, setIsSettingUp2FA] = useState(false);
   const [isVerifying2FA, setIsVerifying2FA] = useState(false);
+  const [showDisableConfirm, setShowDisableConfirm] = useState(false);
+  const [isDisabling2FA, setIsDisabling2FA] = useState(false);
   
   // Image Preview & Upload States
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
@@ -164,17 +167,24 @@ export default function ProfileSettingsPage() {
     }
   };
 
-  const handleDisable2FA = async () => {
-    if (!confirm('Are you sure you want to disable 2FA? This will reduce the security of your account.')) return;
+  const handleDisable2FA = () => {
+    setShowDisableConfirm(true);
+  };
+
+  const confirmDisable2FA = async () => {
     try {
+      setIsDisabling2FA(true);
       setMessage(null);
       const res = await disable2FAProfile();
       if (res.success) {
         setMessage({ type: 'success', text: '2FA successfully disabled.' });
         if (profile) setProfile({ ...profile, is_two_factor_enabled: false });
+        setShowDisableConfirm(false);
       }
     } catch (err: any) {
       setMessage({ type: 'error', text: err.response?.data?.message || 'Failed to disable 2FA.' });
+    } finally {
+      setIsDisabling2FA(false);
     }
   };
 
@@ -419,6 +429,19 @@ export default function ProfileSettingsPage() {
 
         </form>
       </div>
+
+      {/* 2FA Disable Confirmation Modal */}
+      <ConfirmModal
+        isOpen={showDisableConfirm}
+        title="Disable 2FA?"
+        message="Are you sure you want to disable 2FA? This will reduce the security of your account."
+        confirmText="Disable 2FA"
+        cancelText="Cancel"
+        type="danger"
+        isLoading={isDisabling2FA}
+        onConfirm={confirmDisable2FA}
+        onCancel={() => setShowDisableConfirm(false)}
+      />
     </div>
   );
 }
