@@ -149,6 +149,16 @@ export const getMe = (): User | null => {
   return null;
 };
 
+export const setup2FAProfile = async (): Promise<{ success: boolean; qrCodeImage: string; secret: string }> => {
+  const response = await adminApi.post<{ success: boolean; qrCodeImage: string; secret: string }>('/api/admin/auth/2fa/setup');
+  return response.data;
+};
+
+export const verify2FAProfile = async (code: string): Promise<{ success: boolean; message: string }> => {
+  const response = await adminApi.post<{ success: boolean; message: string }>('/api/admin/auth/2fa/verify', { code });
+  return response.data;
+};
+
 // ==========================================
 // 2. STAFF / TEAM DIRECTORY MANAGEMENT
 // ==========================================

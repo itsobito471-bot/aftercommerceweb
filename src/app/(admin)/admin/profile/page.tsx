@@ -6,7 +6,9 @@ import {
   getAdminProfile, 
   updateProfile, 
   uploadDocument, 
-  getDocumentUrl 
+  getDocumentUrl,
+  setup2FAProfile,
+  verify2FAProfile
 } from '@/services/adminApi';
 import { User } from '@/types/admin-lms';
 
@@ -20,6 +22,13 @@ export default function ProfileSettingsPage() {
   // Form states
   const [displayName, setDisplayName] = useState('');
   const [avatarDocId, setAvatarDocId] = useState<string | null>(null);
+
+  // 2FA Setup States
+  const [show2FASetup, setShow2FASetup] = useState(false);
+  const [qrCode, setQrCode] = useState<string | null>(null);
+  const [twoFactorCode, setTwoFactorCode] = useState('');
+  const [isSettingUp2FA, setIsSettingUp2FA] = useState(false);
+  const [isVerifying2FA, setIsVerifying2FA] = useState(false);
   
   // Image Preview & Upload States
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
@@ -113,6 +122,44 @@ export default function ProfileSettingsPage() {
       setMessage({ type: 'error', text: err.message || 'An error occurred while saving.' });
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleSetup2FA = async () => {
+    try {
+      setIsSettingUp2FA(true);
+      setMessage(null);
+      const res = await setup2FAProfile();
+      if (res.success && res.qrCodeImage) {
+        setQrCode(res.qrCodeImage);
+        setShow2FASetup(true);
+      }
+    } catch (err: any) {
+      setMessage({ type: 'error', text: err.response?.data?.message || 'Failed to setup 2FA.' });
+    } finally {
+      setIsSettingUp2FA(false);
+    }
+  };
+
+  const handleVerify2FA = async () => {
+    if (!twoFactorCode || twoFactorCode.length !== 6) {
+      setMessage({ type: 'error', text: 'Please enter a valid 6-digit code.' });
+      return;
+    }
+    try {
+      setIsVerifying2FA(true);
+      setMessage(null);
+      const res = await verify2FAProfile(twoFactorCode);
+      if (res.success) {
+        setMessage({ type: 'success', text: '2FA successfully enabled!' });
+        setShow2FASetup(false);
+        if (profile) setProfile({ ...profile, is_two_factor_enabled: true });
+        setTwoFactorCode('');
+      }
+    } catch (err: any) {
+      setMessage({ type: 'error', text: err.response?.data?.message || 'Invalid 2FA code.' });
+    } finally {
+      setIsVerifying2FA(false);
     }
   };
 
@@ -231,6 +278,78 @@ export default function ProfileSettingsPage() {
               </div>
 
             </div>
+          </div>
+
+          {/* Security & 2FA Section */}
+          <div className="mt-8 pt-8 border-t border-dashed border-[var(--glass-border)]">
+            <div className="flex flex-col md:flex-row gap-6 md:items-center justify-between">
+              <div>
+                <h3 className="text-sm font-bold text-[var(--color-text-primary)] uppercase tracking-wider mb-1">Two-Factor Authentication</h3>
+                <p className="text-xs text-[var(--color-text-muted)] max-w-lg">
+                  Protect your account with an extra layer of security. Once configured, you'll be required to enter both your password and an authentication code from your mobile app to sign in.
+                </p>
+              </div>
+              
+              <div className="shrink-0">
+                {profile?.is_two_factor_enabled ? (
+                  <div className="flex items-center gap-2 px-4 py-2 bg-[var(--color-success)]/10 text-[var(--color-success)] border border-[var(--color-success)]/20 rounded-lg font-medium text-xs tracking-wide">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                      <polyline points="22 4 12 14.01 9 11.01" />
+                    </svg>
+                    2FA Enabled
+                  </div>
+                ) : (
+                  <button 
+                    type="button"
+                    onClick={handleSetup2FA}
+                    disabled={isSettingUp2FA || show2FASetup}
+                    className="flex items-center gap-2 px-5 py-2.5 bg-[var(--color-accent)] border border-transparent hover:bg-transparent hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] text-white rounded-lg font-medium text-xs tracking-wide transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isSettingUp2FA ? 'Setting up...' : 'Enable 2FA'}
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                    </svg>
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* 2FA Setup Flow (QR Code) */}
+            {show2FASetup && qrCode && !profile?.is_two_factor_enabled && (
+              <div className="mt-6 p-6 rounded-xl border border-[var(--glass-border)] bg-[var(--color-bg-deep)]/50 flex flex-col md:flex-row gap-8 items-center animate-fade-in">
+                <div className="shrink-0 p-3 bg-white rounded-xl shadow-md border border-gray-100">
+                  <img src={qrCode} alt="2FA QR Code" className="w-40 h-40 object-contain" />
+                </div>
+                
+                <div className="flex-1 space-y-4">
+                  <div>
+                    <h4 className="text-sm font-semibold text-[var(--color-text-primary)] mb-1">Scan this QR Code</h4>
+                    <p className="text-xs text-[var(--color-text-subtle)] leading-relaxed">
+                      Use an authenticator app like Google Authenticator, Authy, or 1Password to scan this QR code. Then, enter the generated 6-digit code below to verify and enable 2FA.
+                    </p>
+                  </div>
+                  
+                  <div className="flex gap-3 max-w-sm">
+                    <input 
+                      type="text" 
+                      value={twoFactorCode}
+                      onChange={(e) => setTwoFactorCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                      placeholder="000000"
+                      className="glass-input flex-1 text-center font-mono tracking-[0.5em] text-lg py-2"
+                    />
+                    <button 
+                      type="button"
+                      onClick={handleVerify2FA}
+                      disabled={twoFactorCode.length !== 6 || isVerifying2FA}
+                      className="btn-primary px-6 py-2 shrink-0 text-sm"
+                    >
+                      {isVerifying2FA ? 'Verifying...' : 'Verify'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Feedback Message */}
