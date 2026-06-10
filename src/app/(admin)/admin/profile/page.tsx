@@ -8,7 +8,8 @@ import {
   uploadDocument, 
   getDocumentUrl,
   setup2FAProfile,
-  verify2FAProfile
+  verify2FAProfile,
+  disable2FAProfile
 } from '@/services/adminApi';
 import { User } from '@/types/admin-lms';
 
@@ -163,6 +164,20 @@ export default function ProfileSettingsPage() {
     }
   };
 
+  const handleDisable2FA = async () => {
+    if (!confirm('Are you sure you want to disable 2FA? This will reduce the security of your account.')) return;
+    try {
+      setMessage(null);
+      const res = await disable2FAProfile();
+      if (res.success) {
+        setMessage({ type: 'success', text: '2FA successfully disabled.' });
+        if (profile) setProfile({ ...profile, is_two_factor_enabled: false });
+      }
+    } catch (err: any) {
+      setMessage({ type: 'error', text: err.response?.data?.message || 'Failed to disable 2FA.' });
+    }
+  };
+
   // Helper for initial avatar if no image exists
   const getInitials = () => {
     if (!profile?.name) return 'AD';
@@ -292,12 +307,21 @@ export default function ProfileSettingsPage() {
               
               <div className="shrink-0">
                 {profile?.is_two_factor_enabled ? (
-                  <div className="flex items-center gap-2 px-4 py-2 bg-[var(--color-success)]/10 text-[var(--color-success)] border border-[var(--color-success)]/20 rounded-lg font-medium text-xs tracking-wide">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-                      <polyline points="22 4 12 14.01 9 11.01" />
-                    </svg>
-                    2FA Enabled
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2 px-4 py-2 bg-[var(--color-success)]/10 text-[var(--color-success)] border border-[var(--color-success)]/20 rounded-lg font-medium text-xs tracking-wide">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                        <polyline points="22 4 12 14.01 9 11.01" />
+                      </svg>
+                      2FA Enabled
+                    </div>
+                    <button 
+                      type="button" 
+                      onClick={handleDisable2FA}
+                      className="px-4 py-2 bg-red-500/10 text-red-500 border border-red-500/20 hover:bg-red-500 hover:text-white rounded-lg font-medium text-xs tracking-wide transition-all duration-300"
+                    >
+                      Disable
+                    </button>
                   </div>
                 ) : (
                   <button 

@@ -179,22 +179,30 @@ export default function KycPreviewPage() {
 
       {/* Floating Reorder Actions Bar */}
       {pendingOrderFields && (
-        <div className="rounded-xl border border-indigo-500/20 bg-indigo-950/20 p-4 flex items-center justify-between animate-fade-in select-none max-w-[700px] mx-auto mb-6">
-          <div className="text-sm text-indigo-300">
-            <strong>Unsaved Changes!</strong> You adjusted the display order of the questions.
+        <div 
+          className="rounded-xl border p-4 flex flex-col md:flex-row gap-4 md:items-center justify-between animate-fade-in select-none max-w-[700px] mx-auto mb-6 shadow-md"
+          style={{ backgroundColor: 'var(--color-bg-surface)', borderColor: 'var(--color-accent)' }}
+        >
+          <div className="text-sm" style={{ color: 'var(--color-text-primary)' }}>
+            <strong style={{ color: 'var(--color-accent)' }}>Unsaved Changes!</strong> You adjusted the display order of the questions.
           </div>
-          <div className="flex gap-3">
+          <div className="flex gap-3 shrink-0">
             <button 
               onClick={cancelReorder}
               disabled={isSavingOrder}
-              className="rounded-lg border border-slate-800 bg-slate-950/40 px-4 py-2 text-xs font-semibold hover:bg-slate-800/60 transition-all disabled:opacity-50"
+              className="rounded-lg border px-4 py-2 text-xs font-semibold hover:opacity-80 transition-opacity disabled:opacity-50"
+              style={{ 
+                borderColor: 'var(--glass-border-strong)', 
+                color: 'var(--color-text-primary)',
+                backgroundColor: 'transparent'
+              }}
             >
               Cancel
             </button>
             <button 
               onClick={saveNewOrder}
               disabled={isSavingOrder}
-              className="rounded-lg bg-emerald-600 px-4 py-2 text-xs font-semibold text-white shadow-md shadow-emerald-600/25 hover:bg-emerald-700 active:scale-98 transition-all disabled:opacity-50"
+              className="btn-accent px-5 py-2 text-xs"
             >
               {isSavingOrder ? 'Saving...' : 'Save Layout Order'}
             </button>

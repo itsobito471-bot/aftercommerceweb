@@ -127,6 +127,11 @@ export const logout = async (): Promise<{ success: boolean }> => {
   return response.data;
 };
 
+export const getDashboardStats = async () => {
+  const response = await adminApi.get('/api/admin/dashboard');
+  return response.data.data;
+};
+
 export const getAdminProfile = async (): Promise<User> => {
   const response = await adminApi.get<{ success: boolean; data: User }>('/api/admin/users/me');
   return response.data.data;
@@ -156,6 +161,11 @@ export const setup2FAProfile = async (): Promise<{ success: boolean; qrCodeImage
 
 export const verify2FAProfile = async (code: string): Promise<{ success: boolean; message: string }> => {
   const response = await adminApi.post<{ success: boolean; message: string }>('/api/admin/auth/2fa/verify', { code });
+  return response.data;
+};
+
+export const disable2FAProfile = async (): Promise<{ success: boolean; message: string }> => {
+  const response = await adminApi.post<{ success: boolean; message: string }>('/api/admin/auth/2fa/disable', {});
   return response.data;
 };
 

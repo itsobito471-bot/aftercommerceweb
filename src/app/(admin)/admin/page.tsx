@@ -2,10 +2,7 @@
 
 import React, { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
-import {
-  getCourses, getAdminProfile, getCategories,
-  getStaffList, getKycFields, getAssessmentTemplates, getInfluencers,
-} from '../../../services/adminApi';
+import { getDashboardStats } from '../../../services/adminApi';
 import { Course, User, Category } from '../../../types/admin-lms';
 
 /* ─────────────── Scroll reveal ─────────────── */
@@ -15,7 +12,9 @@ function useReveal(threshold = 0.06) {
   useEffect(() => {
     const el = ref.current; if (!el) return;
     const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setV(true); obs.disconnect(); } }, { threshold });
-    obs.observe(el); return () => obs.disconnect();
+    obs.observe(el); 
+    const fallback = setTimeout(() => setV(true), 300); // Safety fallback
+    return () => { obs.disconnect(); clearTimeout(fallback); };
   }, [threshold]);
   return { ref, visible: v };
 }
@@ -168,25 +167,21 @@ export default function AdminDashboardPage() {
   useEffect(() => { const t = setInterval(() => setNow(new Date()), 60_000); return () => clearInterval(t); }, []);
 
   useEffect(() => {
-    Promise.allSettled([
-      getAdminProfile(),
-      getCourses(1, 10),
-      getCourses(1, 1, { is_published: true }),
-      getCategories('?limit=20&page=1'),
-      getStaffList(),
-      getKycFields(),
-      getAssessmentTemplates(),
-      getInfluencers(),
-    ]).then(([rA, rC, rP, rCat, rSt, rK, rAs, rI]) => {
-      if (rA.status   === 'fulfilled') setAdmin(rA.value);
-      if (rC.status   === 'fulfilled') { setCourses(rC.value.data); setTotalCourses(rC.value.pagination.totalDocs); }
-      if (rP.status   === 'fulfilled') setPublished(rP.value.pagination.totalDocs);
-      if (rCat.status === 'fulfilled') { setCategories(rCat.value.data); setTotalCats(rCat.value.pagination.totalDocs); }
-      if (rSt.status  === 'fulfilled') setStaff(rSt.value.data);
-      if (rK.status   === 'fulfilled') setKycCount(rK.value.data.length);
-      if (rAs.status  === 'fulfilled') setAssessCount(rAs.value.data.length);
-      if (rI.status   === 'fulfilled') setInfluencers(rI.value.data);
-    }).finally(() => setLoading(false));
+    getDashboardStats()
+      .then((data) => {
+        setAdmin(data.admin);
+        setCourses(data.courses);
+        setTotalCourses(data.totalCourses);
+        setPublished(data.publishedCourses);
+        setCategories(data.categories);
+        setTotalCats(data.totalCats);
+        setStaff(data.staff);
+        setKycCount(data.kycCount);
+        setAssessCount(data.assessCount);
+        setInfluencers(data.influencers);
+      })
+      .catch((err) => console.error('Dashboard load error:', err))
+      .finally(() => setLoading(false));
   }, []);
 
   /* Reveal refs */

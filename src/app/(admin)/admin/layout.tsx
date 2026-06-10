@@ -23,7 +23,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   // Layout states (mirroring Angular side-nav component states)
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
-  const [isLightTheme, setIsLightTheme] = useState(true);
+  const [isLightTheme, setIsLightTheme] = useState(false);
   const [windowWidth, setWindowWidth] = useState(1200);
 
   // Custom react modal for premium logout confirmation (replaces SweetAlert2 dependency)
@@ -164,14 +164,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   // Sync state values on initial mounting
   useEffect(() => {
-    // Restore theme configurations
+    // Restore theme configurations (Default Dark Mode)
     const savedTheme = localStorage.getItem('ac-theme');
-    if (savedTheme === 'dark') {
-      setIsLightTheme(false);
-      document.documentElement.removeAttribute('data-theme');
-    } else {
+    if (savedTheme === 'light') {
       setIsLightTheme(true);
       document.documentElement.setAttribute('data-theme', 'light');
+    } else {
+      setIsLightTheme(false);
+      document.documentElement.removeAttribute('data-theme');
     }
 
     // Restore sidebar collapse parameters
@@ -245,8 +245,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   // Confirm logout actions
   const executeLogout = () => {
-    localStorage.removeItem('ac-theme');
-    localStorage.removeItem('ac-sidebar-collapsed');
     localStorage.removeItem('admin_token');
     document.cookie = 'admin_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Strict; Secure';
     router.push('/admin-login');
@@ -352,10 +350,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <ul className="sidebar__nav-list">
             {menuItems.map((item, index) => {
               // Custom matching route check (home maps to /admin root)
+              // To prevent parent routes from matching child routes (e.g., /admin/courses and /admin/courses/categories)
+              // we check for exact match or startsWith + '/'
               const isActive = 
                 item.route === '/admin' 
                   ? currentPath === '/admin' 
-                  : currentPath.startsWith(item.route);
+                  : currentPath === item.route || currentPath.startsWith(item.route + '/');
 
               return (
                 <li key={item.route} className={`sidebar__nav-item stagger-${index + 1}`}>

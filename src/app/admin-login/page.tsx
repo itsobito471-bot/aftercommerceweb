@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import logoIcon from '@/assets/images/logo-icon.svg';
+import loginArt from '@/assets/images/login-art.png';
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3000';
 
@@ -37,17 +38,17 @@ export default function AdminLoginPage() {
   const [timeRemaining, setTimeRemaining] = useState(0);
   const [canResend, setCanResend] = useState(false);
 
-  // Theme support matching dashboard layout
-  const [isLightTheme, setIsLightTheme] = useState(true);
+  // Theme support matching dashboard layout (Default Dark Mode)
+  const [isLightTheme, setIsLightTheme] = useState(false);
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('ac-theme');
-    if (savedTheme === 'dark') {
-      setIsLightTheme(false);
-      document.documentElement.removeAttribute('data-theme');
-    } else {
+    if (savedTheme === 'light') {
       setIsLightTheme(true);
       document.documentElement.setAttribute('data-theme', 'light');
+    } else {
+      setIsLightTheme(false);
+      document.documentElement.removeAttribute('data-theme');
     }
   }, []);
 
@@ -254,42 +255,78 @@ export default function AdminLoginPage() {
 
   return (
     <div 
-      className="flex min-h-screen w-screen items-center justify-center relative overflow-hidden bg-[var(--color-bg-deep)] transition-colors duration-300 px-4 py-12 sm:px-6 lg:px-8 select-none"
+      className="flex min-h-screen w-screen relative overflow-hidden bg-[var(--color-bg-deep)] transition-colors duration-300 select-none"
       data-theme={isLightTheme ? 'light' : undefined}
     >
-      {/* Dot-grid overlay & Ambient Orbs matching dashboard layout */}
-      <div className="shell-bg-grid" aria-hidden="true"></div>
-      <div className="shell-bg-orb shell-bg-orb--tl" aria-hidden="true"></div>
-      <div className="shell-bg-orb shell-bg-orb--br" aria-hidden="true"></div>
+      {/* Left side: Premium Branding */}
+      <div className="hidden lg:flex lg:w-[45%] relative flex-col justify-center items-center bg-[var(--color-bg-surface)] border-r border-[var(--glass-border)] overflow-hidden">
+        {/* Dynamic Backgrounds */}
+        <div className="absolute inset-0 bg-gradient-to-br from-[var(--color-brand-blue)]/5 via-transparent to-[var(--color-sky-blue)]/10 z-0"></div>
+        <div className="absolute top-[-20%] left-[-10%] w-[70%] h-[70%] bg-[var(--color-brand-blue)]/10 blur-[120px] rounded-full z-0"></div>
+        <div className="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] bg-[var(--color-sky-blue)]/10 blur-[100px] rounded-full z-0"></div>
+        <div className="shell-bg-grid opacity-40 z-0" aria-hidden="true"></div>
+        
+        <div className="relative z-10 p-12 max-w-lg text-center animate-fade-in flex flex-col items-center justify-center h-full w-full" style={{ animationDelay: '100ms' }}>
+          <div className="relative w-full max-w-sm aspect-square mb-8 rounded-3xl overflow-hidden shadow-2xl transition-transform duration-700 hover:scale-[1.02] border border-white/5 bg-white/5 backdrop-blur-sm">
+            <img 
+              src={loginArt.src} 
+              alt="Commerce Dashboard Art" 
+              className="w-full h-full object-cover mix-blend-screen opacity-90" 
+            />
+            {/* Overlay gradient to blend bottom edge into the dark background */}
+            <div className="absolute inset-0 bg-gradient-to-t from-[var(--color-bg-surface)] to-transparent via-transparent"></div>
+          </div>
 
-      {/* Floating Theme Toggle (Top Right) */}
-      <button 
-        type="button"
-        onClick={toggleTheme} 
-        className="absolute top-6 right-6 z-20 flex items-center justify-center h-10 w-10 rounded-xl border border-[var(--glass-border)] bg-[var(--glass-bg)] text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] transition-all shadow-md active:scale-95" 
-        aria-label="Toggle theme"
-      >
-        {!isLightTheme ? (
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="12" cy="12" r="5" />
-            <line x1="12" y1="1" x2="12" y2="3" />
-            <line x1="12" y1="21" x2="12" y2="23" />
-            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
-            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
-            <line x1="1" y1="12" x2="3" y2="12" />
-            <line x1="21" y1="12" x2="23" y2="12" />
-            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
-            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
-          </svg>
-        ) : (
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" />
-          </svg>
-        )}
-      </button>
+          <h1 className="text-[2.75rem] font-extrabold tracking-tight text-[var(--color-text-primary)] mb-6 leading-[1.15]">
+            Command your <br/>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--color-brand-blue)] to-[#818cf8]">Commerce Engine</span>
+          </h1>
+          <p className="text-[var(--color-text-muted)] text-[1.05rem] leading-relaxed font-medium">
+            Manage your courses, automate affiliate payouts, and oversee platform performance from a single unified control center.
+          </p>
+          
+          <div className="mt-12 flex items-center justify-center gap-6 text-[var(--color-text-subtle)] text-sm font-semibold">
+            <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]"></div> System Operational</div>
+            <div className="w-1 h-1 rounded-full bg-[var(--color-text-subtle)]/30"></div>
+            <div>v2.0.0</div>
+          </div>
+        </div>
+      </div>
 
-      {/* Login Card Box (Inherits standard Glass Card styling) */}
-      <div className="glass-card relative z-10 w-full max-w-md space-y-8 p-8 backdrop-blur-xl animate-card-enter">
+      {/* Right side: Login form */}
+      <div className="flex-1 flex flex-col items-center justify-center p-4 sm:p-6 lg:p-8 relative z-10">
+        <div className="shell-bg-grid lg:hidden opacity-30" aria-hidden="true"></div>
+        <div className="shell-bg-orb shell-bg-orb--tl opacity-60" aria-hidden="true"></div>
+        <div className="shell-bg-orb shell-bg-orb--br opacity-60" aria-hidden="true"></div>
+
+        {/* Floating Theme Toggle (Top Right) */}
+        <button 
+          type="button"
+          onClick={toggleTheme} 
+          className="absolute top-6 right-6 z-20 flex items-center justify-center h-10 w-10 rounded-xl border border-[var(--glass-border)] bg-[var(--glass-bg)] text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] hover:bg-[var(--glass-bg-hover)] transition-all shadow-sm active:scale-95 backdrop-blur-md" 
+          aria-label="Toggle theme"
+        >
+          {!isLightTheme ? (
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="5" />
+              <line x1="12" y1="1" x2="12" y2="3" />
+              <line x1="12" y1="21" x2="12" y2="23" />
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+              <line x1="1" y1="12" x2="3" y2="12" />
+              <line x1="21" y1="12" x2="23" y2="12" />
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+            </svg>
+          ) : (
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" />
+            </svg>
+          )}
+        </button>
+
+        {/* Login Card Box */}
+        <div className="glass-card relative z-10 w-full max-w-[420px] space-y-8 p-8 sm:p-10 backdrop-blur-2xl animate-card-enter border border-[var(--glass-border)] shadow-[0_8px_32px_rgba(0,0,0,0.08)] rounded-3xl">
         
         {/* Form Validation alerts */}
         {errorMsg && (
@@ -603,6 +640,7 @@ export default function AdminLoginPage() {
           </div>
         )}
 
+        </div>
       </div>
     </div>
   );
