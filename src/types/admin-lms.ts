@@ -52,6 +52,8 @@ export interface InfluencerProfile {
 export interface User {
   _id: string;
   name: string;
+  display_name?: string;
+  avatar_doc_id?: string;
   email: string;
   phone: string;
   role: UserRole;

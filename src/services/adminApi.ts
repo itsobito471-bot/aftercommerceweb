@@ -361,3 +361,29 @@ export const syncTemplateFields = async (
   const response = await adminApi.put<{ success: boolean; data: any }>(`/api/admin/assessments/${templateId}/fields/sync`, data);
   return response.data;
 };
+
+// ==========================================
+// 8. DOCUMENTS & PROFILE
+// ==========================================
+
+export const uploadDocument = async (file: File): Promise<{ success: boolean; data: any }> => {
+  const formData = new FormData();
+  formData.append('file', file);
+  
+  const response = await adminApi.post<{ success: boolean; data: any }>('/api/admin/documents/upload', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+  return response.data;
+};
+
+export const updateProfile = async (data: { display_name?: string; avatar_doc_id?: string }): Promise<{ success: boolean; data: User }> => {
+  const response = await adminApi.patch<{ success: boolean; data: User }>('/api/admin/users/me', data);
+  return response.data;
+};
+
+export const getDocumentUrl = async (docId: string): Promise<{ success: boolean; data: { url: string } }> => {
+  const response = await adminApi.get<{ success: boolean; data: { url: string } }>(`/api/admin/documents/${docId}`);
+  return response.data;
+};

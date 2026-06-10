@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { getAdminProfile } from '../../../services/adminApi';
+import { getAdminProfile, getDocumentUrl } from '../../../services/adminApi';
 import { User } from '../../../types/admin-lms';
 import logoIcon from '@/assets/images/logo-icon.svg';
 
@@ -18,6 +18,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   // Profile data & loading states
   const [profile, setProfile] = useState<User | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
 
   // Layout states (mirroring Angular side-nav component states)
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
@@ -193,6 +194,18 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         }
 
         setProfile(userProfile);
+
+        if (userProfile.avatar_doc_id) {
+          try {
+            const docRes = await getDocumentUrl(userProfile.avatar_doc_id);
+            if (docRes.success && docRes.data.url) {
+              setAvatarUrl(docRes.data.url);
+            }
+          } catch (err) {
+            console.error('Failed to load avatar URL', err);
+          }
+        }
+
         setAuthLoading(false);
       } catch (err) {
         if (!active) return;
@@ -304,7 +317,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               className="sidebar__brand-logo-collapsed h-8 w-auto object-contain mx-auto" 
             />
           ) : (
-            <div className="sidebar__brand-text select-none flex items-center gap-2.5">
+            <div className="select-none flex flex-row items-center gap-2.5">
               <img 
                 src={logoIcon.src} 
                 alt="After Commerce" 
@@ -429,7 +442,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <div className="content-area">
         
         {/* TOPBAR PANEL */}
-        <header className="topbar animate-header">
+        <header className="topbar animate-header relative z-50">
           
           <div className="topbar__left">
             {/* Hamburger menu button */}
@@ -487,7 +500,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </button>
 
             {/* Notifications Button */}
-            <div className="topbar__notif-wrap">
+            <div className="relative group">
               <button className="topbar__icon-btn" aria-label="Notifications">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" />
@@ -495,18 +508,68 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 </svg>
               </button>
               <span className="topbar__notif-dot" aria-hidden="true"></span>
+              
+              {/* Notification Dropdown */}
+              <div className="absolute right-0 mt-2 w-72 rounded-xl border border-[var(--glass-border)] bg-[var(--color-bg-surface)] p-3 shadow-xl backdrop-blur-xl z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 translate-y-2 group-hover:translate-y-0 before:absolute before:-top-4 before:left-0 before:w-full before:h-4">
+                <h4 className="px-2 py-1 text-[11px] font-bold uppercase tracking-wider text-[var(--color-text-muted)] border-b border-[var(--glass-border)] pb-2 mb-2">Notifications</h4>
+                <div className="flex flex-col gap-1 max-h-64 overflow-y-auto scrollbar-premium">
+                  <div className="rounded-lg p-2 hover:bg-[var(--glass-bg-hover)] cursor-pointer transition-colors border-l-2 border-[var(--color-accent)] bg-[var(--color-accent-dim)]">
+                    <p className="text-[13px] font-semibold text-[var(--color-text-primary)]">New Registration</p>
+                    <p className="text-xs text-[var(--color-text-subtle)] mt-0.5">A new student signed up.</p>
+                  </div>
+                  <div className="rounded-lg p-2 hover:bg-[var(--glass-bg-hover)] cursor-pointer transition-colors">
+                    <p className="text-[13px] font-semibold text-[var(--color-text-primary)]">Course Published</p>
+                    <p className="text-xs text-[var(--color-text-subtle)] mt-0.5">"Advanced React" is live.</p>
+                  </div>
+                </div>
+                <button className="mt-2 w-full rounded-md py-1.5 text-center text-[11px] font-bold uppercase tracking-wider text-[var(--color-accent)] hover:bg-[var(--glass-bg-hover)]">Mark all as read</button>
+              </div>
             </div>
 
             {/* User Menu Chip Pill */}
-            <button className="topbar__user-chip" id="user-menu-btn" aria-label="User menu">
-              <div className="topbar__avatar select-none">{getUserInitials()}</div>
-              {windowWidth >= 900 && (
-                <div className="topbar__user-info select-none">
-                  <span className="topbar__user-name">{userName}</span>
-                  <span className="topbar__user-role">{userRole}</span>
+            <div className="relative group">
+              <button className="topbar__user-chip" id="user-menu-btn" aria-label="User menu">
+                {avatarUrl ? (
+                  <img 
+                    src={avatarUrl} 
+                    alt={userName} 
+                    className="w-8 h-8 rounded-full object-cover ring-2 ring-[var(--glass-border)] shadow-sm"
+                  />
+                ) : (
+                  <div className="topbar__avatar select-none">{getUserInitials()}</div>
+                )}
+                {windowWidth >= 900 && (
+                  <div className="topbar__user-info select-none">
+                    <span className="topbar__user-name">{profile?.display_name || userName}</span>
+                    <span className="topbar__user-role">{userRole}</span>
+                  </div>
+                )}
+              </button>
+              
+              {/* Profile Dropdown */}
+              <div className="absolute right-0 mt-2 w-52 rounded-xl border border-[var(--glass-border)] bg-[var(--color-bg-surface)] p-2 shadow-xl backdrop-blur-xl z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 translate-y-2 group-hover:translate-y-0 before:absolute before:-top-4 before:left-0 before:w-full before:h-4">
+                <div className="px-3 py-2 mb-1 border-b border-[var(--glass-border)]">
+                  <p className="text-sm font-semibold text-[var(--color-text-primary)] truncate">{profile?.display_name || userName}</p>
+                  <p className="text-xs text-[var(--color-text-subtle)] truncate">{profile?.email || 'admin@lms.com'}</p>
                 </div>
-              )}
-            </button>
+                
+                <Link href="/admin/profile" className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium text-[var(--color-text-primary)] hover:bg-[var(--glass-bg-hover)] transition-colors">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
+                  My Profile
+                </Link>
+                <Link href="/admin/settings" className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium text-[var(--color-text-primary)] hover:bg-[var(--glass-bg-hover)] transition-colors">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                  Change Password
+                </Link>
+                
+                <div className="my-1 border-t border-[var(--glass-border)]"></div>
+                
+                <button onClick={() => setShowLogoutModal(true)} className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium text-red-500 hover:bg-red-500/10 transition-colors">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" /></svg>
+                  Sign Out
+                </button>
+              </div>
+            </div>
 
           </div>
         </header>
