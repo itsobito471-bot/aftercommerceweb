@@ -2,7 +2,7 @@ import axios from 'axios';
 import { User, Course, PaginatedResponse, UserKycRecord, Category } from '../types/admin-lms';
 
 // Base backend URL config
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3000';
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000';
 
 // Central Axios client instance for LMS administration
 export const adminApi = axios.create({

@@ -6,7 +6,7 @@ import axios from 'axios';
 import logoIcon from '@/assets/images/logo-icon.svg';
 import loginArt from '@/assets/images/login-art.png';
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3000';
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000';
 
 type Step = 'login' | '2fa' | 'setup';
 

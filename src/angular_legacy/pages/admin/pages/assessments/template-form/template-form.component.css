@@ -1,5 +1,0 @@
-/* Extension blockers: Hides any floating UI the extensions try to inject next to the inputs */
-::ng-deep .glass-input ~ grammarly-extension,
-::ng-deep .glass-input ~ div[style*="z-index"] {
-    display: none !important;
-}
