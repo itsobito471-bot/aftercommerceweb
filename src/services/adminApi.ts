@@ -1,5 +1,6 @@
 import axios from 'axios';
-import { User, Course, PaginatedResponse, UserKycRecord, Category } from '../types/admin-lms';
+import { User, Course as AdminCourse, PaginatedResponse, UserKycRecord, Category } from '../types/admin-lms';
+import { Course, Module, LearningUnit } from '../types/course';
 
 // Base backend URL config
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5001';
@@ -211,21 +212,21 @@ export const getCourses = async (
   page = 1,
   limit = 10,
   filters: Record<string, unknown> = {}
-): Promise<PaginatedResponse<Course>> => {
+): Promise<PaginatedResponse<AdminCourse>> => {
   const queryPayload = {
     page,
     limit,
     ...filters,
   };
   const encodedQuery = encodeQuery(queryPayload);
-  const response = await adminApi.get<PaginatedResponse<Course>>(
+  const response = await adminApi.get<PaginatedResponse<AdminCourse>>(
     `/api/admin/courses/filter?q=${encodedQuery}`
   );
   return response.data;
 };
 
-export const createCourse = async (payload: Partial<Course>): Promise<Course> => {
-  const response = await adminApi.post<{ success: boolean; data: Course }>('/api/admin/courses', payload);
+export const createCourse = async (payload: Partial<AdminCourse>): Promise<AdminCourse> => {
+  const response = await adminApi.post<{ success: boolean; data: AdminCourse }>('/api/admin/courses', payload);
   return response.data.data;
 };
 
@@ -405,5 +406,44 @@ export const updateProfile = async (data: { display_name?: string; avatar_doc_id
 
 export const getDocumentUrl = async (docId: string): Promise<{ success: boolean; data: { url: string } }> => {
   const response = await adminApi.get<{ success: boolean; data: { url: string } }>(`/api/admin/documents/${docId}`);
+  return response.data;
+};
+
+// ==========================================
+// 9. COURSE BUILDER (ECOSYSTEM)
+// ==========================================
+
+export const createCourseShell = async (data: Partial<Course>): Promise<{ success: boolean; data: Course }> => {
+  const response = await adminApi.post<{ success: boolean; data: Course }>('/api/admin/courses', data);
+  return response.data;
+};
+
+export const updateCourseShell = async (id: string, data: Partial<Course>): Promise<{ success: boolean; data: Course }> => {
+  const response = await adminApi.patch<{ success: boolean; data: Course }>(`/api/admin/courses/${id}`, data);
+  return response.data;
+};
+
+export const createModule = async (data: Partial<Module>): Promise<{ success: boolean; data: Module }> => {
+  const response = await adminApi.post<{ success: boolean; data: Module }>('/api/admin/modules', data);
+  return response.data;
+};
+
+export const updateModule = async (id: string, data: Partial<Module>): Promise<{ success: boolean; data: Module }> => {
+  const response = await adminApi.patch<{ success: boolean; data: Module }>(`/api/admin/modules/${id}`, data);
+  return response.data;
+};
+
+export const createLearningUnit = async (data: Partial<LearningUnit>): Promise<{ success: boolean; data: LearningUnit }> => {
+  const response = await adminApi.post<{ success: boolean; data: LearningUnit }>('/api/admin/units', data);
+  return response.data;
+};
+
+export const updateLearningUnit = async (id: string, data: Partial<LearningUnit>): Promise<{ success: boolean; data: LearningUnit }> => {
+  const response = await adminApi.patch<{ success: boolean; data: LearningUnit }>(`/api/admin/units/${id}`, data);
+  return response.data;
+};
+
+export const getCourseTree = async (id: string): Promise<{ success: boolean; data: any }> => {
+  const response = await adminApi.get<{ success: boolean; data: any }>(`/api/admin/courses/${id}/tree`);
   return response.data;
 };
