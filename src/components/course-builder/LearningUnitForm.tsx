@@ -72,7 +72,7 @@ export const LearningUnitForm: React.FC<LearningUnitFormProps> = ({ moduleId, in
       if (onSave) {
         onSave({
           ...payload,
-          id: savedUnit?.data?._id || savedUnit?.data?.id || initialData?.id
+          id: (savedUnit?.data as any)?._id || (savedUnit?.data as any)?.id || initialData?.id || ''
         });
       }
     } catch (error) {

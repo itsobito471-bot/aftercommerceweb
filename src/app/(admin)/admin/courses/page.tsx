@@ -54,7 +54,7 @@ function CourseCatalogContent() {
       // Execute the API request via our service layer
       const res = await getCourses(page, 10, filters);
       setCourses((res.data as any) || []);
-      setTotalPages(res.totalPages || 1);
+      setTotalPages((res as any).pagination?.totalPages || (res as any).totalPages || 1);
     } catch (error) {
       console.error('Failed to fetch courses:', error);
       setCourses([]);

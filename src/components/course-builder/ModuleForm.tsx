@@ -60,7 +60,7 @@ export const ModuleForm: React.FC<ModuleFormProps> = ({ courseId, initialData, o
       if (onSave) {
         onSave({
           ...formData,
-          id: savedModule?.data?._id || savedModule?.data?.id || initialData?.id
+          id: (savedModule?.data as any)?._id || (savedModule?.data as any)?.id || initialData?.id || ''
         });
       }
     } catch (error) {

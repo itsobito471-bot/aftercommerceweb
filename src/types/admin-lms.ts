@@ -88,6 +88,7 @@ export interface User {
 // Category Entity
 export interface Category {
   _id: string;
+  id?: string;
   name: string;
   slug: string;
   is_active: boolean;

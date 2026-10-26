@@ -124,7 +124,7 @@ export const CourseShellForm: React.FC<CourseShellFormProps> = ({ initialData, o
       if (onSave) {
         onSave({
           ...formData,
-          id: savedCourse?.data?._id || savedCourse?.data?.id || initialData?.id
+          id: (savedCourse?.data as any)?._id || (savedCourse?.data as any)?.id || initialData?.id || ''
         });
       }
     } catch (error) {

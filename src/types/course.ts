@@ -57,9 +57,11 @@ export interface Module {
 
 export interface Course {
   id: string;
+  _id?: string;
   title: string;
   description?: string;
   category: string;
+  category_id?: string;
   price: number;
   validity_days: number;
   structure_mode: StructureMode;

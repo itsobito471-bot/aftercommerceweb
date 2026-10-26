@@ -392,7 +392,7 @@ export default function AdminDashboardPage() {
                   <img src={influencerAvatarUrl} alt="Affiliate Avatar" className="db-welcome-av" style={{ width: 40, height: 40, fontSize: '0.85rem' }} />
                 ) : (
                   <div className="db-welcome-av" style={{ width: 40, height: 40, fontSize: '0.85rem' }}>
-                    {topInfluencer.name?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || 'AF'}
+                    {topInfluencer.name?.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2) || 'AF'}
                   </div>
                 )
               ) : (
