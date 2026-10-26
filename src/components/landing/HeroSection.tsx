@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import logoIcon from '@/assets/images/logo-icon.svg';
-import logoIconDark from '@/assets/images/logo-icon-dark.svg';
+import logoIconDark from '@/assets/images/logo-icon.svg';
 
 interface NodeData {
   id: string;
@@ -14,11 +14,11 @@ interface NodeData {
   heading?: string;
   isOrange?: boolean;
   baseSize: number;
-  // Stage 1 (Dispersed): coordinates as percentage of viewport (0-100)
+  // Stage 1 (Dispersed): coordinates as percentage of viewport (0-100) - Wide perimeter clearance
   s1: { x: number; y: number };
-  // Stage 2 (Connected Lattice): coordinates drifted inward
+  // Stage 2 (Connected Lattice): coordinates drifted inward safely
   s2: { x: number; y: number };
-  // Stage 3 (Gravitational Orbital Convergence): tightly orbiting center (50, 46)
+  // Stage 3 (Gravitational Orbital Convergence): tightly orbiting center (50, 50)
   s3: { x: number; y: number };
   badgeSub?: string;
 }
@@ -32,8 +32,8 @@ const NODES: NodeData[] = [
     labelSub: '.MOD: CORE.01',
     isOrange: false,
     baseSize: 66,
-    s1: { x: 13, y: 26 },
-    s2: { x: 18, y: 27 },
+    s1: { x: 8, y: 22 },
+    s2: { x: 14, y: 24 },
     s3: { x: 42, y: 32 },
     badgeSub: 'ACCOUNTING'
   },
@@ -45,8 +45,8 @@ const NODES: NodeData[] = [
     labelSub: '.ALPHA ACTIVE',
     isOrange: true,
     baseSize: 84,
-    s1: { x: 82, y: 26 },
-    s2: { x: 77, y: 28 },
+    s1: { x: 91, y: 22 },
+    s2: { x: 85, y: 24 },
     s3: { x: 58, y: 29 },
     badgeSub: '02 // TAXATION'
   },
@@ -59,8 +59,8 @@ const NODES: NodeData[] = [
     labelSub: 'CAPITAL ENG.',
     isOrange: false,
     baseSize: 92,
-    s1: { x: 10, y: 51 },
-    s2: { x: 16, y: 50 },
+    s1: { x: 7, y: 50 },
+    s2: { x: 12, y: 50 },
     s3: { x: 64, y: 41 },
     badgeSub: 'FINANCE'
   },
@@ -72,8 +72,8 @@ const NODES: NodeData[] = [
     labelSub: '',
     isOrange: false,
     baseSize: 54,
-    s1: { x: 15, y: 79 },
-    s2: { x: 19, y: 76 },
+    s1: { x: 9, y: 78 },
+    s2: { x: 14, y: 75 },
     s3: { x: 33, y: 43 },
     badgeSub: 'AUDIT'
   },
@@ -85,8 +85,9 @@ const NODES: NodeData[] = [
     labelSub: 'REG_FRAME',
     isOrange: false,
     baseSize: 52,
-    s1: { x: 28, y: 24 },
-    s2: { x: 30, y: 26 },
+    // Outer perimeter to completely clear the headline on all screens
+    s1: { x: 17, y: 14 },
+    s2: { x: 21, y: 17 },
     s3: { x: 34, y: 56 },
     badgeSub: 'COMPLIANCE'
   },
@@ -99,8 +100,8 @@ const NODES: NodeData[] = [
     labelSub: 'STREAM READY',
     isOrange: true,
     baseSize: 86,
-    s1: { x: 88, y: 49 },
-    s2: { x: 83, y: 49 },
+    s1: { x: 92, y: 50 },
+    s2: { x: 87, y: 50 },
     s3: { x: 53, y: 64 },
     badgeSub: '06 // ANALYTICS'
   },
@@ -112,8 +113,8 @@ const NODES: NodeData[] = [
     labelSub: '',
     isOrange: false,
     baseSize: 72,
-    s1: { x: 81, y: 79 },
-    s2: { x: 76, y: 76 },
+    s1: { x: 90, y: 78 },
+    s2: { x: 85, y: 75 },
     s3: { x: 61, y: 52 },
     badgeSub: 'BANKING'
   },
@@ -125,8 +126,9 @@ const NODES: NodeData[] = [
     labelSub: 'OPS_VENTURE',
     isOrange: false,
     baseSize: 54,
-    s1: { x: 67, y: 24 },
-    s2: { x: 64, y: 26 },
+    // Outer perimeter to completely clear the headline on all screens
+    s1: { x: 82, y: 14 },
+    s2: { x: 76, y: 17 },
     s3: { x: 62, y: 62 },
     badgeSub: 'STRATEGY'
   },
@@ -138,8 +140,9 @@ const NODES: NodeData[] = [
     labelSub: '09 / OPERATIONS',
     isOrange: false,
     baseSize: 64,
-    s1: { x: 64, y: 83 },
-    s2: { x: 60, y: 80 },
+    // Outer perimeter to completely clear the action buttons
+    s1: { x: 82, y: 88 },
+    s2: { x: 76, y: 84 },
     s3: { x: 44, y: 48 },
     badgeSub: 'OPERATIONS'
   },
@@ -151,8 +154,9 @@ const NODES: NodeData[] = [
     labelSub: '10 / JURIS_PRUD COMMERCE_LAW',
     isOrange: false,
     baseSize: 50,
-    s1: { x: 28, y: 85 },
-    s2: { x: 31, y: 81 },
+    // Outer perimeter to completely clear the action buttons
+    s1: { x: 17, y: 88 },
+    s2: { x: 21, y: 84 },
     s3: { x: 42, y: 67 },
     badgeSub: 'COMMERCE LAW'
   }
@@ -166,38 +170,71 @@ const LATTICE_CONNECTIONS = [
 
 export default function HeroSection() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const targetProgressRef = useRef(0);
+  const currentProgressRef = useRef(0);
   const [scrollProgress, setScrollProgress] = useState(0);
   const [activeStage, setActiveStage] = useState<1 | 2 | 3 | 4>(1);
+  const [isMobile, setIsMobile] = useState(false);
+  const [isTablet, setIsTablet] = useState(false);
 
-  // Sync scroll progress with window scroll within container
-  const handleScroll = useCallback(() => {
-    if (!containerRef.current) return;
-    const rect = containerRef.current.getBoundingClientRect();
-    const totalScrollable = containerRef.current.offsetHeight - window.innerHeight;
-    
-    if (totalScrollable <= 0) return;
-
-    const currentScroll = -rect.top;
-    const progress = Math.max(0, Math.min(1, currentScroll / totalScrollable));
-    setScrollProgress(progress);
-
-    // Determine discrete stage
-    if (progress < 0.28) {
-      setActiveStage(1);
-    } else if (progress < 0.58) {
-      setActiveStage(2);
-    } else if (progress < 0.85) {
-      setActiveStage(3);
-    } else {
-      setActiveStage(4);
-    }
+  // Responsive screen detection
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 640);
+      setIsTablet(window.innerWidth >= 640 && window.innerWidth < 1024);
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  // Silky Smooth 60-120fps RAF LERP Scroll Engine with Apple-grade momentum
   useEffect(() => {
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll();
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [handleScroll]);
+    let animId: number;
+
+    const onScroll = () => {
+      if (!containerRef.current) return;
+      const rect = containerRef.current.getBoundingClientRect();
+      const totalScrollable = containerRef.current.offsetHeight - window.innerHeight;
+      if (totalScrollable <= 0) return;
+      const currentScroll = -rect.top;
+      targetProgressRef.current = Math.max(0, Math.min(1, currentScroll / totalScrollable));
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+
+    const tick = () => {
+      const diff = targetProgressRef.current - currentProgressRef.current;
+      // Fluid exponential damping (0.095 provides ultra-silky inertia and zero stutter)
+      if (Math.abs(diff) > 0.00015) {
+        currentProgressRef.current += diff * 0.095;
+        const p = currentProgressRef.current;
+        setScrollProgress(p);
+
+        if (p < 0.28) setActiveStage(1);
+        else if (p < 0.58) setActiveStage(2);
+        else if (p < 0.85) setActiveStage(3);
+        else setActiveStage(4);
+      } else if (currentProgressRef.current !== targetProgressRef.current) {
+        currentProgressRef.current = targetProgressRef.current;
+        const p = currentProgressRef.current;
+        setScrollProgress(p);
+        if (p < 0.28) setActiveStage(1);
+        else if (p < 0.58) setActiveStage(2);
+        else if (p < 0.85) setActiveStage(3);
+        else setActiveStage(4);
+      }
+      animId = requestAnimationFrame(tick);
+    };
+
+    animId = requestAnimationFrame(tick);
+
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      cancelAnimationFrame(animId);
+    };
+  }, []);
 
   // Programmatically jump/scroll to a specific stage
   const scrollToStage = (stage: 1 | 2 | 3 | 4) => {
@@ -239,9 +276,8 @@ export default function HeroSection() {
       opacity = 1;
     } else {
       // STAGE 3 TO 4: ACTIVE PHYSICAL CONVERGENCE & FUSION MERGE
-      // From 0.62 to 0.88, balls are drawn with gravitational acceleration directly into (50, 47)
+      // From 0.62 to 0.88, balls are drawn with gravitational acceleration directly into (50, 50)
       const t = Math.min(1, Math.max(0, (progress - 0.62) / 0.26));
-      // Gravitational acceleration: inward trajectory
       const easeIn = Math.pow(t, 2.2);
 
       const targetCenter = { x: 50, y: 50 };
@@ -250,16 +286,13 @@ export default function HeroSection() {
 
       // The balls remain fully visible as they plunge inward!
       if (t < 0.65) {
-        // Approaching outer perimeter of the forming core
         scale = (1 - 0.12) * (1 - t * 0.2);
         opacity = 1;
       } else {
         // Penetrating and melting into the central sphere volume!
         isColliding = true;
         const absorbT = (t - 0.65) / 0.35;
-        // As balls sink inside the core, their size compresses into the center
         scale = Math.max(0, (1 - 0.25) * (1 - absorbT * 0.95));
-        // Fade out ONLY once they are absorbed deep inside the core mass
         opacity = Math.max(0, 1 - Math.pow(absorbT, 2.5));
       }
     }
@@ -268,27 +301,22 @@ export default function HeroSection() {
   };
 
   // ── CENTRAL UNIFIED SPHERE SEEDING & GROWTH ──
-  // The central core begins as an energy nucleus at 0.60, swells as it absorbs incoming balls,
-  // peaks dynamically at 0.86 as all 10 collide, then locks into final 100% equilibrium.
   let coreScale = 0;
   let coreOpacity = 0;
-  let fusionEnergy = 0; // Peak energy corona glow during collision
+  let fusionEnergy = 0;
 
   if (scrollProgress >= 0.60) {
     const t = Math.min(1, (scrollProgress - 0.60) / 0.28);
-    coreOpacity = Math.min(1, t * 2.5); // Rapidly reaches 1 so it receives incoming balls
+    coreOpacity = Math.min(1, t * 2.5);
 
     if (t < 0.85) {
-      // Swells continuously as it is fed matter from the 10 balls
       const growEase = t * (2 - t);
-      coreScale = 0.20 + 0.88 * growEase; // expands to ~1.08
+      coreScale = 0.20 + 0.88 * growEase;
     } else {
-      // Elastic settle into stable equilibrium (1.00)
       const settleT = (t - 0.85) / 0.15;
       coreScale = 1.08 - 0.08 * settleT;
     }
 
-    // Fusion pulse peaks right during collision impact (t = 0.50 - 0.90)
     if (t > 0.30 && t < 0.95) {
       fusionEnergy = Math.sin(((t - 0.30) / 0.65) * Math.PI);
     }
@@ -298,7 +326,7 @@ export default function HeroSection() {
   let headingOpacity = 1;
   if (scrollProgress >= 0.50 && scrollProgress < 0.72) {
     const t = (scrollProgress - 0.50) / 0.22;
-    headingOpacity = 1 - t * 0.85; // Dims to 15% watermark in Stage 3
+    headingOpacity = 1 - t * 0.85;
   } else if (scrollProgress >= 0.72) {
     headingOpacity = Math.max(0, 0.15 - (scrollProgress - 0.72) * 1.5);
   }
@@ -306,12 +334,10 @@ export default function HeroSection() {
   return (
     <section
       ref={containerRef}
-      className="relative w-full h-[380vh] bg-[#F8F9FC] text-[#1A1A2E]"
+      className="relative w-full h-[460vh] bg-[#F8F9FC] text-[#1A1A2E]"
     >
-      {/* Sticky Screen Viewport */}
       <div className="sticky top-0 h-screen w-full overflow-hidden select-none flex flex-col justify-between">
         
-        {/* Background Dotted Matrix Grid */}
         <div 
           className="absolute inset-0 pointer-events-none"
           style={{
@@ -321,7 +347,6 @@ export default function HeroSection() {
           }}
         />
 
-        {/* Ambient Subtle Grid Accents & Precision Marks */}
         <div className="absolute inset-0 pointer-events-none opacity-40">
           <div className="absolute top-1/4 left-1/4 w-3 h-3 border-t border-l border-slate-400" />
           <div className="absolute top-1/4 right-1/4 w-3 h-3 border-t border-r border-slate-400" />
@@ -329,12 +354,13 @@ export default function HeroSection() {
           <div className="absolute bottom-1/4 right-1/4 w-3 h-3 border-b border-r border-slate-400" />
         </div>
 
-        {/* <div className="relative z-40 pt-20 px-6 sm:px-10 flex flex-wrap items-center justify-between gap-3 font-mono text-[11px] text-slate-500 uppercase tracking-widest border-b border-slate-200/40 pb-2">
+        {/* ── TOP TELEMETRY BAR (Directly matching specification & reference screenshots) ── */}
+        <div className="relative z-40 pt-16 sm:pt-20 px-4 sm:px-8 md:px-10 flex flex-wrap items-center justify-between gap-2 font-mono text-[9px] sm:text-[11px] text-slate-500 uppercase tracking-widest border-b border-slate-200/40 pb-2">
           
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-blue-500/80 animate-pulse" />
-            <span className="text-slate-600 font-semibold">SYS_COORD: 43.6532° N, 79.3832° W</span>
-            <span className="text-slate-300">/</span>
+            <span className="hidden sm:inline text-slate-600 font-semibold">SYS_COORD: 43.6532° N, 79.3832° W</span>
+            <span className="hidden sm:inline text-slate-300">/</span>
             <span className="text-[#2B4788] font-bold">
               {activeStage === 1 && 'RENDER: VECTOR_UNCONVERGED'}
               {activeStage === 2 && 'RENDER: ACTIVE_LATTICE_TRANSIT'}
@@ -344,14 +370,14 @@ export default function HeroSection() {
           </div>
 
           {(activeStage === 3 || activeStage === 4) && (
-            <div className="hidden lg:flex items-center gap-2 px-3 py-1 rounded bg-slate-200/70 text-slate-700 font-bold text-[10px]">
+            <div className="hidden lg:flex items-center gap-2 px-3 py-0.5 rounded bg-slate-200/70 text-slate-700 font-bold text-[10px]">
               {activeStage === 3
                 ? 'KERNEL CLUSTER LOCK: STAGE 3'
                 : 'KERNEL CLUSTER LOCK: STAGE 4 (RESOLVED)'}
             </div>
           )}
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             <button
               onClick={() => scrollToStage(1)}
               className={`hover:text-[#2B4788] transition-colors ${
@@ -388,36 +414,40 @@ export default function HeroSection() {
               04
             </button>
 
-            <span className="text-slate-300">|</span>
+            <span className="hidden sm:inline text-slate-300">|</span>
 
             <span className="text-slate-700 font-semibold flex items-center gap-1.5">
               {activeStage === 1 && (
                 <>
-                  STATE: 01 // DISPERSED DISCIPLINE MATRIX
+                  <span className="hidden sm:inline">STATE: 01 // DISPERSED DISCIPLINE MATRIX</span>
+                  <span className="sm:hidden">S1 // DISPERSED</span>
                   <span className="w-2 h-2 rounded-full bg-[#FF6B35]" />
                 </>
               )}
               {activeStage === 2 && (
                 <>
-                  STATE: 02 // CONNECTED KNOWLEDGE NETWORK
+                  <span className="hidden sm:inline">STATE: 02 // CONNECTED KNOWLEDGE NETWORK</span>
+                  <span className="sm:hidden">S2 // LATTICE</span>
                   <span className="w-2 h-2 rounded-full bg-[#2B4788]" />
                 </>
               )}
               {activeStage === 3 && (
                 <>
-                  STATE: 03 // GRAVITATIONAL CONVERGENCE • 78% CONTRACTION
+                  <span className="hidden sm:inline">STATE: 03 // GRAVITATIONAL CONVERGENCE • 78% CONTRACTION</span>
+                  <span className="sm:hidden">S3 // ORBIT</span>
                   <span className="w-2 h-2 rounded-full bg-[#FF6B35] animate-ping" />
                 </>
               )}
               {activeStage === 4 && (
                 <>
-                  STATE: 04 // RESOLVED UNIFIED ECOSYSTEM • 100% SYNTHESIS
+                  <span className="hidden sm:inline">STATE: 04 // RESOLVED UNIFIED ECOSYSTEM • 100% SYNTHESIS</span>
+                  <span className="sm:hidden">S4 // UNIFIED</span>
                   <span className="w-2 h-2 rounded-full bg-[#2B4788]" />
                 </>
               )}
             </span>
           </div>
-        </div> */}
+        </div>
 
         {/* ── MAIN INTERACTIVE CANVAS AREA ── */}
         <div className="relative flex-1 w-full h-full overflow-hidden flex items-center justify-center">
@@ -430,12 +460,6 @@ export default function HeroSection() {
                 <stop offset="50%" stopColor="#4A63CC" stopOpacity="0.7" />
                 <stop offset="100%" stopColor="#FF6B35" stopOpacity="0.3" />
               </linearGradient>
-
-              <radialGradient id="fusionRadial" cx="50%" cy="50%" r="50%">
-                <stop offset="0%" stopColor="#FF7D47" stopOpacity="0.8" />
-                <stop offset="40%" stopColor="#2B4788" stopOpacity="0.5" />
-                <stop offset="100%" stopColor="#1E3494" stopOpacity="0" />
-              </radialGradient>
             </defs>
 
             {/* STAGE 3 CONCENTRIC RADAR RINGS - Fades out completely before Stage 4 */}
@@ -449,7 +473,7 @@ export default function HeroSection() {
                       : Math.max(0, 1 - (scrollProgress - 0.70) / 0.08)
                 }}
               >
-                {/* Orbital concentric circles */}
+                {/* Orbital concentric circles centered on (50%, 50%) */}
                 <circle cx="50%" cy="50%" r="90" fill="none" stroke="#2B4788" strokeWidth="1" strokeDasharray="3 4" opacity="0.3" />
                 <circle cx="50%" cy="50%" r="150" fill="none" stroke="#2B4788" strokeWidth="1" strokeDasharray="4 4" opacity="0.25" />
                 <circle cx="50%" cy="50%" r="220" fill="none" stroke="#2B4788" strokeWidth="1" opacity="0.18" />
@@ -500,7 +524,7 @@ export default function HeroSection() {
               </g>
             )}
 
-            {/* ACTIVE MATTER STREAMS: Lines connecting each plunging ball to the nucleus during merge */}
+            {/* ACTIVE MATTER STREAMS: Lines connecting each plunging ball to (50%, 50%) */}
             {scrollProgress >= 0.62 && scrollProgress < 0.85 && (
               <g>
                 {NODES.map((node) => {
@@ -525,22 +549,22 @@ export default function HeroSection() {
             )}
           </svg>
 
-          {/* ── HERO TEXT (Center Content - States 1 & 2, dimmed in 3, hidden in 4) ── */}
+          {/* ── HERO TEXT (Center Content - Centered with absolute precision) ── */}
           <div
-            className="absolute z-20 max-w-3xl mx-auto px-6 text-center pointer-events-auto transition-opacity duration-300"
+            className="absolute z-20 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[340px] sm:max-w-xl md:max-w-2xl lg:max-w-3xl px-4 sm:px-6 text-center pointer-events-auto transition-opacity duration-300"
             style={{
               opacity: headingOpacity,
-              transform: `scale(${1 - scrollProgress * 0.08})`,
+              transform: `translate(-50%, -50%) scale(${1 - scrollProgress * 0.08})`,
               display: headingOpacity <= 0.01 ? 'none' : 'block'
             }}
           >
             {/* Top Indicator Pill */}
-            <div className="inline-flex items-center justify-center mb-4">
+            <div className="inline-flex items-center justify-center mb-2.5 sm:mb-4">
               <span className="w-4 h-1.5 rounded-full bg-[#FF6B35]" />
             </div>
 
-            {/* Main Headline */}
-            <h1 className="font-extrabold text-[44px] sm:text-[56px] md:text-[68px] leading-[1.08] tracking-tight text-[#1A1A2E] font-['Poppins',sans-serif]">
+            {/* Main Headline - Responsive typography to prevent collision */}
+            <h1 className="font-extrabold text-[28px] sm:text-[38px] md:text-[50px] lg:text-[62px] leading-[1.08] tracking-tight text-[#1A1A2E] font-['Poppins',sans-serif]">
               Everything your{' '}
               <br className="hidden sm:inline" />
               commerce career{' '}
@@ -551,28 +575,28 @@ export default function HeroSection() {
             </h1>
 
             {/* Sub-headline */}
-            <div className="mt-5 max-w-xl mx-auto">
-              <p className="font-bold text-[14px] sm:text-[15px] text-[#1A1A2E] tracking-tight">
+            <div className="mt-3 sm:mt-5 max-w-sm sm:max-w-lg mx-auto">
+              <p className="font-bold text-[12px] sm:text-[14px] text-[#1A1A2E] tracking-tight">
                 Beyond Theory. Into Skills.
               </p>
-              <p className="mt-1 text-[13px] sm:text-[14px] text-slate-500 leading-relaxed font-normal">
+              <p className="mt-1 text-[11px] sm:text-[13px] text-slate-500 leading-relaxed font-normal">
                 Practical apprenticeships, real-world finance engines, and executive
                 mentorship unified into a cohesive career operating system.
               </p>
             </div>
 
             {/* CTA Buttons in State 1 & 2 */}
-            <div className="mt-7 flex flex-wrap items-center justify-center gap-4">
+            <div className="mt-5 sm:mt-6 flex flex-wrap items-center justify-center gap-2.5 sm:gap-4">
               <Link
                 href="/admin-login"
-                className="inline-flex items-center justify-center gap-2 px-7 py-3 rounded-xl bg-[#2B4788] hover:bg-[#1E3494] text-white font-semibold text-sm shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 active:translate-y-0"
+                className="inline-flex items-center justify-center gap-2 px-5 sm:px-7 py-2.5 sm:py-3 rounded-xl bg-[#2B4788] hover:bg-[#1E3494] text-white font-semibold text-xs sm:text-sm shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 active:translate-y-0"
               >
                 <span>EXPLORE PROGRAMS</span>
                 <span className="font-bold">→</span>
               </Link>
               <a
                 href="#about"
-                className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-white hover:bg-slate-50 text-slate-800 font-semibold text-sm border border-slate-200/90 shadow-sm hover:shadow transition-all"
+                className="inline-flex items-center justify-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl bg-white hover:bg-slate-50 text-slate-800 font-semibold text-xs sm:text-sm border border-slate-200/90 shadow-sm hover:shadow transition-all"
               >
                 <span>DISCOVER AFTER COMMERCE</span>
                 <span className="font-mono text-xs">↗</span>
@@ -583,7 +607,7 @@ export default function HeroSection() {
           {/* ── STAGE 3 WATERMARK SUBTITLE ── */}
           {scrollProgress >= 0.55 && scrollProgress < 0.78 && (
             <div
-              className="absolute top-[18%] text-center z-20 pointer-events-none transition-opacity duration-300"
+              className="absolute top-[16%] sm:top-[18%] left-1/2 -translate-x-1/2 text-center z-20 pointer-events-none transition-opacity duration-300 w-full px-4"
               style={{
                 opacity:
                   scrollProgress < 0.65
@@ -591,11 +615,11 @@ export default function HeroSection() {
                     : Math.max(0, 1 - (scrollProgress - 0.72) / 0.06)
               }}
             >
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50/80 border border-blue-200/60 text-[#2B4788] font-mono text-[11px] font-bold uppercase tracking-wider mb-2">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50/80 border border-blue-200/60 text-[#2B4788] font-mono text-[10px] sm:text-[11px] font-bold uppercase tracking-wider mb-2">
                 <span className="w-2 h-2 rounded-full bg-[#2B4788] animate-pulse" />
                 STAGE 03 • INWARD TRAJECTORY
               </div>
-              <p className="text-xs font-mono text-slate-500 max-w-md mx-auto">
+              <p className="text-[11px] sm:text-xs font-mono text-slate-500 max-w-md mx-auto">
                 Decentralized commerce specializations drawn into an integrated executive system.
               </p>
             </div>
@@ -638,9 +662,9 @@ export default function HeroSection() {
                 />
               )}
 
-              {/* Top Equilibrium Monospace Pill - Positioned cleanly above the sphere */}
+              {/* Top Equilibrium Monospace Pill - Positioned cleanly above the sphere out-of-bounds */}
               <div 
-                className="absolute left-1/2 -translate-x-1/2 bottom-[calc(50%+150px)] pointer-events-auto inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/90 border border-slate-200 shadow-sm font-mono text-[10px] font-bold text-slate-600 uppercase tracking-widest whitespace-nowrap transition-opacity duration-300"
+                className="absolute left-1/2 -translate-x-1/2 bottom-[calc(50%+145px)] sm:bottom-[calc(50%+165px)] md:bottom-[calc(50%+175px)] pointer-events-auto inline-flex items-center gap-2 px-3 sm:px-3.5 py-1 rounded-full bg-white/90 border border-slate-200 shadow-sm font-mono text-[9px] sm:text-[10px] font-bold text-slate-600 uppercase tracking-widest whitespace-nowrap transition-opacity duration-300"
                 style={{ opacity: scrollProgress > 0.84 ? 1 : 0 }}
               >
                 <span className="w-2 h-2 rounded-full bg-[#FF6B35] animate-pulse" />
@@ -649,7 +673,7 @@ export default function HeroSection() {
 
               {/* The Grand Unified 3D Sphere - EXACT CENTER (50%, 50%) */}
               <div
-                className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[240px] h-[240px] sm:w-[260px] sm:h-[260px] rounded-full flex flex-col items-center justify-center p-6 shadow-2xl select-none group cursor-pointer hover:scale-105 transition-transform duration-300 pointer-events-auto"
+                className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[210px] h-[210px] sm:w-[240px] sm:h-[240px] md:w-[260px] md:h-[260px] rounded-full flex flex-col items-center justify-center p-4 sm:p-6 shadow-2xl select-none group cursor-pointer hover:scale-105 transition-transform duration-300 pointer-events-auto"
                 style={{
                   background:
                     'radial-gradient(circle at 35% 26%, #8bb2ff 0%, #3058db 25%, #18338a 55%, #0f1f58 80%, #080d28 100%)',
@@ -677,7 +701,7 @@ export default function HeroSection() {
                   style={{ opacity: Math.max(0, Math.min(1, (scrollProgress - 0.78) / 0.10)) }}
                 >
                   {/* White Rounded Badge with Larger Official Logo */}
-                  <div className="w-20 h-13 sm:w-24 sm:h-15 rounded-2xl bg-white shadow-xl px-3 py-1.5 flex items-center justify-center mb-3 border border-white/95 group-hover:scale-105 transition-transform duration-200">
+                  <div className="w-20 h-13 sm:w-24 sm:h-15 rounded-2xl bg-white shadow-xl px-3 py-1.5 flex items-center justify-center mb-2.5 sm:mb-3 border border-white/95 group-hover:scale-105 transition-transform duration-200">
                     <img 
                       src={logoIconDark.src} 
                       alt="After Commerce Logo" 
@@ -685,18 +709,18 @@ export default function HeroSection() {
                     />
                   </div>
 
-                  <span className="font-extrabold text-[16px] sm:text-[18px] text-white tracking-wider font-['Poppins',sans-serif] leading-tight">
+                  <span className="font-extrabold text-[15px] sm:text-[18px] text-white tracking-wider font-['Poppins',sans-serif] leading-tight">
                     AFTER COMMERCE
                   </span>
-                  <span className="font-mono text-[10px] sm:text-[11px] font-bold text-cyan-300 tracking-widest uppercase mt-1">
+                  <span className="font-mono text-[9px] sm:text-[11px] font-bold text-cyan-300 tracking-widest uppercase mt-1">
                     UNIFIED CAREER ENGINE
                   </span>
                 </div>
               </div>
 
-              {/* Resolved Stage 4 Action Buttons - Sits cleanly below the outer orbit circle (at 50% + 205px) */}
+              {/* Resolved Stage 4 Action Buttons - Sits cleanly below outer orbit circle */}
               <div 
-                className="absolute left-1/2 -translate-x-1/2 top-[calc(50%+205px)] pointer-events-auto flex flex-wrap items-center justify-center gap-4 whitespace-nowrap transition-all duration-300"
+                className="absolute left-1/2 -translate-x-1/2 top-[calc(50%+155px)] sm:top-[calc(50%+200px)] md:top-[calc(50%+235px)] pointer-events-auto flex flex-wrap items-center justify-center gap-3 sm:gap-4 whitespace-nowrap transition-all duration-300"
                 style={{
                   opacity: Math.max(0, Math.min(1, (scrollProgress - 0.84) / 0.08)),
                   transform: `translate(-50%, ${(1 - Math.max(0, Math.min(1, (scrollProgress - 0.84) / 0.08))) * 12}px)`
@@ -704,7 +728,7 @@ export default function HeroSection() {
               >
                 <Link
                   href="/admin-login"
-                  className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl bg-gradient-to-r from-[#FF7D47] to-[#FF6B35] hover:from-[#ff8c5a] hover:to-[#ff7642] text-white font-bold text-sm shadow-[0_8px_25px_rgba(255,107,53,0.35)] hover:shadow-[0_10px_30px_rgba(255,107,53,0.5)] transition-all transform hover:-translate-y-0.5 active:translate-y-0"
+                  className="inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3 sm:py-3.5 rounded-xl bg-gradient-to-r from-[#FF7D47] to-[#FF6B35] hover:from-[#ff8c5a] hover:to-[#ff7642] text-white font-bold text-xs sm:text-sm shadow-[0_8px_25px_rgba(255,107,53,0.35)] hover:shadow-[0_10px_30px_rgba(255,107,53,0.5)] transition-all transform hover:-translate-y-0.5 active:translate-y-0"
                 >
                   <span>EXPLORE PROGRAMS</span>
                   <span className="font-bold">→</span>
@@ -712,7 +736,7 @@ export default function HeroSection() {
 
                 <a
                   href="#about"
-                  className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl bg-white hover:bg-slate-50 text-slate-800 font-semibold text-sm border border-slate-200/90 shadow-sm hover:shadow transition-all"
+                  className="inline-flex items-center justify-center gap-2 px-5 sm:px-7 py-3 sm:py-3.5 rounded-xl bg-white hover:bg-slate-50 text-slate-800 font-semibold text-xs sm:text-sm border border-slate-200/90 shadow-sm hover:shadow transition-all"
                 >
                   <span>DISCOVER AFTER COMMERCE</span>
                   <span className="font-mono text-xs">↗</span>
@@ -724,20 +748,21 @@ export default function HeroSection() {
           {/* ── THE 10 FLOATING 3D SPHERES (ACTIVE CONVERGENCE & SINKING INTO THE CORE) ── */}
           {NODES.map((node) => {
             const state = getNodeState(node, scrollProgress);
-            const size = node.baseSize * state.scale;
+            const responsiveBase = isMobile ? node.baseSize * 0.50 : (isTablet ? node.baseSize * 0.72 : node.baseSize);
+            const size = responsiveBase * state.scale;
 
             if (state.opacity <= 0.01) return null;
 
             return (
               <div
                 key={node.id}
-                className="absolute transition-transform duration-75 pointer-events-auto group cursor-pointer"
+                className="absolute pointer-events-auto group cursor-pointer"
                 style={{
                   left: `${state.x}%`,
                   top: `${state.y}%`,
-                  transform: `translate(-50%, -50%)`,
+                  transform: `translate3d(-50%, -50%, 0)`,
+                  willChange: 'transform, left, top',
                   opacity: state.opacity,
-                  // Position above the core when colliding so you see them entering and merging into it!
                   zIndex: state.isColliding ? 35 : 20
                 }}
                 onClick={() => {
@@ -756,7 +781,6 @@ export default function HeroSection() {
                     boxShadow: node.isOrange
                       ? 'inset -6px -6px 14px rgba(60, 15, 0, 0.6), inset 4px 4px 10px rgba(255, 255, 255, 0.5), 0 16px 28px -6px rgba(255, 107, 53, 0.45), 0 8px 14px -4px rgba(0, 0, 0, 0.2)'
                       : 'inset -6px -6px 14px rgba(0, 0, 40, 0.6), inset 4px 4px 10px rgba(255, 255, 255, 0.45), 0 16px 28px -6px rgba(18, 33, 92, 0.4), 0 8px 14px -4px rgba(0, 0, 0, 0.2)',
-                    // If colliding into the core, add a luminous fusion glow
                     filter: state.isColliding
                       ? `drop-shadow(0 0 12px ${node.isOrange ? '#FF7D47' : '#3B82F6'})`
                       : undefined
@@ -801,36 +825,36 @@ export default function HeroSection() {
                   )}
                 </div>
 
-                {/* LABELS & METADATA IN STAGES 1 & 2 */}
+                {/* LABELS & METADATA IN STAGES 1 & 2 (Oriented away from center content) */}
                 {scrollProgress < 0.50 && (
                   <div
                     className="absolute pointer-events-none whitespace-nowrap transition-opacity duration-200"
                     style={{
                       opacity: Math.max(0, 1 - (scrollProgress - 0.35) / 0.12),
-                      ...(node.id === '01' && { top: '-22px', left: '0' }),
-                      ...(node.id === '02' && { top: '-22px', right: '0', textAlign: 'right' }),
+                      ...(node.id === '01' && { top: '-24px', left: '0' }),
+                      ...(node.id === '02' && { top: '-24px', right: '0', textAlign: 'right' }),
                       ...(node.id === '03' && { left: '108%', top: '24%' }),
-                      ...(node.id === '04' && { left: '108%', top: '30%' }),
-                      ...(node.id === '05' && { bottom: '-22px', left: '0' }),
+                      ...(node.id === '04' && { bottom: '-26px', left: '0' }),
+                      ...(node.id === '05' && { top: '-26px', left: '0' }),
                       ...(node.id === '06' && { right: '108%', top: '24%', textAlign: 'right' }),
-                      ...(node.id === '07' && { bottom: '-22px', right: '0', textAlign: 'right' }),
-                      ...(node.id === '08' && { left: '108%', top: '20%' }),
-                      ...(node.id === '09' && { bottom: '-26px', left: '50%', transform: 'translateX(-50%)', textAlign: 'center' }),
-                      ...(node.id === '10' && { top: '-30px', left: '0' })
+                      ...(node.id === '07' && { bottom: '-26px', right: '0', textAlign: 'right' }),
+                      ...(node.id === '08' && { top: '-26px', right: '0', textAlign: 'right' }),
+                      ...(node.id === '09' && { bottom: '-28px', right: '0', textAlign: 'right' }),
+                      ...(node.id === '10' && { bottom: '-28px', left: '0' })
                     }}
                   >
                     {node.heading && (
-                      <div className="font-extrabold text-[15px] text-[#1A1A2E] leading-tight font-['Poppins',sans-serif]">
+                      <div className="font-extrabold text-[13px] sm:text-[15px] text-[#1A1A2E] leading-tight font-['Poppins',sans-serif]">
                         {node.heading}
                       </div>
                     )}
                     {node.labelTop && (
-                      <div className="font-mono text-[10px] font-bold text-slate-700 tracking-wider">
+                      <div className="font-mono text-[9px] sm:text-[10px] font-bold text-slate-700 tracking-wider">
                         {node.labelTop}
                       </div>
                     )}
                     {node.labelSub && (
-                      <div className="font-mono text-[9px] text-slate-400 uppercase tracking-widest">
+                      <div className="hidden sm:block font-mono text-[8px] sm:text-[9px] text-slate-400 uppercase tracking-widest">
                         {node.labelSub}
                       </div>
                     )}
