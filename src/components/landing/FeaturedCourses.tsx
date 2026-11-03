@@ -88,15 +88,16 @@ export default function FeaturedCourses() {
 
   const total = FEATURED_COURSES.length;
 
-  // Viewport intersection observer for smooth starting entrance animation
+  // Viewport intersection observer for bi-directional entrance and reverse exit animation
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-        }
+        setIsVisible(entry.isIntersecting);
       },
-      { threshold: 0.15 }
+      { 
+        threshold: 0.12,
+        rootMargin: '0px 0px -50px 0px'
+      }
     );
 
     if (sectionRef.current) {

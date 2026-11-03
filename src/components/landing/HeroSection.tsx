@@ -202,9 +202,9 @@ export default function HeroSection() {
 
     const tick = () => {
       const diff = targetProgressRef.current - currentProgressRef.current;
-      // Fluid, responsive LERP (0.16 gives instant, responsive feel with silky momentum)
-      if (Math.abs(diff) > 0.00015) {
-        currentProgressRef.current += diff * 0.16;
+      // Ultra-silky exponential LERP (0.12 provides smooth continuous glide in forward & reverse)
+      if (Math.abs(diff) > 0.00008) {
+        currentProgressRef.current += diff * 0.12;
         const p = currentProgressRef.current;
         setScrollProgress(p);
 

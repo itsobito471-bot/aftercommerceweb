@@ -11,11 +11,13 @@ export default function FeaturedProgram() {
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-        }
+        // Bi-directional visibility: triggers true when scrolling into view, false when scrolling away
+        setIsVisible(entry.isIntersecting);
       },
-      { threshold: 0.15 }
+      { 
+        threshold: 0.15,
+        rootMargin: '0px 0px -50px 0px'
+      }
     );
 
     if (sectionRef.current) {

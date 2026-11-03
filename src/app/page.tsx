@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Navbar from '@/components/landing/Navbar';
 import HeroSection from '@/components/landing/HeroSection';
@@ -9,6 +9,27 @@ import FeaturedCourses from '@/components/landing/FeaturedCourses';
 import logoIcon from '@/assets/images/logo-icon.svg';
 
 export default function LandingPage() {
+  const [ctaVisible, setCtaVisible] = useState(false);
+  const ctaRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setCtaVisible(entry.isIntersecting);
+      },
+      { 
+        threshold: 0.12,
+        rootMargin: '0px 0px -40px 0px'
+      }
+    );
+
+    if (ctaRef.current) {
+      observer.observe(ctaRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
+
   const handleNavigate = (sectionId: string) => {
     const el = document.getElementById(sectionId);
     if (el) {
@@ -48,24 +69,46 @@ export default function LandingPage() {
           id="platform"
           className="relative py-16 sm:py-20 px-6 sm:px-10 border-t border-slate-200/60 bg-gradient-to-b from-transparent to-[#F1F4F9]/60"
         >
-          <div className="max-w-7xl mx-auto">
-            <div className="rounded-3xl bg-[#121624] text-white p-8 sm:p-14 border border-slate-800 shadow-2xl relative overflow-hidden">
+          <div ref={ctaRef} className="max-w-7xl mx-auto">
+            <div 
+              className={`rounded-3xl bg-[#121624] text-white p-8 sm:p-14 border border-slate-800 shadow-2xl relative overflow-hidden transition-all duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+                ctaVisible 
+                  ? 'opacity-100 translate-y-0 scale-100' 
+                  : 'opacity-0 translate-y-12 scale-[0.98]'
+              }`}
+            >
               <div className="absolute top-0 right-0 w-96 h-96 bg-[#2B4788]/30 rounded-full filter blur-3xl pointer-events-none" />
               <div className="absolute bottom-0 left-0 w-80 h-80 bg-[#FF6B35]/20 rounded-full filter blur-3xl pointer-events-none" />
 
               <div className="relative z-10 max-w-2xl">
                 {/* AFTER COMMERCE PLATFORM OS */}
-                <span className="inline-block px-3 py-1 rounded-full bg-white/10 text-cyan-300 font-mono text-xs font-semibold uppercase tracking-widest mb-4">
+                <span 
+                  className={`inline-block px-3 py-1 rounded-full bg-white/10 text-cyan-300 font-mono text-xs font-semibold uppercase tracking-widest mb-4 transition-all duration-700 delay-100 ${
+                    ctaVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+                  }`}
+                >
                   AFTER COMMERCE CAREER PLATFORM
                 </span>
-                <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight leading-tight">
+                <h2 
+                  className={`text-3xl sm:text-5xl font-extrabold tracking-tight leading-tight transition-all duration-700 delay-200 ${
+                    ctaVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
+                  }`}
+                >
                   Ready to converge your career into a high-performance operating system?
                 </h2>
-                <p className="mt-4 text-sm sm:text-base text-slate-300 leading-relaxed">
+                <p 
+                  className={`mt-4 text-sm sm:text-base text-slate-300 leading-relaxed transition-all duration-700 delay-300 ${
+                    ctaVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
+                  }`}
+                >
                   Join thousands of future financial engineers, chartered executives, and commerce innovators already operating with After Commerce.
                 </p>
 
-                <div className="mt-8 flex flex-wrap items-center gap-4">
+                <div 
+                  className={`mt-8 flex flex-wrap items-center gap-4 transition-all duration-700 delay-400 ${
+                    ctaVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
+                  }`}
+                >
                   <Link
                     href="/admin-login"
                     className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl bg-gradient-to-r from-[#FF7D47] to-[#FF6B35] hover:from-[#ff8c5a] hover:to-[#ff7642] text-white font-bold text-sm shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-0.5 active:translate-y-0"
