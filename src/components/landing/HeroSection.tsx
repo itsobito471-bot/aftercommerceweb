@@ -32,8 +32,8 @@ const NODES: NodeData[] = [
     labelSub: '.MOD: CORE.01',
     isOrange: false,
     baseSize: 66,
-    s1: { x: 7, y: 20 },
-    s2: { x: 12, y: 23 },
+    s1: { x: 13, y: 22 },
+    s2: { x: 16, y: 24 },
     s3: { x: 42, y: 32 },
     badgeSub: 'ACCOUNTING'
   },
@@ -45,8 +45,8 @@ const NODES: NodeData[] = [
     labelSub: '.ALPHA ACTIVE',
     isOrange: true,
     baseSize: 84,
-    s1: { x: 93, y: 20 },
-    s2: { x: 88, y: 23 },
+    s1: { x: 87, y: 22 },
+    s2: { x: 84, y: 24 },
     s3: { x: 58, y: 29 },
     badgeSub: '02 // TAXATION'
   },
@@ -59,8 +59,8 @@ const NODES: NodeData[] = [
     labelSub: 'CAPITAL ENG.',
     isOrange: false,
     baseSize: 92,
-    s1: { x: 6, y: 50 },
-    s2: { x: 11, y: 50 },
+    s1: { x: 11, y: 50 },
+    s2: { x: 15, y: 50 },
     s3: { x: 64, y: 41 },
     badgeSub: 'FINANCE'
   },
@@ -72,8 +72,8 @@ const NODES: NodeData[] = [
     labelSub: '',
     isOrange: false,
     baseSize: 54,
-    s1: { x: 7, y: 78 },
-    s2: { x: 12, y: 76 },
+    s1: { x: 13, y: 76 },
+    s2: { x: 16, y: 74 },
     s3: { x: 33, y: 43 },
     badgeSub: 'AUDIT'
   },
@@ -85,9 +85,8 @@ const NODES: NodeData[] = [
     labelSub: 'REG_FRAME',
     isOrange: false,
     baseSize: 52,
-    // Balanced positioning with 17% separation from Node 01 and complete clearance from headline
-    s1: { x: 24, y: 12 },
-    s2: { x: 26, y: 16 },
+    s1: { x: 27, y: 18 },
+    s2: { x: 28, y: 20 },
     s3: { x: 34, y: 56 },
     badgeSub: 'COMPLIANCE'
   },
@@ -100,8 +99,8 @@ const NODES: NodeData[] = [
     labelSub: 'STREAM READY',
     isOrange: true,
     baseSize: 86,
-    s1: { x: 94, y: 50 },
-    s2: { x: 89, y: 50 },
+    s1: { x: 89, y: 50 },
+    s2: { x: 85, y: 50 },
     s3: { x: 53, y: 64 },
     badgeSub: '06 // ANALYTICS'
   },
@@ -113,8 +112,8 @@ const NODES: NodeData[] = [
     labelSub: '',
     isOrange: false,
     baseSize: 72,
-    s1: { x: 93, y: 78 },
-    s2: { x: 88, y: 76 },
+    s1: { x: 87, y: 76 },
+    s2: { x: 84, y: 74 },
     s3: { x: 61, y: 52 },
     badgeSub: 'BANKING'
   },
@@ -126,9 +125,8 @@ const NODES: NodeData[] = [
     labelSub: 'OPS_VENTURE',
     isOrange: false,
     baseSize: 54,
-    // Balanced positioning with 17% separation from Node 02 and complete clearance from headline
-    s1: { x: 76, y: 12 },
-    s2: { x: 74, y: 16 },
+    s1: { x: 73, y: 18 },
+    s2: { x: 72, y: 20 },
     s3: { x: 62, y: 62 },
     badgeSub: 'STRATEGY'
   },
@@ -140,9 +138,8 @@ const NODES: NodeData[] = [
     labelSub: '09 / OPERATIONS',
     isOrange: false,
     baseSize: 64,
-    // Sits well clear of both Node 07 and the right action button
-    s1: { x: 76, y: 88 },
-    s2: { x: 74, y: 84 },
+    s1: { x: 73, y: 82 },
+    s2: { x: 72, y: 80 },
     s3: { x: 44, y: 48 },
     badgeSub: 'OPERATIONS'
   },
@@ -154,9 +151,8 @@ const NODES: NodeData[] = [
     labelSub: '10 / JURIS_PRUD COMMERCE_LAW',
     isOrange: false,
     baseSize: 50,
-    // Sits well clear of both Node 04 and the left action button
-    s1: { x: 24, y: 88 },
-    s2: { x: 26, y: 84 },
+    s1: { x: 27, y: 82 },
+    s2: { x: 28, y: 80 },
     s3: { x: 42, y: 67 },
     badgeSub: 'COMMERCE LAW'
   }
