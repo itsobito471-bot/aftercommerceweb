@@ -19,7 +19,7 @@ const FEATURED_COURSES: CourseItem[] = [
     id: 'c1',
     category: 'FORENSIC CONTROLS',
     rating: 4.7,
-    title: 'Internal Audit & System Telemetry',
+    title: 'Internal Audit & Financial Controls',
     tutor: 'Devansh Mehta',
     duration: '140 mins',
     nodes: 9,

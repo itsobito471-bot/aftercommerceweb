@@ -95,7 +95,7 @@ const NODES: NodeData[] = [
     id: '06',
     code: 'ANL',
     discipline: 'ANALYTICS',
-    labelTop: '06 / TELEMETRY',
+    labelTop: '06 / METRICS', // Commented unwanted sci-fi term: '06 / TELEMETRY'
     heading: 'Analytics',
     labelSub: 'STREAM READY',
     isOrange: true,
@@ -206,23 +206,24 @@ export default function HeroSection() {
 
     const tick = () => {
       const diff = targetProgressRef.current - currentProgressRef.current;
-      // Fluid exponential damping (0.095 provides ultra-silky inertia and zero stutter)
+      // Fluid, responsive LERP (0.16 gives instant, responsive feel with silky momentum)
       if (Math.abs(diff) > 0.00015) {
-        currentProgressRef.current += diff * 0.095;
+        currentProgressRef.current += diff * 0.16;
         const p = currentProgressRef.current;
         setScrollProgress(p);
 
-        if (p < 0.28) setActiveStage(1);
-        else if (p < 0.58) setActiveStage(2);
-        else if (p < 0.85) setActiveStage(3);
+        if (p < 0.24) setActiveStage(1);
+        else if (p < 0.52) setActiveStage(2);
+        else if (p < 0.76) setActiveStage(3);
         else setActiveStage(4);
       } else if (currentProgressRef.current !== targetProgressRef.current) {
         currentProgressRef.current = targetProgressRef.current;
         const p = currentProgressRef.current;
         setScrollProgress(p);
-        if (p < 0.28) setActiveStage(1);
-        else if (p < 0.58) setActiveStage(2);
-        else if (p < 0.85) setActiveStage(3);
+
+        if (p < 0.24) setActiveStage(1);
+        else if (p < 0.52) setActiveStage(2);
+        else if (p < 0.76) setActiveStage(3);
         else setActiveStage(4);
       }
       animId = requestAnimationFrame(tick);
@@ -241,10 +242,10 @@ export default function HeroSection() {
     if (!containerRef.current) return;
     const totalScrollable = containerRef.current.offsetHeight - window.innerHeight;
     const targets = {
-      1: 0.05,
-      2: 0.38,
-      3: 0.68,
-      4: 0.95
+      1: 0.02,
+      2: 0.34,
+      3: 0.64,
+      4: 0.92
     };
     const targetProgress = targets[stage];
     const targetY = containerRef.current.offsetTop + totalScrollable * targetProgress;
@@ -259,41 +260,41 @@ export default function HeroSection() {
     let opacity = 1;
     let isColliding = false;
 
-    if (progress < 0.30) {
+    if (progress < 0.28) {
       // Transition from S1 to S2
-      const t = progress / 0.30;
+      const t = progress / 0.28;
       x = node.s1.x + (node.s2.x - node.s1.x) * t;
       y = node.s1.y + (node.s2.y - node.s1.y) * t;
       scale = 1;
       opacity = 1;
-    } else if (progress < 0.62) {
+    } else if (progress < 0.58) {
       // Transition from S2 to S3 (Orbital constellation)
-      const t = (progress - 0.30) / 0.32;
+      const t = (progress - 0.28) / 0.30;
       const ease = t * t * (3 - 2 * t);
       x = node.s2.x + (node.s3.x - node.s2.x) * ease;
       y = node.s2.y + (node.s3.y - node.s2.y) * ease;
-      scale = 1 - 0.12 * ease;
+      scale = 1 - 0.10 * ease;
       opacity = 1;
     } else {
       // STAGE 3 TO 4: ACTIVE PHYSICAL CONVERGENCE & FUSION MERGE
-      // From 0.62 to 0.88, balls are drawn with gravitational acceleration directly into (50, 50)
-      const t = Math.min(1, Math.max(0, (progress - 0.62) / 0.26));
-      const easeIn = Math.pow(t, 2.2);
+      // From 0.58 to 0.78, balls are drawn directly into (50, 50)
+      const t = Math.min(1, Math.max(0, (progress - 0.58) / 0.20));
+      const easeIn = Math.pow(t, 2.0);
 
       const targetCenter = { x: 50, y: 50 };
       x = node.s3.x + (targetCenter.x - node.s3.x) * easeIn;
       y = node.s3.y + (targetCenter.y - node.s3.y) * easeIn;
 
-      // The balls remain fully visible as they plunge inward!
-      if (t < 0.65) {
-        scale = (1 - 0.12) * (1 - t * 0.2);
+      // The balls plunge inward towards the center!
+      if (t < 0.62) {
+        scale = (1 - 0.10) * (1 - t * 0.15);
         opacity = 1;
       } else {
-        // Penetrating and melting into the central sphere volume!
+        // Impact & fusion: merging into the central sphere
         isColliding = true;
-        const absorbT = (t - 0.65) / 0.35;
-        scale = Math.max(0, (1 - 0.25) * (1 - absorbT * 0.95));
-        opacity = Math.max(0, 1 - Math.pow(absorbT, 2.5));
+        const absorbT = (t - 0.62) / 0.38;
+        scale = Math.max(0, (1 - 0.18) * (1 - absorbT * 0.95));
+        opacity = Math.max(0, 1 - Math.pow(absorbT, 2.0));
       }
     }
 
@@ -305,36 +306,51 @@ export default function HeroSection() {
   let coreOpacity = 0;
   let fusionEnergy = 0;
 
-  if (scrollProgress >= 0.60) {
-    const t = Math.min(1, (scrollProgress - 0.60) / 0.28);
+  // The sphere emerges right as the plunging balls collide at the center (~0.66 - 0.78)
+  if (scrollProgress >= 0.66) {
+    const t = Math.min(1, (scrollProgress - 0.66) / 0.24);
     coreOpacity = Math.min(1, t * 2.5);
 
     if (t < 0.85) {
       const growEase = t * (2 - t);
-      coreScale = 0.20 + 0.88 * growEase;
+      coreScale = 0.25 + 0.83 * growEase;
     } else {
       const settleT = (t - 0.85) / 0.15;
       coreScale = 1.08 - 0.08 * settleT;
     }
 
-    if (t > 0.30 && t < 0.95) {
-      fusionEnergy = Math.sin(((t - 0.30) / 0.65) * Math.PI);
+    if (t > 0.02 && t < 0.65) {
+      fusionEnergy = Math.sin(((t - 0.02) / 0.63) * Math.PI);
     }
   }
 
-  // Heading opacity: visible in Stage 1 & 2, dimmed in Stage 3, hidden in Stage 4
+  // Heading opacity & blur:
+  // In Stage 1: crisp, sharp
+  // In Stage 2: soft elegant defocus and fade
+  // In Stage 3+: completely gone
   let headingOpacity = 1;
-  if (scrollProgress >= 0.50 && scrollProgress < 0.72) {
-    const t = (scrollProgress - 0.50) / 0.22;
-    headingOpacity = 1 - t * 0.85;
-  } else if (scrollProgress >= 0.72) {
-    headingOpacity = Math.max(0, 0.15 - (scrollProgress - 0.72) * 1.5);
+  let headingBlur = 0;
+  let headingPointerEvents: 'auto' | 'none' = 'auto';
+
+  if (scrollProgress < 0.14) {
+    headingOpacity = 1;
+    headingBlur = 0;
+    headingPointerEvents = 'auto';
+  } else if (scrollProgress < 0.42) {
+    const t = (scrollProgress - 0.14) / 0.28;
+    headingBlur = t * 5; // soft, subtle focus falloff
+    headingOpacity = Math.max(0, 1 - Math.pow(t, 1.35));
+    headingPointerEvents = 'none';
+  } else {
+    headingOpacity = 0;
+    headingBlur = 8;
+    headingPointerEvents = 'none';
   }
 
   return (
     <section
       ref={containerRef}
-      className="relative w-full h-[460vh] bg-[#F8F9FC] text-[#1A1A2E]"
+      className="relative w-full h-[340vh] bg-[#F8F9FC] text-[#1A1A2E]"
     >
       <div className="sticky top-0 h-screen w-full overflow-hidden select-none flex flex-col justify-between">
         
@@ -347,16 +363,16 @@ export default function HeroSection() {
           }}
         />
 
-        <div className="absolute inset-0 pointer-events-none opacity-40">
+        {/* Corner HUD brackets commented out for clean commerce presentation */}
+        {/* <div className="absolute inset-0 pointer-events-none opacity-40">
           <div className="absolute top-1/4 left-1/4 w-3 h-3 border-t border-l border-slate-400" />
           <div className="absolute top-1/4 right-1/4 w-3 h-3 border-t border-r border-slate-400" />
           <div className="absolute bottom-1/4 left-1/4 w-3 h-3 border-b border-l border-slate-400" />
           <div className="absolute bottom-1/4 right-1/4 w-3 h-3 border-b border-r border-slate-400" />
-        </div>
+        </div> */}
 
-        {/* ── TOP TELEMETRY BAR (Directly matching specification & reference screenshots) ── */}
-        <div className="relative z-40 pt-16 sm:pt-20 px-4 sm:px-8 md:px-10 flex flex-wrap items-center justify-between gap-2 font-mono text-[9px] sm:text-[11px] text-slate-500 uppercase tracking-widest border-b border-slate-200/40 pb-2">
-          
+        {/* ── TOP TELEMETRY / COORDINATES BAR (Commented out for clean commerce presentation) ── */}
+        {/* <div className="relative z-40 pt-16 sm:pt-20 px-4 sm:px-8 md:px-10 flex flex-wrap items-center justify-between gap-2 font-mono text-[9px] sm:text-[11px] text-slate-500 uppercase tracking-widest border-b border-slate-200/40 pb-2">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-blue-500/80 animate-pulse" />
             <span className="hidden sm:inline text-slate-600 font-semibold">SYS_COORD: 43.6532° N, 79.3832° W</span>
@@ -413,41 +429,8 @@ export default function HeroSection() {
             >
               04
             </button>
-
-            <span className="hidden sm:inline text-slate-300">|</span>
-
-            <span className="text-slate-700 font-semibold flex items-center gap-1.5">
-              {activeStage === 1 && (
-                <>
-                  <span className="hidden sm:inline">STATE: 01 // DISPERSED DISCIPLINE MATRIX</span>
-                  <span className="sm:hidden">S1 // DISPERSED</span>
-                  <span className="w-2 h-2 rounded-full bg-[#FF6B35]" />
-                </>
-              )}
-              {activeStage === 2 && (
-                <>
-                  <span className="hidden sm:inline">STATE: 02 // CONNECTED KNOWLEDGE NETWORK</span>
-                  <span className="sm:hidden">S2 // LATTICE</span>
-                  <span className="w-2 h-2 rounded-full bg-[#2B4788]" />
-                </>
-              )}
-              {activeStage === 3 && (
-                <>
-                  <span className="hidden sm:inline">STATE: 03 // GRAVITATIONAL CONVERGENCE • 78% CONTRACTION</span>
-                  <span className="sm:hidden">S3 // ORBIT</span>
-                  <span className="w-2 h-2 rounded-full bg-[#FF6B35] animate-ping" />
-                </>
-              )}
-              {activeStage === 4 && (
-                <>
-                  <span className="hidden sm:inline">STATE: 04 // RESOLVED UNIFIED ECOSYSTEM • 100% SYNTHESIS</span>
-                  <span className="sm:hidden">S4 // UNIFIED</span>
-                  <span className="w-2 h-2 rounded-full bg-[#2B4788]" />
-                </>
-              )}
-            </span>
           </div>
-        </div>
+        </div> */}
 
         {/* ── MAIN INTERACTIVE CANVAS AREA ── */}
         <div className="relative flex-1 w-full h-full overflow-hidden flex items-center justify-center">
@@ -479,13 +462,13 @@ export default function HeroSection() {
                 <circle cx="50%" cy="50%" r="220" fill="none" stroke="#2B4788" strokeWidth="1" opacity="0.18" />
                 <circle cx="50%" cy="50%" r="300" fill="none" stroke="#2B4788" strokeWidth="1" strokeDasharray="5 6" opacity="0.12" />
 
-                {/* Central crosshair & nucleus point */}
-                <line x1="50%" y1="20%" x2="50%" y2="80%" stroke="#2B4788" strokeWidth="1" strokeDasharray="2 4" opacity="0.15" />
+                {/* Central crosshairs commented out for clean commerce aesthetic */}
+                {/* <line x1="50%" y1="20%" x2="50%" y2="80%" stroke="#2B4788" strokeWidth="1" strokeDasharray="2 4" opacity="0.15" />
                 <line x1="20%" y1="50%" x2="80%" y2="50%" stroke="#2B4788" strokeWidth="1" strokeDasharray="2 4" opacity="0.15" />
-                <circle cx="50%" cy="50%" r="4" fill="#2B4788" opacity="0.6" />
-                <text x="50.8%" y="49.6%" fill="#2B4788" fontSize="10" fontFamily="monospace" opacity="0.7">
+                <circle cx="50%" cy="50%" r="4" fill="#2B4788" opacity="0.6" /> */}
+                {/* <text x="50.8%" y="49.6%" fill="#2B4788" fontSize="10" fontFamily="monospace" opacity="0.7">
                   _NUCLEUS // 0.00
-                </text>
+                </text> */}
               </g>
             )}
 
@@ -549,13 +532,16 @@ export default function HeroSection() {
             )}
           </svg>
 
-          {/* ── HERO TEXT (Center Content - Centered with absolute precision) ── */}
+          {/* ── HERO TEXT (Center Content - Soft Defocus in Stage 2, Completely Gone in Stage 3) ── */}
           <div
-            className="absolute z-20 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[340px] sm:max-w-xl md:max-w-2xl lg:max-w-3xl px-4 sm:px-6 text-center pointer-events-auto transition-opacity duration-300"
+            className="absolute z-20 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[340px] sm:max-w-xl md:max-w-2xl lg:max-w-3xl px-4 sm:px-6 text-center"
             style={{
               opacity: headingOpacity,
-              transform: `translate(-50%, -50%) scale(${1 - scrollProgress * 0.08})`,
-              display: headingOpacity <= 0.01 ? 'none' : 'block'
+              filter: headingBlur > 0 ? `blur(${headingBlur}px)` : undefined,
+              pointerEvents: headingPointerEvents,
+              transform: `translate(-50%, -50%) scale(${1 - scrollProgress * 0.06})`,
+              display: headingOpacity <= 0.005 ? 'none' : 'block',
+              willChange: 'opacity, filter, transform'
             }}
           >
             {/* Top Indicator Pill */}
@@ -604,8 +590,8 @@ export default function HeroSection() {
             </div>
           </div>
 
-          {/* ── STAGE 3 WATERMARK SUBTITLE ── */}
-          {scrollProgress >= 0.55 && scrollProgress < 0.78 && (
+          {/* ── STAGE 3 WATERMARK SUBTITLE (Commented out telemetry terms as requested) ── */}
+          {/* {scrollProgress >= 0.55 && scrollProgress < 0.78 && (
             <div
               className="absolute top-[16%] sm:top-[18%] left-1/2 -translate-x-1/2 text-center z-20 pointer-events-none transition-opacity duration-300 w-full px-4"
               style={{
@@ -623,7 +609,7 @@ export default function HeroSection() {
                 Decentralized commerce specializations drawn into an integrated executive system.
               </p>
             </div>
-          )}
+          )} */}
 
           {/* ── STAGE 4: THE UNIFIED SINGLE GRAND 3D SPHERE ── */}
           {scrollProgress >= 0.60 && (
@@ -662,14 +648,14 @@ export default function HeroSection() {
                 />
               )}
 
-              {/* Top Equilibrium Monospace Pill - Positioned cleanly above the sphere out-of-bounds */}
-              <div 
+              {/* Top Equilibrium Monospace Pill - Commented out technical telemetry as requested */}
+              {/* <div 
                 className="absolute left-1/2 -translate-x-1/2 bottom-[calc(50%+145px)] sm:bottom-[calc(50%+165px)] md:bottom-[calc(50%+175px)] pointer-events-auto inline-flex items-center gap-2 px-3 sm:px-3.5 py-1 rounded-full bg-white/90 border border-slate-200 shadow-sm font-mono text-[9px] sm:text-[10px] font-bold text-slate-600 uppercase tracking-widest whitespace-nowrap transition-opacity duration-300"
                 style={{ opacity: scrollProgress > 0.84 ? 1 : 0 }}
               >
                 <span className="w-2 h-2 rounded-full bg-[#FF6B35] animate-pulse" />
                 STAGE 04 • SYSTEM EQUILIBRIUM // SYNTHESIS COMPLETE
-              </div>
+              </div> */}
 
               {/* The Grand Unified 3D Sphere - EXACT CENTER (50%, 50%) */}
               <div
@@ -701,7 +687,7 @@ export default function HeroSection() {
                   style={{ opacity: Math.max(0, Math.min(1, (scrollProgress - 0.78) / 0.10)) }}
                 >
                   {/* White Rounded Badge with Larger Official Logo */}
-                  <div className="w-20 h-13 sm:w-24 sm:h-15 rounded-2xl bg-white shadow-xl px-3 py-1.5 flex items-center justify-center mb-2.5 sm:mb-3 border border-white/95 group-hover:scale-105 transition-transform duration-200">
+                  <div className="w-20 h-12 sm:w-24 sm:h-14 rounded-2xl bg-white shadow-xl px-3 py-1.5 flex items-center justify-center mb-2.5 sm:mb-3 border border-white/95 group-hover:scale-105 transition-transform duration-200">
                     <img 
                       src={logoIconDark.src} 
                       alt="After Commerce Logo" 
@@ -720,10 +706,11 @@ export default function HeroSection() {
 
               {/* Resolved Stage 4 Action Buttons - Sits cleanly below outer orbit circle */}
               <div 
-                className="absolute left-1/2 -translate-x-1/2 top-[calc(50%+155px)] sm:top-[calc(50%+200px)] md:top-[calc(50%+235px)] pointer-events-auto flex flex-wrap items-center justify-center gap-3 sm:gap-4 whitespace-nowrap transition-all duration-300"
+                className="absolute left-1/2 -translate-x-1/2 top-[calc(50%+155px)] sm:top-[calc(50%+200px)] md:top-[calc(50%+235px)] pointer-events-auto flex flex-wrap items-center justify-center gap-3 sm:gap-4 whitespace-nowrap"
                 style={{
-                  opacity: Math.max(0, Math.min(1, (scrollProgress - 0.84) / 0.08)),
-                  transform: `translate(-50%, ${(1 - Math.max(0, Math.min(1, (scrollProgress - 0.84) / 0.08))) * 12}px)`
+                  opacity: Math.max(0, Math.min(1, (scrollProgress - 0.82) / 0.10)),
+                  transform: `translate(-50%, ${(1 - Math.max(0, Math.min(1, (scrollProgress - 0.82) / 0.10))) * 12}px)`,
+                  willChange: 'opacity, transform'
                 }}
               >
                 <Link
@@ -816,11 +803,6 @@ export default function HeroSection() {
                       <span className="text-[12px] font-extrabold tracking-wider mt-0.5">
                         {node.code}
                       </span>
-                      {node.isOrange && (
-                        <span className="text-[8px] uppercase tracking-tighter opacity-80 mt-0.5">
-                          {node.id === '02' ? 'ENERGY ACCENT' : 'CORE FOCUS'}
-                        </span>
-                      )}
                     </div>
                   )}
                 </div>
@@ -891,69 +873,63 @@ export default function HeroSection() {
         {/* ── BOTTOM STATUS BAR & DYNAMIC ACTIONS ── */}
         <div className="relative z-40 px-6 sm:px-10 pb-5 pt-3 flex flex-wrap items-center justify-between gap-4 font-mono text-[11px] text-slate-500 uppercase tracking-wider border-t border-slate-200/40">
           
-          {/* Left Status Message */}
+          {/* Left Status Message - Clean professional commerce phrasing */}
           <div className="flex items-center gap-2 text-slate-700 font-semibold">
             {activeStage === 1 && (
               <>
                 <span className="w-2 h-2 rounded-full bg-[#FF6B35]" />
-                <span>ECOSYSTEM STATUS: 10 NODES DISTRIBUTED • READY FOR SYNTHESIS</span>
+                <span>10 CORE DISCIPLINES DISTRIBUTED • READY FOR EXPLORATION</span>
               </>
             )}
             {activeStage === 2 && (
               <>
                 <span className="w-2 h-2 rounded-full bg-[#2B4788]" />
-                <span>ECOSYSTEM STATUS: 10 NODES INTERLINKED • DYNAMIC SYNTHESIS ENGAGED</span>
+                <span>CONNECTED COMMERCE CURRICULUM • DYNAMIC INTERACTION</span>
               </>
             )}
             {activeStage === 3 && (
               <>
                 <span className="w-2 h-2 rounded-full bg-[#FF6B35]" />
-                <span>ACTIVE NODES: 10 / 10 CONVERGING • 82% ORBITAL COMPRESSION</span>
+                <span>SYNTHESIZING 10 DISCIPLINES INTO UNIFIED ENGINE</span>
               </>
             )}
             {activeStage === 4 && (
               <>
                 <span className="w-2 h-2 rounded-full bg-[#2B4788]" />
-                <span>CORE RESOLUTION: 10 DISCIPLINES SYNTHESIZED • 100% UNIFIED</span>
+                <span>AFTER COMMERCE • UNIFIED CAREER ENGINE READY</span>
               </>
             )}
           </div>
 
           {/* Center Dynamic Interaction Pill (Changes per state) */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             {activeStage === 1 && (
               <button
                 onClick={() => scrollToStage(2)}
-                className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-white/90 hover:bg-white border border-slate-200/90 shadow-sm text-slate-700 hover:text-[#2B4788] text-[11px] font-bold tracking-widest uppercase transition-all"
+                className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-white/95 hover:bg-white border border-slate-200/90 shadow-sm text-slate-700 hover:text-[#2B4788] text-[11px] font-bold tracking-widest uppercase transition-all"
               >
-                <span>🖱 SCROLL TO INITIATE CONVERGENCE</span>
-                <span className="text-orange-500 font-bold">↕</span>
+                <span>EXPLORE NETWORK</span>
+                <span className="text-[#FF6B35] font-bold">↓</span>
               </button>
             )}
 
             {activeStage === 2 && (
               <button
                 onClick={() => scrollToStage(3)}
-                className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-white/90 hover:bg-white border border-slate-200/90 shadow-sm text-slate-700 hover:text-[#2B4788] text-[11px] font-bold tracking-widest uppercase transition-all"
+                className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-white/95 hover:bg-white border border-slate-200/90 shadow-sm text-slate-700 hover:text-[#2B4788] text-[11px] font-bold tracking-widest uppercase transition-all"
               >
-                <span>🖱 SCROLL TO CONVERGE ECOSYSTEM</span>
-                <span className="text-blue-600 font-bold">↓</span>
+                <span>CONVERGE DISCIPLINES</span>
+                <span className="text-[#2B4788] font-bold">↓</span>
               </button>
             )}
 
             {activeStage === 3 && (
               <div className="flex items-center gap-3">
                 <button
-                  onClick={() => scrollToStage(1)}
-                  className="text-slate-500 hover:text-slate-800 underline underline-offset-4 cursor-pointer text-[10px] font-mono"
-                >
-                  RESET TRAJECTORY
-                </button>
-                <button
                   onClick={() => scrollToStage(4)}
                   className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-[#1A1A2E] hover:bg-slate-800 text-white text-[11px] font-bold tracking-wider transition-all shadow-md"
                 >
-                  <span>UNIFY SYSTEM (STATE 04)</span>
+                  <span>UNIFY CURRICULUM</span>
                   <span>→</span>
                 </button>
               </div>
@@ -961,7 +937,6 @@ export default function HeroSection() {
 
             {activeStage === 4 && (
               <div className="flex items-center gap-4">
-                <span className="text-slate-400 text-[10px]">KERNEL // STAGE 04 OPERATIONAL</span>
                 <button
                   onClick={() => scrollToStage(1)}
                   className="text-[#2B4788] hover:text-[#1E3494] font-bold underline underline-offset-4 cursor-pointer text-[11px]"
@@ -972,12 +947,10 @@ export default function HeroSection() {
             )}
           </div>
 
-          {/* Right Protocol Code */}
-          <div className="hidden sm:block text-slate-400 font-mono text-[10px]">
-            {activeStage === 4
-              ? 'KERNEL // STAGE 04 OPERATIONAL'
-              : 'KERNEL PROTOCOL • AC-CORE.SYS.BUILD_2025'}
-          </div>
+          {/* Right Protocol / Kernel telemetry commented out as requested for clean commerce presentation */}
+          {/* <div className="hidden sm:block text-slate-400 font-mono text-[10px]">
+            KERNEL PROTOCOL • AC-CORE.SYS.BUILD_2025
+          </div> */}
         </div>
 
       </div>

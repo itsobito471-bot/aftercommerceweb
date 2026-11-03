@@ -29,9 +29,9 @@ export default function Navbar({ onNavigate }: NavbarProps) {
               <span className="font-extrabold text-[15px] tracking-wide text-[#1A1A2E] leading-tight font-['Poppins',sans-serif]">
                 AFTER COMMERCE
               </span>
-              <span className="font-mono text-[9px] uppercase tracking-widest text-slate-500 font-semibold leading-none mt-0.5">
+              {/* <span className="font-mono text-[9px] uppercase tracking-widest text-slate-500 font-semibold leading-none mt-0.5">
                 KERNEL // SYS.01
-              </span>
+              </span> */}
             </div>
           </Link>
 

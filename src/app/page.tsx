@@ -54,8 +54,9 @@ export default function LandingPage() {
               <div className="absolute bottom-0 left-0 w-80 h-80 bg-[#FF6B35]/20 rounded-full filter blur-3xl pointer-events-none" />
 
               <div className="relative z-10 max-w-2xl">
+                {/* AFTER COMMERCE PLATFORM OS */}
                 <span className="inline-block px-3 py-1 rounded-full bg-white/10 text-cyan-300 font-mono text-xs font-semibold uppercase tracking-widest mb-4">
-                  AFTER COMMERCE PLATFORM OS
+                  AFTER COMMERCE CAREER PLATFORM
                 </span>
                 <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight leading-tight">
                   Ready to converge your career into a high-performance operating system?
@@ -100,13 +101,15 @@ export default function LandingPage() {
                 />
               </div>
               <span className="font-extrabold text-sm tracking-wide text-[#1A1A2E] font-['Poppins',sans-serif]">
-                AFTER COMMERCE // KERNEL SYS.01
+                {/* AFTER COMMERCE // KERNEL SYS.01 */}
+                AFTER COMMERCE
               </span>
             </div>
 
             <div className="flex items-center gap-6 font-mono text-xs text-slate-500 uppercase tracking-wider">
-              <span>SECURITY PROTOCOL ENFORCED</span>
-              <span>·</span>
+              {/* Commented out unwanted sci-fi/kernel telemetry terms */}
+              {/* <span>SECURITY PROTOCOL ENFORCED</span>
+              <span>·</span> */}
               <span>100% UNIFIED CURRICULUM</span>
             </div>
 
