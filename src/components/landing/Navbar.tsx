@@ -12,8 +12,13 @@ interface NavbarProps {
 export default function Navbar({ onNavigate, isLoggedIn = false }: NavbarProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolledPastHero, setIsScrolledPastHero] = useState(false);
+  const [hasStudentAuth, setHasStudentAuth] = useState(false);
 
   useEffect(() => {
+    // Detect if student user is logged in
+    const token = typeof window !== 'undefined' ? localStorage.getItem('student_token') : null;
+    setHasStudentAuth(Boolean(token) || isLoggedIn);
+
     const handleScroll = () => {
       const programsEl = document.getElementById('programs');
       if (programsEl) {
@@ -117,17 +122,26 @@ export default function Navbar({ onNavigate, isLoggedIn = false }: NavbarProps) 
           {/* Right Actions */}
           <div className="flex items-center gap-2.5 sm:gap-3">
             <Link
-              href="/admin-login"
+              href="/onboarding"
               className="inline-flex items-center justify-center bg-[#1A1A2E] hover:bg-slate-800 text-white font-bold tracking-wider text-xs px-5 sm:px-6 py-2.5 rounded-xl transition-all duration-200 shadow-sm hover:shadow hover:scale-[1.02] active:scale-95"
             >
               GET STARTED
             </Link>
 
             {/* Profile icon shown only when user is authenticated */}
-            {isLoggedIn && (
-              <Link
-                href="/admin"
+            {hasStudentAuth && (
+              <button
+                onClick={() => {
+                  if (confirm('Do you want to log out of your student session?')) {
+                    localStorage.removeItem('student_token');
+                    localStorage.removeItem('student_user');
+                    document.cookie = 'student_token=; path=/; max-age=0;';
+                    setHasStudentAuth(false);
+                    window.location.reload();
+                  }
+                }}
                 aria-label="User Account"
+                title="Student Profile (Click to logout)"
                 className="w-9 h-9 rounded-xl bg-[#1E3494] hover:bg-[#2B4788] text-white flex items-center justify-center transition-transform hover:scale-105 shadow-sm"
               >
                 <svg
@@ -143,7 +157,7 @@ export default function Navbar({ onNavigate, isLoggedIn = false }: NavbarProps) 
                   <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
                   <circle cx="12" cy="7" r="4" />
                 </svg>
-              </Link>
+              </button>
             )}
 
             {/* Mobile Menu Hamburger */}
@@ -215,7 +229,7 @@ export default function Navbar({ onNavigate, isLoggedIn = false }: NavbarProps) 
             </a>
             <div className="pt-2 border-t border-slate-200/60 flex items-center justify-end">
               <Link
-                href="/admin-login"
+                href="/onboarding"
                 className="bg-[#1A1A2E] text-white text-xs font-bold px-5 py-2.5 rounded-xl"
               >
                 GET STARTED

@@ -85,7 +85,7 @@ export default function FeaturedProgram() {
               }`}
             >
               <Link
-                href="/admin-login"
+                href="/onboarding"
                 className="inline-flex items-center justify-center gap-2 px-7 sm:px-8 py-3.5 rounded-xl bg-gradient-to-r from-[#FF7D47] to-[#FF6B35] hover:from-[#ff8c5a] hover:to-[#ff7642] text-white font-bold text-sm shadow-[0_8px_25px_rgba(255,107,53,0.35)] hover:shadow-[0_10px_30px_rgba(255,107,53,0.5)] transition-all transform hover:-translate-y-0.5 active:translate-y-0"
               >
                 <span>Enroll now</span>

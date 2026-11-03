@@ -570,7 +570,7 @@ export default function HeroSection() {
             {/* CTA Buttons in State 1 & 2 */}
             <div className="mt-5 sm:mt-6 flex flex-wrap items-center justify-center gap-2.5 sm:gap-4">
               <Link
-                href="/admin-login"
+                href="/onboarding"
                 className="inline-flex items-center justify-center gap-2 px-5 sm:px-7 py-2.5 sm:py-3 rounded-xl bg-[#2B4788] hover:bg-[#1E3494] text-white font-semibold text-xs sm:text-sm shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 active:translate-y-0"
               >
                 <span>EXPLORE PROGRAMS</span>
@@ -710,7 +710,7 @@ export default function HeroSection() {
                 }}
               >
                 <Link
-                  href="/admin-login"
+                  href="/onboarding"
                   className="inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3 sm:py-3.5 rounded-xl bg-gradient-to-r from-[#FF7D47] to-[#FF6B35] hover:from-[#ff8c5a] hover:to-[#ff7642] text-white font-bold text-xs sm:text-sm shadow-[0_8px_25px_rgba(255,107,53,0.35)] hover:shadow-[0_10px_30px_rgba(255,107,53,0.5)] transition-all transform hover:-translate-y-0.5 active:translate-y-0"
                 >
                   <span>EXPLORE PROGRAMS</span>
