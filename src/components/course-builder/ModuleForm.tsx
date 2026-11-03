@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Module } from '@/types/course';
 import { useCharacterStore } from '@/store/useCharacterStore';
 import { createModule, updateModule } from '@/services/adminApi';
+import { QuillEditor } from '@/components/common/QuillEditor';
 
 interface ModuleFormProps {
   courseId: string;
@@ -16,9 +17,23 @@ export const ModuleForm: React.FC<ModuleFormProps> = ({ courseId, initialData, o
 
   const [formData, setFormData] = useState<Partial<Module>>({
     title: initialData?.title || '',
+    description: initialData?.description || '',
     order_index: initialData?.order_index || 1,
     unlock_days: initialData?.unlock_days || 0,
   });
+
+  // Synchronize internal state when selecting a different module in the curriculum tree
+  useEffect(() => {
+    if (initialData) {
+      setFormData(prev => ({
+        ...prev,
+        title: initialData.title !== undefined ? initialData.title : prev.title,
+        description: initialData.description !== undefined ? initialData.description : (prev.description || ''),
+        order_index: initialData.order_index !== undefined ? initialData.order_index : prev.order_index,
+        unlock_days: initialData.unlock_days !== undefined ? initialData.unlock_days : prev.unlock_days,
+      }));
+    }
+  }, [initialData?.id, initialData?.title, initialData?.description, initialData?.order_index, initialData?.unlock_days]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type } = e.target;
@@ -54,13 +69,24 @@ export const ModuleForm: React.FC<ModuleFormProps> = ({ courseId, initialData, o
         const payload = { ...formData, course_id: courseId };
         savedModule = await createModule(payload);
       }
+
+      const returnedModule = savedModule?.data as any;
+      const savedId = returnedModule?._id || returnedModule?.id || initialData?.id || '';
+      const savedDescription = returnedModule?.description !== undefined ? returnedModule.description : (formData.description || '');
       
+      setFormData(prev => ({
+        ...prev,
+        id: savedId,
+        description: savedDescription
+      }));
+
       triggerCharacter('celebrating', 'Module successfully saved!');
       
       if (onSave) {
         onSave({
           ...formData,
-          id: (savedModule?.data as any)?._id || (savedModule?.data as any)?.id || initialData?.id || ''
+          id: savedId,
+          description: savedDescription
         });
       }
     } catch (error) {
@@ -85,7 +111,7 @@ export const ModuleForm: React.FC<ModuleFormProps> = ({ courseId, initialData, o
           onChange={handleChange}
           className={inputClass}
           style={{ backgroundColor: 'var(--color-bg-elevated)', borderColor: 'var(--glass-border)' }}
-          placeholder="e.g. Introduction to React"
+          placeholder="e.g. Introduction to Financial Modeling"
           required
         />
       </div>
@@ -123,11 +149,35 @@ export const ModuleForm: React.FC<ModuleFormProps> = ({ courseId, initialData, o
         </div>
       </div>
 
+      {/* ── MODULE DESCRIPTION (QUILL RICH TEXT EDITOR) ── */}
+      <div className="pt-4 border-t" style={{ borderColor: 'var(--glass-border)' }}>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2.5 flex-wrap">
+              <h3 className="text-base font-bold">Module Overview & Learning Objectives</h3>
+              <span className="font-mono text-[10px] px-2.5 py-0.5 rounded-full bg-indigo-500/10 text-indigo-500 font-bold border border-indigo-500/20 whitespace-nowrap shrink-0">
+                Quill Rich HTML
+              </span>
+            </div>
+            <p className="text-xs opacity-70 mt-1 leading-relaxed">
+              Detail chapter goals, target learning outcomes, required background, and recommended pacing with rich formatting.
+            </p>
+          </div>
+        </div>
+
+        <QuillEditor
+          value={formData.description || ''}
+          onChange={(html) => setFormData(prev => ({ ...prev, description: html }))}
+          placeholder="Craft rich chapter summary, module outcomes, core competencies, and reading materials..."
+          minHeight="220px"
+        />
+      </div>
+
       <div className="pt-6 flex justify-end">
         <button
           type="submit"
           disabled={isLoading}
-          className="px-6 py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-semibold transition-colors shadow-md active:scale-95 disabled:opacity-50 flex items-center gap-2"
+          className="px-6 py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-semibold transition-colors shadow-md active:scale-95 disabled:opacity-50 flex items-center gap-2 cursor-pointer"
         >
           {isLoading ? (
             <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>

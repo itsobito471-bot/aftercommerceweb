@@ -5,7 +5,7 @@ import { CourseTreeSidebar } from '@/components/course-builder/CourseTreeSidebar
 import { CourseShellForm } from '@/components/course-builder/CourseShellForm';
 import { ModuleForm } from '@/components/course-builder/ModuleForm';
 import { LearningUnitForm } from '@/components/course-builder/LearningUnitForm';
-import { Course, StructureMode, LearningUnitType, Module, LearningUnit } from '@/types/course';
+import { Course, StructureMode, LearningUnitType, Module, LearningUnit, CourseStatus } from '@/types/course';
 import { useSearchParams } from 'next/navigation';
 import { getCourseTree } from '@/services/adminApi';
 
@@ -36,11 +36,23 @@ export default function CourseBuilderOrchestrator() {
         const response = await getCourseTree(courseIdParam);
         const data = response.data;
         if (data) {
+          const isHex = (str?: string) => Boolean(str && /^[0-9a-fA-F]{24}$/.test(str));
+          const catId = typeof data.category_id === 'object' && data.category_id !== null 
+            ? (data.category_id._id || data.category_id.id || '') 
+            : (isHex(data.category_id) ? data.category_id : (isHex(data.category) ? data.category : ''));
+
+          const catName = typeof data.category_id === 'object' && data.category_id !== null 
+            ? (data.category_id.name || '') 
+            : (!isHex(data.category) && data.category ? data.category : '');
+
           // Deep map _id to id for the frontend Course interface
           setCourseData({
             id: data._id,
             title: data.title,
-            category: data.category_id, 
+            description: data.description || '',
+            status: data.status || (data.is_published ? CourseStatus.PUBLISHED : CourseStatus.IN_PROGRESS),
+            category: catName, 
+            category_id: catId,
             price: data.pricing?.regular_price || 0,
             validity_days: data.validity_days,
             structure_mode: data.structure_mode === 'flexible' ? StructureMode.FREE_FLEXIBLE : StructureMode.LINEAR,
@@ -49,6 +61,7 @@ export default function CourseBuilderOrchestrator() {
               id: m._id,
               course_id: m.course_id,
               title: m.title,
+              description: m.description || '',
               order_index: m.order_index,
               unlock_days: m.unlock_days,
               units: (m.units || []).map((u: any) => ({
@@ -85,6 +98,7 @@ export default function CourseBuilderOrchestrator() {
       id: newModuleId,
       course_id: courseData.id,
       title: 'New Module',
+      description: '',
       order_index: (courseData.modules?.length || 0) + 1,
       unlock_days: 0,
       units: []
@@ -190,7 +204,14 @@ export default function CourseBuilderOrchestrator() {
               
               <CourseShellForm 
                 initialData={courseData} 
-                onSave={(data) => setCourseData(prev => ({ ...prev, ...data }))} 
+                onSave={(data) => {
+                  setCourseData(prev => ({ ...prev, ...data }));
+                  if (data.id && (!courseIdParam || courseIdParam !== data.id)) {
+                    const url = new URL(window.location.href);
+                    url.searchParams.set('id', data.id);
+                    window.history.replaceState({}, '', url.toString());
+                  }
+                }} 
               />
             </div>
           )}

@@ -121,6 +121,12 @@ export default function Navbar({ onNavigate, isLoggedIn = false }: NavbarProps) 
 
           {/* Navigation Center Links */}
           <nav className="hidden md:flex items-center gap-7 lg:gap-8 text-[13px] font-medium text-slate-600 font-['Poppins',sans-serif]">
+            <Link
+              href="/courses"
+              className="hover:text-[#2B4788] transition-colors cursor-pointer"
+            >
+              Courses
+            </Link>
             <a
               href="#programs"
               onClick={(e) => {
@@ -227,7 +233,7 @@ export default function Navbar({ onNavigate, isLoggedIn = false }: NavbarProps) 
                     {/* Menu items */}
                     <div className="py-1.5 flex flex-col gap-0.5">
                       <Link
-                        href="/onboarding"
+                        href={studentUser?.role === 'admin' || studentUser?.role === 'staff' ? '/admin' : '/'}
                         onClick={() => setIsProfileMenuOpen(false)}
                         className="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:text-[#1E3494] hover:bg-blue-50/80 transition-colors"
                       >
@@ -241,7 +247,7 @@ export default function Navbar({ onNavigate, isLoggedIn = false }: NavbarProps) 
                       </Link>
 
                       <Link
-                        href="/onboarding"
+                        href={studentUser?.role === 'admin' || studentUser?.role === 'staff' ? '/admin' : '/'}
                         onClick={() => setIsProfileMenuOpen(false)}
                         className="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:text-[#1E3494] hover:bg-blue-50/80 transition-colors"
                       >
@@ -305,6 +311,13 @@ export default function Navbar({ onNavigate, isLoggedIn = false }: NavbarProps) 
               WebkitBackdropFilter: 'blur(24px) saturate(190%)',
             }}
           >
+            <Link
+              href="/courses"
+              onClick={() => setMobileMenuOpen(false)}
+              className="py-2 px-3 rounded-xl hover:bg-slate-100/70 text-slate-700 font-medium"
+            >
+              Courses
+            </Link>
             <a
               href="#programs"
               onClick={() => {
@@ -362,14 +375,14 @@ export default function Navbar({ onNavigate, isLoggedIn = false }: NavbarProps) 
                     {studentUser?.name || 'Student Account'}
                   </div>
                   <Link
-                    href="/onboarding"
+                    href={studentUser?.role === 'admin' || studentUser?.role === 'staff' ? '/admin' : '/'}
                     onClick={() => setMobileMenuOpen(false)}
                     className="py-1.5 px-3 rounded-xl text-xs font-medium text-slate-700 hover:bg-slate-100"
                   >
                     Dashboard
                   </Link>
                   <Link
-                    href="/onboarding"
+                    href={studentUser?.role === 'admin' || studentUser?.role === 'staff' ? '/admin' : '/'}
                     onClick={() => setMobileMenuOpen(false)}
                     className="py-1.5 px-3 rounded-xl text-xs font-medium text-slate-700 hover:bg-slate-100"
                   >

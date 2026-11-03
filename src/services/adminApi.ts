@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { User, Course as AdminCourse, PaginatedResponse, UserKycRecord, Category } from '../types/admin-lms';
+import { User, Course as AdminCourse, PaginatedResponse, UserKycRecord, Category, FeaturedCourseLog } from '../types/admin-lms';
 import { Course, Module, LearningUnit } from '../types/course';
 
 // Base backend URL config
@@ -228,6 +228,32 @@ export const getCourses = async (
 export const createCourse = async (payload: Partial<AdminCourse>): Promise<AdminCourse> => {
   const response = await adminApi.post<{ success: boolean; data: AdminCourse }>('/api/admin/courses', payload);
   return response.data.data;
+};
+
+export const toggleFeaturedCourse = async (
+  courseId: string, 
+  isFeatured: boolean, 
+  notes?: string
+): Promise<{ success: boolean; message: string; data: AdminCourse; log: FeaturedCourseLog }> => {
+  const response = await adminApi.patch<{ success: boolean; message: string; data: AdminCourse; log: FeaturedCourseLog }>(
+    `/api/admin/courses/${courseId}/feature`,
+    { is_featured: isFeatured, notes }
+  );
+  return response.data;
+};
+
+export const getFeaturedLogs = async (): Promise<{ success: boolean; count: number; data: FeaturedCourseLog[] }> => {
+  const response = await adminApi.get<{ success: boolean; count: number; data: FeaturedCourseLog[] }>(
+    '/api/admin/courses/featured-logs'
+  );
+  return response.data;
+};
+
+export const getFeaturedCourse = async (): Promise<{ success: boolean; data: AdminCourse | null }> => {
+  const response = await adminApi.get<{ success: boolean; data: AdminCourse | null }>(
+    '/api/admin/courses/featured'
+  );
+  return response.data;
 };
 
 // ==========================================

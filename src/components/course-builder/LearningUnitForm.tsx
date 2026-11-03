@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { LearningUnit, LearningUnitType, VideoContentData } from '@/types/course';
 import { useCharacterStore } from '@/store/useCharacterStore';
 import { createLearningUnit, updateLearningUnit } from '@/services/adminApi';
+import { QuillEditor } from '@/components/common/QuillEditor';
 
 interface LearningUnitFormProps {
   moduleId: string | null;
@@ -21,13 +22,32 @@ export const LearningUnitForm: React.FC<LearningUnitFormProps> = ({ moduleId, in
   
   // Content states
   const [vdoCipherId, setVdoCipherId] = useState((initialData?.content_data as VideoContentData)?.vdo_cipher_id || '');
+  const [notesContent, setNotesContent] = useState((initialData?.content_data as any)?.rich_text_content || '');
+
+  // Synchronize internal state when switching between different units in curriculum tree
+  useEffect(() => {
+    if (initialData) {
+      setTitle(initialData.title || '');
+      setActiveType(initialData.type || LearningUnitType.VIDEO);
+      setPrerequisiteId(initialData.prerequisite_unit_id || '');
+      setVdoCipherId((initialData.content_data as VideoContentData)?.vdo_cipher_id || '');
+      setNotesContent((initialData.content_data as any)?.rich_text_content || '');
+    }
+  }, [
+    initialData?.id, 
+    initialData?.title, 
+    initialData?.type, 
+    initialData?.prerequisite_unit_id, 
+    (initialData?.content_data as any)?.vdo_cipher_id,
+    (initialData?.content_data as any)?.rich_text_content
+  ]);
 
   const handleTypeChange = (type: LearningUnitType) => {
     setActiveType(type);
     if (type === LearningUnitType.VIDEO) {
       triggerCharacter('thinking', 'Make sure your VdoCipher video is fully encoded before pasting the ID.');
     } else if (type === LearningUnitType.NOTES) {
-      triggerCharacter('helper', 'Use rich text to break down complex topics cleanly.');
+      triggerCharacter('helper', 'Use the rich Quill editor to break down complex topics, add headings, lists, and code blocks.');
     } else {
       triggerCharacter('celebrating', 'Interactive elements increase student engagement greatly!');
     }
@@ -50,14 +70,21 @@ export const LearningUnitForm: React.FC<LearningUnitFormProps> = ({ moduleId, in
     setIsLoading(true);
 
     try {
+      let contentPayload: any = {};
+      if (activeType === LearningUnitType.VIDEO) {
+        contentPayload = { vdo_cipher_id: vdoCipherId };
+      } else if (activeType === LearningUnitType.NOTES) {
+        contentPayload = { rich_text_content: notesContent };
+      } else {
+        contentPayload = initialData?.content_data || {};
+      }
+
       const payload: Partial<LearningUnit> = {
         title,
         type: activeType,
         prerequisite_unit_id: prerequisiteId || null,
         module_id: moduleId,
-        content_data: activeType === LearningUnitType.VIDEO 
-          ? { vdo_cipher_id: vdoCipherId } 
-          : { rich_text_content: '' } as any 
+        content_data: contentPayload
       };
 
       let savedUnit;
@@ -162,12 +189,18 @@ export const LearningUnitForm: React.FC<LearningUnitFormProps> = ({ moduleId, in
 
         {activeType === LearningUnitType.NOTES && (
           <div className="animate-in fade-in duration-300">
-            <label className={labelClass}>Rich Text Content</label>
-            <textarea
-              className={`${inputClass} min-h-[160px] resize-y`}
-              style={{ backgroundColor: 'var(--color-bg-elevated)', borderColor: 'var(--glass-border)' }}
-              placeholder="Draft your lecture notes here... (Rich Text Editor initialization placeholder)"
-            ></textarea>
+            <div className="flex items-center justify-between gap-2 mb-2">
+              <label className={labelClass}>Rich Text Lecture Notes</label>
+              <span className="font-mono text-[10px] px-2.5 py-0.5 rounded-full bg-indigo-500/10 text-indigo-500 font-bold border border-indigo-500/20 whitespace-nowrap shrink-0">
+                Quill Rich HTML
+              </span>
+            </div>
+            <QuillEditor
+              value={notesContent}
+              onChange={(html) => setNotesContent(html)}
+              placeholder="Draft comprehensive lecture notes, key takeaways, diagrams, references, and formatted content..."
+              minHeight="240px"
+            />
           </div>
         )}
 

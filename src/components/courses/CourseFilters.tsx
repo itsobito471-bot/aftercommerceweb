@@ -57,9 +57,11 @@ export const CourseFilters: React.FC<CourseFiltersProps> = ({ initialFilters, on
           className="w-full px-4 py-2.5 rounded-lg outline-none bg-black/5 dark:bg-white/5 border transition-all focus:ring-2 focus:ring-indigo-500/50 appearance-none"
           style={{ borderColor: 'var(--glass-border)', color: 'var(--color-text-primary)' }}
         >
-          <option value="">All</option>
-          <option value="true">Live (Published)</option>
-          <option value="false">Draft</option>
+          <option value="">All Statuses</option>
+          <option value="published">Published (Live)</option>
+          <option value="in_progress">In Progress (Draft)</option>
+          <option value="coming_soon">Coming Soon</option>
+          <option value="paused">Paused</option>
         </select>
       </div>
 

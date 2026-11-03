@@ -50,9 +50,17 @@ export interface Module {
   id: string;
   course_id: string;
   title: string;
+  description?: string;
   order_index: number;
   unlock_days: number;
   units?: LearningUnit[];
+}
+
+export enum CourseStatus {
+  IN_PROGRESS = 'in_progress',
+  PUBLISHED = 'published',
+  COMING_SOON = 'coming_soon',
+  PAUSED = 'paused'
 }
 
 export interface Course {
@@ -60,12 +68,16 @@ export interface Course {
   _id?: string;
   title: string;
   description?: string;
+  status?: CourseStatus | 'in_progress' | 'published' | 'coming_soon' | 'paused';
   category: string;
   category_id?: string;
   price: number;
   validity_days: number;
   structure_mode: StructureMode;
   is_published: boolean;
+  is_featured?: boolean;
+  featured_at?: string | null;
+  featured_by?: any;
   thumbnail_url?: string;
   modules?: Module[];
 }

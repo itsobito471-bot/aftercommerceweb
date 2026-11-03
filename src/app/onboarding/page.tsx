@@ -18,6 +18,7 @@ interface CategoryItem {
   name: string;
   slug?: string;
   description?: string;
+  is_active?: boolean;
   courseCount?: number;
   routeCode?: string;
   gateCode?: string;
@@ -30,9 +31,15 @@ interface CourseItem {
   _id: string;
   title: string;
   description?: string;
-  category_id?: { _id: string; name: string };
+  category_id?: { _id: string; name: string } | string;
   price?: number;
   sale_price?: number;
+  pricing?: {
+    is_free?: boolean;
+    regular_price?: number;
+    discounted_price?: number;
+  };
+  validity_days?: number;
   featured_image_url?: string;
   duration?: string;
   rating?: number;
@@ -46,117 +53,6 @@ interface CourseItem {
   subregions?: string;
   enrolledCount?: string;
 }
-
-// ── Fallback High-Fidelity Categories Matching Image 2 ──
-const FALLBACK_CATEGORIES: CategoryItem[] = [
-  {
-    _id: 'cat_ca',
-    name: 'Chartered Accountancy',
-    description: 'Foundations & strategic audit with real industry reporting practice.',
-    routeCode: 'CA',
-    gateCode: 'Gate A-12',
-    trackTag: '▲ Track: Direct',
-    tierTag: 'TIER 1 EXPEDITION',
-    courseCount: 3,
-    iconType: 'grad'
-  },
-  {
-    _id: 'cat_cma',
-    name: 'Cost & Management',
-    description: 'Costing architectures, executive strategy, and financial modeling.',
-    routeCode: 'CMA',
-    gateCode: 'Gate B-04',
-    trackTag: 'Track: Corporate',
-    tierTag: 'CMA CERTIFIED',
-    courseCount: 2,
-    iconType: 'strategy'
-  },
-  {
-    _id: 'cat_bcom',
-    name: 'Bachelor of Commerce',
-    description: 'Fortify degree foundations with applied commercial accounting skills.',
-    routeCode: 'BCOM',
-    gateCode: 'Gate C-08',
-    trackTag: 'Track: Foundation',
-    tierTag: 'UNDERGRAD PRO',
-    courseCount: 1,
-    iconType: 'book'
-  },
-  {
-    _id: 'cat_job',
-    name: 'Get Job-Ready',
-    description: 'Master advanced Excel, GST filing, compliance, and corporate ledgers.',
-    routeCode: 'JOB',
-    gateCode: 'Gate D-16',
-    trackTag: 'Track: Accelerated',
-    tierTag: 'CAREER SPRINT',
-    courseCount: 4,
-    iconType: 'briefcase'
-  }
-];
-
-// ── Fallback High-Fidelity Courses Matching Image 3 ──
-const FALLBACK_COURSES: CourseItem[] = [
-  {
-    _id: 'c1',
-    title: 'Basics of Taxation: Corporate GST & Deductions',
-    description: 'Master corporate GST mechanisms, input tax credit reconciliation, cross-border filing defenses, and TDS claim pipelines.',
-    tutor: 'Ahmed Muneer, CPA',
-    tutorRole: 'lead fiscal architect • ernst & young alum',
-    duration: '140 Mins',
-    subregions: '5 Sub-regions',
-    rating: 4.9,
-    enrolledCount: '1.4k Enrolled',
-    nodesCount: 30,
-    progress: 73,
-    levelsVerified: '22/30 Levels Verified',
-    sectorTag: 'VOCATIONAL LEVEL 4 // FISCAL GOVERNANCE',
-    price: 3499
-  },
-  {
-    _id: 'c2',
-    title: 'Advanced Accounting',
-    description: 'Consolidated statements, holding companies, and GAAP accounting structures.',
-    tutor: 'Ahmed Muneer, CPA',
-    duration: '120 mins',
-    subregions: '4 regions',
-    rating: 4.8,
-    nodesCount: 30,
-    progress: 45,
-    levelsVerified: '14 of 30 levels',
-    sectorTag: 'SECTOR 02 // ACC',
-    price: 2999
-  },
-  {
-    _id: 'c3',
-    title: 'GST Essentials & Systemic Audit',
-    description: 'Audit trails, automated scrutiny checks, and input tax compliance verification.',
-    tutor: 'Sneha Kapoor, CA',
-    duration: '90 mins',
-    subregions: '3 regions',
-    rating: 4.9,
-    nodesCount: 24,
-    progress: 100,
-    claimed: true,
-    levelsVerified: 'Claimed & Mastered',
-    sectorTag: 'SECTOR 01 // CONQUERED',
-    price: 2499
-  },
-  {
-    _id: 'c4',
-    title: 'Financial Statement Analysis',
-    description: 'Ratio engines, forensic balance sheet auditing, and cash flow decomposition.',
-    tutor: 'Rohan Verma, FCA',
-    duration: '180 mins',
-    subregions: '4 regions',
-    rating: 4.8,
-    nodesCount: 26,
-    progress: 12,
-    levelsVerified: '4 of 26 levels',
-    sectorTag: 'SECTOR 03 // FIN',
-    price: 2799
-  }
-];
 
 // ── SVG Isometric 3D Cube Component (Pixel-perfect vector geometry for Image 3) ──
 function IsometricCube({
@@ -307,30 +203,121 @@ export default function OnboardingPage() {
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
 
-  // Category & Course Data States
-  const [categories, setCategories] = useState<CategoryItem[]>(FALLBACK_CATEGORIES);
-  const [selectedCategoryId, setSelectedCategoryId] = useState<string>('cat_ca');
-  const [courses, setCourses] = useState<CourseItem[]>(FALLBACK_COURSES);
+  // Category & Course Data States (strictly initialized to empty, never fall back to dummy mock data)
+  const [categories, setCategories] = useState<CategoryItem[]>([]);
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string>('');
+  const [courses, setCourses] = useState<CourseItem[]>([]);
   const [selectedCourse, setSelectedCourse] = useState<CourseItem | null>(null);
+  const [categoriesLoaded, setCategoriesLoaded] = useState<boolean>(false);
 
-  // Fetch categories from backend on mount (falls back cleanly if server is offline)
+  // Session verification: if user token is available and valid, revert to dashboard
+  const [isVerifyingSession, setIsVerifyingSession] = useState(true);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const checkExistingSession = async () => {
+      try {
+        // 1. Check for admin token in localStorage or cookie
+        const adminToken = typeof window !== 'undefined'
+          ? (localStorage.getItem('admin_token') || document.cookie.split('; ').find(row => row.startsWith('admin_token='))?.split('=')[1])
+          : null;
+
+        if (adminToken) {
+          try {
+            const res = await axios.get(`${BACKEND_URL}/api/admin/users/me`, {
+              headers: { Authorization: `Bearer ${adminToken}` }
+            });
+            if (res.data?.success && isMounted) {
+              // Valid admin session, revert to admin dashboard immediately
+              router.replace('/admin');
+              return;
+            }
+          } catch {
+            // Token is invalid/expired - clear stale storage
+            localStorage.removeItem('admin_token');
+          }
+        }
+
+        // 2. Check for student token / general user token in localStorage or cookie
+        const studentToken = typeof window !== 'undefined'
+          ? (localStorage.getItem('student_token') || document.cookie.split('; ').find(row => row.startsWith('student_token='))?.split('=')[1])
+          : null;
+
+        if (studentToken) {
+          try {
+            const res = await axios.get(`${BACKEND_URL}/api/auth/me`, {
+              headers: { Authorization: `Bearer ${studentToken}` }
+            });
+            if (res.data?.success && isMounted) {
+              const role = res.data.user?.role;
+              if (role === 'admin' || role === 'staff') {
+                document.cookie = `admin_token=${studentToken}; path=/; max-age=604800; SameSite=Lax`;
+                localStorage.setItem('admin_token', studentToken);
+                router.replace('/admin');
+                return;
+              } else {
+                // Student user with active session: revert to student dashboard / home
+                router.replace('/');
+                return;
+              }
+            }
+          } catch {
+            // Token invalid/expired - clear stale storage
+            localStorage.removeItem('student_token');
+            localStorage.removeItem('student_user');
+          }
+        }
+      } catch (err) {
+        console.error('Session verification error:', err);
+      } finally {
+        if (isMounted) {
+          setIsVerifyingSession(false);
+        }
+      }
+    };
+
+    checkExistingSession();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [router]);
+
+  // Fetch categories from backend on mount (strictly only active categories with published/launched courses)
   useEffect(() => {
     const fetchCategories = async () => {
       try {
         const res = await axios.get(`${BACKEND_URL}/api/public/categories-with-courses`);
-        if (res.data?.success && Array.isArray(res.data.data) && res.data.data.length > 0) {
-          const enriched = res.data.data.map((cat: CategoryItem, idx: number) => ({
-            ...cat,
-            routeCode: cat.routeCode || cat.slug?.toUpperCase() || cat.name.split(' ').map((w: string) => w[0]).join('').slice(0, 4).toUpperCase() || `R0${idx + 1}`,
-            gateCode: cat.gateCode || `Gate ${String.fromCharCode(65 + idx)}-0${idx + 4}`,
-            trackTag: cat.trackTag || (idx % 2 === 0 ? '▲ Track: Direct' : 'Track: Corporate'),
-            tierTag: cat.tierTag || (idx === 0 ? 'TIER 1 EXPEDITION' : 'ACCREDITED')
-          }));
-          setCategories(enriched);
-          setSelectedCategoryId(enriched[0]._id);
+        if (res.data?.success && Array.isArray(res.data.data)) {
+          // First check that category is active (is_active !== false), then check for launched courses
+          const activeWithCourses = res.data.data.filter(
+            (cat: CategoryItem) => cat.is_active !== false && (cat.courseCount || 0) > 0
+          );
+          if (activeWithCourses.length > 0) {
+            const enriched = activeWithCourses.map((cat: CategoryItem, idx: number) => ({
+              ...cat,
+              routeCode: cat.routeCode || cat.slug?.toUpperCase() || cat.name.split(' ').map((w: string) => w[0]).join('').slice(0, 4).toUpperCase() || `R0${idx + 1}`,
+              gateCode: cat.gateCode || `Gate ${String.fromCharCode(65 + idx)}-0${idx + 4}`,
+              trackTag: cat.trackTag || (idx % 2 === 0 ? '▲ Track: Direct' : 'Track: Corporate'),
+              tierTag: cat.tierTag || (idx === 0 ? 'TIER 1 EXPEDITION' : 'ACCREDITED')
+            }));
+            setCategories(enriched);
+            setSelectedCategoryId(enriched[0]._id);
+          } else {
+            setCategories([]);
+            setSelectedCategoryId('');
+          }
+        } else {
+          setCategories([]);
+          setSelectedCategoryId('');
         }
-      } catch {
-        // Keep fallback categories
+      } catch (err) {
+        console.error('Failed to fetch categories:', err);
+        setCategories([]);
+        setSelectedCategoryId('');
+      } finally {
+        setCategoriesLoaded(true);
       }
     };
     fetchCategories();
@@ -437,16 +424,36 @@ export default function OnboardingPage() {
     }
   };
 
-  // Load courses for selected category
+  // Load courses for selected category (strictly real courses, never mock fallback)
   const loadCoursesForCategory = async (categoryId: string) => {
     try {
+      // Check if target category exists and is active before checking for courses
+      const targetCat = categories.find(c => c._id === categoryId);
+      if (targetCat && targetCat.is_active === false) {
+        setCourses([]);
+        setPhase('course_selection');
+        return;
+      }
+
       setLoading(true);
       const res = await axios.get(`${BACKEND_URL}/api/public/courses?categoryId=${categoryId}`);
       let fetchedCourses: CourseItem[] = [];
-      if (res.data?.success && Array.isArray(res.data.data) && res.data.data.length > 0) {
-        fetchedCourses = res.data.data;
-      } else {
-        fetchedCourses = FALLBACK_COURSES;
+      if (res.data?.success && Array.isArray(res.data.data)) {
+        fetchedCourses = res.data.data.map((c: any) => ({
+          _id: c._id,
+          title: c.title,
+          description: c.description ? c.description.replace(/<[^>]+>/g, '').trim() : '',
+          price: c.pricing?.discounted_price || c.pricing?.regular_price || c.price || 0,
+          category_id: c.category_id,
+          duration: `${c.validity_days ? c.validity_days + ' Days Access' : 'Full Access'}`,
+          rating: c.rating || 4.9,
+          tutor: c.tutor || 'Executive Mentor',
+          nodesCount: c.nodesCount || 24,
+          progress: c.progress || 0,
+          levelsVerified: c.levelsVerified || 'Verified Curriculum',
+          sectorTag: c.sectorTag || 'EXPEDITION COHORT',
+          ...c
+        }));
       }
       setCourses(fetchedCourses);
 
@@ -456,8 +463,9 @@ export default function OnboardingPage() {
       } else {
         setPhase('course_selection');
       }
-    } catch {
-      setCourses(FALLBACK_COURSES);
+    } catch (err) {
+      console.error('Failed to load courses for category:', err);
+      setCourses([]);
       setPhase('course_selection');
     } finally {
       setLoading(false);
@@ -465,10 +473,23 @@ export default function OnboardingPage() {
   };
 
   const handleCategoryContinue = () => {
-    loadCoursesForCategory(selectedCategoryId);
+    if (selectedCategoryId) {
+      loadCoursesForCategory(selectedCategoryId);
+    }
   };
 
-  const activeCategory = categories.find((c) => c._id === selectedCategoryId) || categories[0];
+  const activeCategory = (selectedCategoryId && categories.find((c) => c._id === selectedCategoryId)) || categories[0] || null;
+
+  if (isVerifyingSession) {
+    return (
+      <div className="min-h-screen bg-[#F8F9FC] flex flex-col items-center justify-center font-['Poppins',sans-serif] selection:bg-[#2B4788] selection:text-white">
+        <div className="w-8 h-8 border-3 border-[#2B4788] border-t-transparent rounded-full animate-spin mb-3" />
+        <span className="font-mono text-[10px] text-slate-500 font-bold uppercase tracking-widest">
+          Checking session credentials...
+        </span>
+      </div>
+    );
+  }
 
   return (
     <div className="relative min-h-screen bg-[#F8F9FC] text-[#1A1A2E] font-['Poppins',sans-serif] flex flex-col justify-between selection:bg-[#2B4788] selection:text-white">
@@ -910,7 +931,38 @@ export default function OnboardingPage() {
             (Exact Visual Match to Image 2)
            ════════════════════════════════════════════════════════════════ */}
         {phase === 'category' && (
-          <div className="w-full max-w-4xl mx-auto flex flex-col items-center animate-fade-in relative py-4">
+          categories.length === 0 ? (
+            <div className="w-full max-w-xl mx-auto flex flex-col items-center text-center p-8 sm:p-12 rounded-3xl bg-white/95 backdrop-blur-md border border-slate-200/90 shadow-xl animate-fade-in relative z-10">
+              <div className="w-20 h-20 rounded-2xl bg-orange-50 border border-orange-200 flex items-center justify-center text-3xl mb-5 shadow-inner">
+                🧭
+              </div>
+              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-slate-100 text-slate-600 font-mono text-[10px] font-bold uppercase tracking-wider mb-3">
+                CURRICULUM RADAR • EXPEDITIONS
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-[#1A1A2E] tracking-tight font-['Poppins',sans-serif]">
+                Sorry, there are no courses for you
+              </h2>
+              <p className="mt-3 text-sm text-slate-500 leading-relaxed max-w-md">
+                There are currently no active categories or launched courses available right now. Our curriculum architects are crafting new cohorts soon.
+              </p>
+              <div className="mt-8 flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
+                <button
+                  type="button"
+                  onClick={() => setPhase('auth')}
+                  className="w-full sm:w-auto px-6 py-3 rounded-xl bg-[#2B4788] hover:bg-[#1E3494] text-white font-bold text-xs shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <span>← Back to Account</span>
+                </button>
+                <Link
+                  href="/"
+                  className="w-full sm:w-auto px-5 py-3 rounded-xl border border-slate-300 hover:border-slate-400 text-slate-600 font-semibold text-xs transition-colors flex items-center justify-center"
+                >
+                  Return to Home
+                </Link>
+              </div>
+            </div>
+          ) : (
+            <div className="w-full max-w-4xl mx-auto flex flex-col items-center animate-fade-in relative py-4">
             
             {/* Giant Watermark "01" behind tickets (Matching Image 2) */}
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[260px] font-black text-slate-900/[0.04] select-none pointer-events-none font-mono z-0">
@@ -1102,7 +1154,7 @@ export default function OnboardingPage() {
               </div>
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-slate-300 shadow-sm text-xs font-mono text-slate-700">
                 <span className="w-2 h-2 rounded-full bg-[#FF6B35]" />
-                <span className="font-bold text-[#1E3494]">{activeCategory.routeCode || 'CA'} logged!</span>
+                <span className="font-bold text-[#1E3494]">{activeCategory?.routeCode || 'ROUTE'} logged!</span>
               </div>
               <span className="font-mono text-[9px] text-slate-400 font-bold uppercase tracking-wider hidden sm:inline">
                 ATLAS GUIDANCE
@@ -1132,6 +1184,7 @@ export default function OnboardingPage() {
               </button>
             </div>
           </div>
+          )
         )}
 
         {/* ════════════════════════════════════════════════════════════════
@@ -1185,305 +1238,122 @@ export default function OnboardingPage() {
                 </h1>
               </div>
 
-              {/* 4 Cards Layout Matching Image 3: 
-                  - Top Left: Wide Hero Card (Basics of Taxation)
-                  - Top Right: Advanced Accounting
-                  - Bottom Left: GST Essentials & Systemic Audit (Green)
-                  - Bottom Right: Financial Statement Analysis
-              */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-5 w-full">
-                
-                {/* ── CARD 1: Hero Card (Spans 2 columns, Matching Image 3 Top-Left) ── */}
-                <div className="md:col-span-2 rounded-3xl bg-white border border-slate-200/90 shadow-md p-5 sm:p-6 flex flex-col justify-between hover:border-[#2B4788] transition-all">
-                  <div className="flex flex-col sm:flex-row gap-5 items-start">
-                    
-                    {/* Isometric Cube Canvas Box */}
-                    <div 
-                      className="w-full sm:w-56 h-48 rounded-2xl flex flex-col justify-between p-3.5 relative shadow-inner shrink-0"
-                      style={{
-                        background: 'radial-gradient(circle at 40% 30%, #152458 0%, #0d173d 60%, #070d24 100%)'
-                      }}
+              {/* Dynamic Courses Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 w-full">
+                {courses.map((course, idx) => {
+                  const isHero = idx === 0 && courses.length > 2;
+                  const priceDisplay = course.pricing?.discounted_price 
+                    ? `₹${course.pricing.discounted_price.toLocaleString()}`
+                    : course.pricing?.regular_price 
+                    ? `₹${course.pricing.regular_price.toLocaleString()}`
+                    : course.price 
+                    ? `₹${course.price.toLocaleString()}`
+                    : 'Included';
+
+                  const durationDisplay = course.duration || (course.validity_days ? `${course.validity_days} Days Access` : 'Full Access');
+
+                  return (
+                    <div
+                      key={course._id || idx}
+                      className={`${isHero ? 'md:col-span-2 lg:col-span-2' : ''} rounded-3xl bg-white border border-slate-200/90 shadow-md p-5 sm:p-6 flex flex-col justify-between hover:border-[#2B4788] transition-all`}
                     >
-                      {/* Top coordinates & bookmark */}
-                      <div className="flex items-center justify-between text-[9px] font-mono text-slate-300">
-                        <span>COORD: 10°N 72°E • SECTOR 4</span>
-                        <span>🔖</span>
-                      </div>
-
-                      {/* 3D Isometric Cube Vector SVG */}
-                      <div className="flex items-center justify-center my-auto">
-                        <IsometricCube
-                          topColor="#10B981"
-                          leftColor="#1A2D6E"
-                          rightColor="#FF6B35"
-                          size={110}
-                          glow={true}
-                        />
-                      </div>
-
-                      {/* Bottom button & node counter */}
-                      <div className="flex items-center justify-between">
-                        <span className="px-2.5 py-0.5 rounded-full bg-white text-slate-800 font-mono text-[8px] font-bold uppercase shadow-sm flex items-center gap-1">
-                          <span>✏</span>
-                          <span>Scout Active</span>
-                        </span>
-                        <span className="font-mono text-[8px] font-bold text-orange-400">
-                          22/30 NODES
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Card Content Details */}
-                    <div className="flex-1 flex flex-col justify-between">
-                      <div>
-                        <div className="flex items-center gap-2 mb-2 font-mono text-[9px] font-bold text-blue-600">
-                          <span className="px-2 py-0.5 rounded bg-blue-50 border border-blue-100 uppercase">
-                            VOCATIONAL LEVEL 4 // FISCAL GOVERNANCE
-                          </span>
-                          <span className="text-slate-400">★ 4.9 (1.4k Enrolled)</span>
-                        </div>
-
-                        <h3 className="font-extrabold text-lg sm:text-xl text-[#1A1A2E] leading-snug">
-                          {courses[0]?.title || 'Basics of Taxation: Corporate GST & Deductions'}
-                        </h3>
-                        <p className="mt-1.5 text-xs text-slate-500 leading-relaxed font-normal">
-                          {courses[0]?.description || 'Master corporate GST mechanisms, input tax credit reconciliation, cross-border filing defenses, and TDS claim pipelines.'}
-                        </p>
-
-                        <div className="mt-3 flex items-center gap-2 text-xs font-semibold text-slate-700">
-                          <div className="w-6 h-6 rounded-full bg-[#1E3494] text-white flex items-center justify-center text-[9px] font-bold">
-                            AM
-                          </div>
-                          <div>
-                            <span className="block font-bold text-slate-800">
-                              Tutor: {courses[0]?.tutor || 'Ahmed Muneer, CPA'} <span className="text-blue-600">✓</span>
-                            </span>
-                            <span className="block text-[10px] text-slate-400 font-normal">
-                              lead fiscal architect • ernst & young alum
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Progress & Bottom Button Bar */}
-                  <div className="mt-5 pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
-                    <div className="w-full sm:w-1/2">
-                      <div className="flex items-center justify-between text-[11px] font-mono font-semibold text-slate-600 mb-1">
-                        <span>Territory Claimed: {courses[0]?.progress || 73}%</span>
-                        <span>{courses[0]?.levelsVerified || '22/30 Levels Verified'}</span>
-                      </div>
-                      <div className="w-full h-2 rounded-full bg-slate-100 overflow-hidden">
+                      <div className={`flex flex-col ${isHero ? 'sm:flex-row' : ''} gap-5 items-start`}>
+                        {/* Isometric Cube Box */}
                         <div 
-                          className="h-full bg-gradient-to-r from-[#FF7D47] to-[#FF6B35] rounded-full transition-all duration-500"
-                          style={{ width: `${courses[0]?.progress || 73}%` }}
-                        />
-                      </div>
-                    </div>
+                          className={`w-full ${isHero ? 'sm:w-56 h-48' : 'h-36'} rounded-2xl flex flex-col justify-between p-3.5 relative shadow-inner shrink-0`}
+                          style={{
+                            background: idx % 3 === 0 
+                              ? 'radial-gradient(circle at 40% 30%, #152458 0%, #0d173d 60%, #070d24 100%)'
+                              : idx % 3 === 1
+                              ? 'radial-gradient(circle at 40% 30%, #065f46 0%, #047857 60%, #064e3b 100%)'
+                              : 'radial-gradient(circle at 40% 30%, #1e1b4b 0%, #0f172a 60%, #020617 100%)'
+                          }}
+                        >
+                          <div className="flex items-center justify-between text-[9px] font-mono text-slate-300">
+                            <span className="uppercase">SECTOR 0{idx + 1} // {typeof course.category_id === 'object' && course.category_id?.name ? course.category_id.name : 'CURRICULUM'}</span>
+                            <span>★ {course.rating || 4.9}</span>
+                          </div>
 
-                    <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
-                      <span className="text-xs font-mono text-slate-500 hidden sm:inline">
-                        ⏱ 140 Mins • 5 Sub-regions
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setSelectedCourse(courses[0]);
-                          setPhase('course_single');
-                        }}
-                        className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#FF7D47] to-[#FF6B35] hover:from-[#ff8c5a] text-white font-bold text-xs shadow-md hover:shadow-lg transition-all cursor-pointer whitespace-nowrap"
-                      >
-                        Continue Expedition →
-                      </button>
-                    </div>
-                  </div>
-                </div>
+                          <div className="flex items-center justify-center my-auto">
+                            {idx % 3 === 0 ? (
+                              <IsometricCube
+                                topColor="#10B981"
+                                leftColor="#1A2D6E"
+                                rightColor="#FF6B35"
+                                size={isHero ? 110 : 85}
+                                glow={true}
+                              />
+                            ) : idx % 3 === 1 ? (
+                              <IsometricCube
+                                topColor="#10B981"
+                                leftColor="#047857"
+                                rightColor="#065F46"
+                                hasFlag={true}
+                                size={85}
+                              />
+                            ) : (
+                              <IsometricPolyhedron size={isHero ? 90 : 75} />
+                            )}
+                          </div>
 
-                {/* ── CARD 2: Advanced Accounting (Matching Image 3 Top-Right) ── */}
-                <div className="rounded-3xl bg-white border border-slate-200/90 shadow-md p-5 flex flex-col justify-between hover:border-[#2B4788] transition-all">
-                  <div 
-                    className="w-full h-32 rounded-2xl flex flex-col justify-between p-3 relative shadow-inner mb-3"
-                    style={{
-                      background: 'radial-gradient(circle at 40% 30%, #152458 0%, #0d173d 60%, #070d24 100%)'
-                    }}
-                  >
-                    <div className="flex items-center justify-between text-[9px] font-mono text-slate-300">
-                      <span className="px-1.5 py-0.5 rounded bg-white/10 uppercase">SECTOR 02 // ACC</span>
-                      <span className="text-orange-400 font-bold">45%</span>
-                    </div>
-
-                    <div className="flex items-center justify-center my-auto">
-                      <IsometricCube
-                        topColor="#1E3A8A"
-                        leftColor="#FF6B35"
-                        rightColor="#172554"
-                        size={85}
-                      />
-                    </div>
-
-                    <div className="flex items-center justify-between text-[9px] font-mono text-slate-400">
-                      <span>14 of 30 levels</span>
-                      <span>★ 4.8</span>
-                    </div>
-                  </div>
-
-                  <div>
-                    <h4 className="font-extrabold text-sm text-[#1A1A2E]">
-                      {courses[1]?.title || 'Advanced Accounting'}
-                    </h4>
-                    <span className="text-[11px] text-slate-500 font-normal block mt-0.5">
-                      Tutor: {courses[1]?.tutor || 'Ahmed Muneer, CPA'}
-                    </span>
-                    <span className="text-[10px] text-slate-400 font-mono block">
-                      120 mins • 4 regions • ★ 4.8
-                    </span>
-                  </div>
-
-                  <div className="mt-3 pt-3 border-t border-slate-100">
-                    <div className="flex items-center justify-between text-[11px] font-mono text-slate-600 mb-1">
-                      <span>Progress</span>
-                      <span>45%</span>
-                    </div>
-                    <div className="w-full h-1.5 rounded-full bg-slate-100 overflow-hidden mb-3">
-                      <div className="h-full bg-[#FF6B35] rounded-full" style={{ width: '45%' }} />
-                    </div>
-
-                    <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-mono text-slate-400">14 of 30 levels</span>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setSelectedCourse(courses[1]);
-                          setPhase('course_single');
-                        }}
-                        className="px-4 py-1.5 rounded-xl bg-[#1E3494] hover:bg-[#2B4788] text-white text-xs font-bold transition-all cursor-pointer"
-                      >
-                        Continue →
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                {/* ── CARD 3: GST Essentials & Systemic Audit (Green, Matching Image 3 Bottom-Left) ── */}
-                <div className="rounded-3xl bg-white border border-slate-200/90 shadow-md p-5 flex flex-col justify-between hover:border-emerald-600 transition-all">
-                  <div 
-                    className="w-full h-32 rounded-2xl flex flex-col justify-between p-3 relative shadow-inner mb-3"
-                    style={{
-                      background: 'radial-gradient(circle at 40% 30%, #065f46 0%, #047857 60%, #064e3b 100%)'
-                    }}
-                  >
-                    <div className="flex items-center justify-between text-[9px] font-mono text-white/90">
-                      <span className="px-1.5 py-0.5 rounded bg-white/20 uppercase font-bold">SECTOR 01 // CONQUERED</span>
-                      <span className="px-2 py-0.5 rounded-full bg-emerald-400/40 font-bold text-white">100% CLAIMED</span>
-                    </div>
-
-                    {/* Isometric Cube with Flag planted on top */}
-                    <div className="flex items-center justify-center my-auto">
-                      <IsometricCube
-                        topColor="#10B981"
-                        leftColor="#047857"
-                        rightColor="#065F46"
-                        hasFlag={true}
-                        size={85}
-                      />
-                    </div>
-
-                    <div className="flex items-center justify-between text-[9px] font-mono text-emerald-100">
-                      <span>90 mins • 3 regions</span>
-                      <span>★ 4.9</span>
-                    </div>
-                  </div>
-
-                  <div>
-                    <h4 className="font-extrabold text-sm text-[#1A1A2E] flex items-center gap-1.5">
-                      <span>{courses[2]?.title || 'GST Essentials & Systemic Audit'}</span>
-                      <span className="text-emerald-500 font-bold">✓</span>
-                    </h4>
-                    <span className="text-[11px] text-slate-500 font-normal block mt-0.5">
-                      Tutor: {courses[2]?.tutor || 'Sneha Kapoor, CA'}
-                    </span>
-                    <span className="mt-1 inline-block px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 text-[10px] font-bold font-mono">
-                      Claimed & Mastered
-                    </span>
-                  </div>
-
-                  <div className="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between">
-                    <span className="text-[10px] font-mono text-slate-400">ID: #GST-004</span>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setSelectedCourse(courses[2]);
-                        setPhase('course_single');
-                      }}
-                      className="px-3.5 py-1.5 rounded-xl border border-slate-300 hover:border-slate-400 text-slate-700 text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer"
-                    >
-                      <span>📜</span>
-                      <span>View Certificate</span>
-                    </button>
-                  </div>
-                </div>
-
-                {/* ── CARD 4: Financial Statement Analysis (Faceted Prism, Matching Image 3 Bottom-Right) ── */}
-                <div className="md:col-span-2 rounded-3xl bg-white border border-slate-200/90 shadow-md p-5 flex flex-col justify-between hover:border-[#2B4788] transition-all">
-                  <div className="flex flex-col sm:flex-row gap-5 items-start">
-                    <div 
-                      className="w-full sm:w-48 h-32 rounded-2xl flex flex-col justify-between p-3 relative shadow-inner shrink-0"
-                      style={{
-                        background: 'radial-gradient(circle at 40% 30%, #152458 0%, #0d173d 60%, #070d24 100%)'
-                      }}
-                    >
-                      <div className="flex items-center justify-between text-[9px] font-mono text-slate-300">
-                        <span className="px-1.5 py-0.5 rounded bg-white/10 uppercase">SECTOR 03 // FIN</span>
-                        <span className="text-orange-400 font-bold">12%</span>
-                      </div>
-
-                      {/* Isometric Polyhedron */}
-                      <div className="flex items-center justify-center my-auto">
-                        <IsometricPolyhedron size={80} />
-                      </div>
-
-                      <div className="flex items-center justify-between text-[9px] font-mono text-slate-400">
-                        <span>100 mins • 4 regions</span>
-                        <span>★ 4.8</span>
-                      </div>
-                    </div>
-
-                    <div className="flex-1">
-                      <h4 className="font-extrabold text-base text-[#1A1A2E]">
-                        {courses[3]?.title || 'Financial Statement Analysis'}
-                      </h4>
-                      <p className="mt-1 text-xs text-slate-500 leading-relaxed font-normal">
-                        Tutor: {courses[3]?.tutor || 'Rohan Verma, FCA'} • 180 mins • 4 regions • ★ 4.8
-                      </p>
-
-                      <div className="mt-3">
-                        <div className="flex items-center justify-between text-[11px] font-mono text-slate-600 mb-1">
-                          <span>Progress</span>
-                          <span>12%</span>
+                          <div className="flex items-center justify-between text-[9px] font-mono text-slate-300">
+                            <span className="font-bold text-orange-400">{durationDisplay}</span>
+                            <span className="font-bold text-emerald-400">{priceDisplay}</span>
+                          </div>
                         </div>
-                        <div className="w-full h-1.5 rounded-full bg-slate-100 overflow-hidden mb-2">
-                          <div className="h-full bg-[#FF6B35] rounded-full" style={{ width: '12%' }} />
+
+                        {/* Card Content Details */}
+                        <div className="flex-1 flex flex-col justify-between w-full">
+                          <div>
+                            <div className="flex items-center gap-2 mb-2 font-mono text-[9px] font-bold text-blue-600">
+                              <span className="px-2 py-0.5 rounded bg-blue-50 border border-blue-100 uppercase">
+                                EXPEDITION {idx + 1}
+                              </span>
+                              <span className="text-slate-400">★ {course.rating || 4.9}</span>
+                            </div>
+
+                            <h3 className="font-extrabold text-lg sm:text-xl text-[#1A1A2E] leading-snug">
+                              {course.title}
+                            </h3>
+                            <p className="mt-1.5 text-xs text-slate-500 leading-relaxed font-normal line-clamp-3">
+                              {course.description || 'Comprehensive curriculum with practical mastery and executive instruction.'}
+                            </p>
+
+                            <div className="mt-3 flex items-center gap-2 text-xs font-semibold text-slate-700">
+                              <div className="w-6 h-6 rounded-full bg-[#1E3494] text-white flex items-center justify-center text-[9px] font-bold">
+                                {(course.tutor || 'AC').split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase()}
+                              </div>
+                              <div>
+                                <span className="block font-bold text-slate-800">
+                                  Tutor: {course.tutor || 'Academic Faculty'} <span className="text-blue-600">✓</span>
+                                </span>
+                              </div>
+                            </div>
+                          </div>
                         </div>
                       </div>
+
+                      {/* Progress & Bottom Button Bar */}
+                      <div className="mt-5 pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-black text-slate-800 font-mono">{priceDisplay}</span>
+                          <span className="text-xs text-slate-400 font-mono">• {durationDisplay}</span>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedCourse(course);
+                            setPhase('course_single');
+                          }}
+                          className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#FF7D47] to-[#FF6B35] hover:from-[#ff8c5a] text-white font-bold text-xs shadow-md hover:shadow-lg transition-all cursor-pointer whitespace-nowrap text-center"
+                        >
+                          Continue Expedition →
+                        </button>
+                      </div>
                     </div>
-                  </div>
-
-                  <div className="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between">
-                    <span className="text-xs font-mono text-slate-400">4 of 26 levels</span>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setSelectedCourse(courses[3]);
-                        setPhase('course_single');
-                      }}
-                      className="px-5 py-2 rounded-xl bg-[#1E3494] hover:bg-[#2B4788] text-white text-xs font-bold transition-all cursor-pointer"
-                    >
-                      Continue →
-                    </button>
-                  </div>
-                </div>
-
+                  );
+                })}
               </div>
 
               {/* Bottom Back Action */}
@@ -1547,11 +1417,27 @@ export default function OnboardingPage() {
                 <div>
                   <span className="text-xs text-slate-400 block font-mono">ADMISSION INVESTMENT</span>
                   <div className="flex items-baseline gap-2">
-                    <span className="text-2xl sm:text-3xl font-black text-[#1A1A2E] font-['Poppins',sans-serif]">
-                      ₹{(selectedCourse.price || 3499).toLocaleString()}
-                    </span>
-                    <span className="text-xs text-slate-400 line-through">₹5,999</span>
-                    <span className="text-xs font-bold text-emerald-600">42% OFF</span>
+                    {(() => {
+                      const finalPrice = selectedCourse.pricing?.discounted_price ?? selectedCourse.pricing?.regular_price ?? selectedCourse.price ?? 0;
+                      const hasDiscount = Boolean(selectedCourse.pricing?.discounted_price && selectedCourse.pricing?.regular_price && selectedCourse.pricing.regular_price > selectedCourse.pricing.discounted_price);
+                      return (
+                        <>
+                          <span className="text-2xl sm:text-3xl font-black text-[#1A1A2E] font-['Poppins',sans-serif]">
+                            {finalPrice > 0 ? `₹${finalPrice.toLocaleString()}` : 'Free Admission'}
+                          </span>
+                          {hasDiscount && (
+                            <>
+                              <span className="text-xs text-slate-400 line-through">
+                                ₹{selectedCourse.pricing!.regular_price!.toLocaleString()}
+                              </span>
+                              <span className="text-xs font-bold text-emerald-600">
+                                {Math.round(((selectedCourse.pricing!.regular_price! - selectedCourse.pricing!.discounted_price!) / selectedCourse.pricing!.regular_price!) * 100)}% OFF
+                              </span>
+                            </>
+                          )}
+                        </>
+                      );
+                    })()}
                   </div>
                 </div>
 

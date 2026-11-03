@@ -118,6 +118,14 @@ export interface Course {
   validity_days: number;
   structure_mode: CourseStructureMode;
   is_published: boolean;
+  status?: 'in_progress' | 'published' | 'coming_soon' | 'paused';
+  is_featured?: boolean;
+  featured_at?: string | null;
+  featured_by?: {
+    _id: string;
+    name: string;
+    email: string;
+  } | null;
   
   // Post-Completion parameters
   post_completion_access: PostCompletionAccess;
@@ -170,10 +178,25 @@ export interface KycDocumentValue {
 
 export interface UserKycRecord {
   _id: string;
-  user_id: string | User;
-  verification_status: KycStatus;
-  submitted_documents: KycDocumentValue[];
-  admin_feedback?: string | null;
+  user_id: string;
+  status: 'pending' | 'verified' | 'rejected';
+  documents: KycDocumentValue[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+// Featured Course Audit History Log
+export interface FeaturedCourseLog {
+  _id: string;
+  course_id: Course;
+  previous_course_id?: Course | null;
+  action: 'SET_FEATURED' | 'REMOVED_FEATURED' | 'REPLACED_FEATURED';
+  changed_by: {
+    _id: string;
+    name: string;
+    email: string;
+  };
+  notes?: string;
   createdAt: string;
   updatedAt: string;
 }

@@ -25,12 +25,9 @@
   },
   "include": [
     "next-env.d.ts",
-    "src/middleware.ts",
-    "src/types/**/*.ts",
-    "src/services/**/*.ts",
-    "src/store/**/*.ts",
-    "src/app/**/*.ts",
-    "src/app/**/*.tsx",
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "src/**/*.d.ts",
     ".next/types/**/*.ts"
   ],
   "exclude": ["node_modules"]

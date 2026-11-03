@@ -10,9 +10,17 @@ interface CourseDataTableProps {
   page: number;
   totalPages: number;
   onPageChange: (page: number) => void;
+  onToggleFeatured?: (course: Course) => void;
 }
 
-export const CourseDataTable: React.FC<CourseDataTableProps> = ({ courses, isLoading, page, totalPages, onPageChange }) => {
+export const CourseDataTable: React.FC<CourseDataTableProps> = ({ 
+  courses, 
+  isLoading, 
+  page, 
+  totalPages, 
+  onPageChange,
+  onToggleFeatured 
+}) => {
   if (isLoading) {
     return (
       <div className="w-full h-80 flex items-center justify-center rounded-xl border" style={{ borderColor: 'var(--glass-border)', backgroundColor: 'var(--color-bg-surface)' }}>
@@ -50,6 +58,7 @@ export const CourseDataTable: React.FC<CourseDataTableProps> = ({ courses, isLoa
               <th className="p-4 text-xs font-bold uppercase tracking-wider opacity-60" style={{ color: 'var(--color-text-primary)' }}>Category</th>
               <th className="p-4 text-xs font-bold uppercase tracking-wider opacity-60" style={{ color: 'var(--color-text-primary)' }}>Price</th>
               <th className="p-4 text-xs font-bold uppercase tracking-wider opacity-60" style={{ color: 'var(--color-text-primary)' }}>Status</th>
+              <th className="p-4 text-xs font-bold uppercase tracking-wider opacity-60 text-center" style={{ color: 'var(--color-text-primary)' }}>Featured</th>
               <th className="p-4 text-xs font-bold uppercase tracking-wider opacity-60" style={{ color: 'var(--color-text-primary)' }}>Validity</th>
               <th className="p-4 text-xs font-bold uppercase tracking-wider opacity-60 text-right" style={{ color: 'var(--color-text-primary)' }}>Actions</th>
             </tr>
@@ -57,20 +66,75 @@ export const CourseDataTable: React.FC<CourseDataTableProps> = ({ courses, isLoa
           <tbody className="divide-y" style={{ borderColor: 'var(--glass-border)' }}>
             {courses.map(course => {
               const courseId = course.id || (course as any)._id; // Safe fallback for Mongoose
+              const categoryDisplay = (typeof course.category_id === 'object' && course.category_id !== null ? (course.category_id as any).name : '')
+                || (course.category && !/^[0-9a-fA-F]{24}$/.test(course.category) ? course.category : '')
+                || 'Uncategorized';
               return (
                 <tr key={courseId} className="transition-colors hover:bg-black/5 dark:hover:bg-white/5 group">
                   <td className="p-4 font-semibold" style={{ color: 'var(--color-text-primary)' }}>{course.title}</td>
-                  <td className="p-4 text-sm opacity-80" style={{ color: 'var(--color-text-primary)' }}>{course.category || 'Uncategorized'}</td>
+                  <td className="p-4 text-sm opacity-80" style={{ color: 'var(--color-text-primary)' }}>{categoryDisplay}</td>
                   <td className="p-4 text-sm font-mono" style={{ color: 'var(--color-text-primary)' }}>${Number(course.price || 0).toFixed(2)}</td>
                   <td className="p-4">
-                    {course.is_published ? (
-                      <span className="db-badge-green px-3 py-1.5 text-xs font-bold uppercase tracking-wide rounded-md bg-green-500/10 text-green-500 border border-green-500/20 shadow-sm">
-                        Live
-                      </span>
+                    {(() => {
+                      const status = course.status || (course.is_published ? 'published' : 'in_progress');
+                      if (status === 'published') {
+                        return (
+                          <span className="db-badge-green px-2.5 py-1 text-xs font-bold uppercase tracking-wide rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 shadow-sm inline-flex items-center gap-1.5">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                            <span>Published</span>
+                          </span>
+                        );
+                      }
+                      if (status === 'coming_soon') {
+                        return (
+                          <span className="px-2.5 py-1 text-xs font-bold uppercase tracking-wide rounded-md bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 shadow-sm inline-flex items-center gap-1.5">
+                            <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                            <span>Coming Soon</span>
+                          </span>
+                        );
+                      }
+                      if (status === 'paused') {
+                        return (
+                          <span className="px-2.5 py-1 text-xs font-bold uppercase tracking-wide rounded-md bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 shadow-sm inline-flex items-center gap-1.5">
+                            <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
+                            <span>Paused</span>
+                          </span>
+                        );
+                      }
+                      return (
+                        <span className="db-badge-amber px-2.5 py-1 text-xs font-bold uppercase tracking-wide rounded-md bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 shadow-sm inline-flex items-center gap-1.5">
+                          <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                          <span>In Progress</span>
+                        </span>
+                      );
+                    })()}
+                  </td>
+                  <td className="p-4 text-center">
+                    {course.is_featured ? (
+                      <button
+                        type="button"
+                        onClick={() => onToggleFeatured && onToggleFeatured(course)}
+                        className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 hover:bg-amber-500/25 transition-all shadow-sm cursor-pointer"
+                        title="Featured Spotlight Active • Click to Unset"
+                      >
+                        <span>⭐</span>
+                        <span>Spotlight</span>
+                      </button>
                     ) : (
-                      <span className="db-badge-amber px-3 py-1.5 text-xs font-bold uppercase tracking-wide rounded-md bg-amber-500/10 text-amber-500 border border-amber-500/20 shadow-sm">
-                        Draft
-                      </span>
+                      <button
+                        type="button"
+                        onClick={() => onToggleFeatured && onToggleFeatured(course)}
+                        disabled={course.status !== 'published' && !course.is_published}
+                        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border transition-all ${
+                          course.status === 'published' || course.is_published
+                            ? 'border-slate-300 dark:border-slate-700 text-slate-500 hover:text-amber-600 hover:border-amber-400 cursor-pointer hover:bg-amber-500/5'
+                            : 'border-transparent text-slate-300 dark:text-slate-700 opacity-40 cursor-not-allowed'
+                        }`}
+                        title={course.status === 'published' || course.is_published ? "Set as Featured Spotlight" : "Publish course to enable featured status"}
+                      >
+                        <span className="opacity-50">☆</span>
+                        <span>Feature</span>
+                      </button>
                     )}
                   </td>
                   <td className="p-4 text-sm opacity-80" style={{ color: 'var(--color-text-primary)' }}>{course.validity_days || 0} days</td>
