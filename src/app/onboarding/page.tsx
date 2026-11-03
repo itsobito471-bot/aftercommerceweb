@@ -154,9 +154,9 @@ export default function OnboardingPage() {
   const [successMsg, setSuccessMsg] = useState('');
 
   // Category & Course Data States
-  const [categories, setCategories] = useState<CategoryItem[]>(FALLBACK_CATEGORIES);
-  const [selectedCategoryId, setSelectedCategoryId] = useState<string>('cat_ca');
-  const [courses, setCourses] = useState<CourseItem[]>(FALLBACK_COURSES);
+  const [categories, setCategories] = useState<CategoryItem[]>([]);
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string>('');
+  const [courses, setCourses] = useState<CourseItem[]>([]);
   const [selectedCourse, setSelectedCourse] = useState<CourseItem | null>(null);
 
   // Fetch categories from backend on mount
@@ -168,16 +168,20 @@ export default function OnboardingPage() {
           // Enrich with routes and badges
           const enriched = res.data.data.map((cat: CategoryItem, idx: number) => ({
             ...cat,
-            routeCode: cat.routeCode || cat.name.split(' ').map((w: string) => w[0]).join('').slice(0, 3).toUpperCase() || `R0${idx + 1}`,
+            routeCode: cat.routeCode || cat.slug?.toUpperCase() || cat.name.split(' ').map((w: string) => w[0]).join('').slice(0, 4).toUpperCase() || `R0${idx + 1}`,
             gateCode: cat.gateCode || `Gate ${String.fromCharCode(65 + idx)}-0${idx + 4}`,
             trackTag: cat.trackTag || (idx % 2 === 0 ? 'Track: Direct' : 'Track: Corporate'),
             tierTag: cat.tierTag || (idx === 0 ? 'TIER 1 EXPEDITION' : 'ACCREDITED')
           }));
           setCategories(enriched);
           setSelectedCategoryId(enriched[0]._id);
+        } else if (res.data?.success && Array.isArray(res.data.data)) {
+          setCategories(res.data.data);
         }
       } catch {
-        // Fallback already preloaded
+        // Fallback if backend server is unreachable
+        setCategories(FALLBACK_CATEGORIES);
+        setSelectedCategoryId(FALLBACK_CATEGORIES[0]._id);
       }
     };
     fetchCategories();
@@ -213,7 +217,7 @@ export default function OnboardingPage() {
 
           setSuccessMsg('Account registered! Calibrating expedition...');
           
-          // Determine single category skip rule
+          // Advance to destination calibration
           setTimeout(() => {
             handlePostAuthTransition();
           }, 600);
@@ -262,15 +266,13 @@ export default function OnboardingPage() {
 
   // Check category count rule
   const handlePostAuthTransition = () => {
-    // Active categories with courses
-    const activeCategoriesWithCourses = categories.filter(c => (c.courseCount ?? 1) > 0);
-
-    // If only one category exists (or only one has courses), select it and skip directly to course selection
-    if (activeCategoriesWithCourses.length === 1) {
-      const singleCat = activeCategoriesWithCourses[0];
+    // If only one category exists in the system, auto-select it and skip to course load
+    if (categories.length === 1) {
+      const singleCat = categories[0];
       setSelectedCategoryId(singleCat._id);
       loadCoursesForCategory(singleCat._id);
     } else {
+      // Multiple categories available (e.g. 2 categories in database): Show Phase 2
       setPhase('category');
     }
   };
@@ -280,21 +282,22 @@ export default function OnboardingPage() {
     try {
       setLoading(true);
       const res = await axios.get(`${BACKEND_URL}/api/public/courses?categoryId=${categoryId}`);
-      let fetchedCourses = FALLBACK_COURSES;
-      if (res.data?.success && Array.isArray(res.data.data) && res.data.data.length > 0) {
+      let fetchedCourses: CourseItem[] = [];
+      if (res.data?.success && Array.isArray(res.data.data)) {
         fetchedCourses = res.data.data;
       }
       setCourses(fetchedCourses);
 
-      // If only 1 course is available, display single course breakdown + payment
+      // If only 1 course is launched, display single course breakdown + payment
       if (fetchedCourses.length === 1) {
         setSelectedCourse(fetchedCourses[0]);
         setPhase('course_single');
       } else {
+        // When 0 courses (empty state) or 2+ courses, enter course_selection phase
         setPhase('course_selection');
       }
     } catch {
-      setCourses(FALLBACK_COURSES);
+      setCourses([]);
       setPhase('course_selection');
     } finally {
       setLoading(false);
@@ -321,42 +324,44 @@ export default function OnboardingPage() {
       <div className="absolute top-0 right-1/4 w-96 h-96 bg-[#2B4788]/10 rounded-full filter blur-3xl pointer-events-none" />
       <div className="absolute bottom-10 left-1/4 w-80 h-80 bg-[#FF6B35]/10 rounded-full filter blur-3xl pointer-events-none" />
 
-      {/* ── TOP HEADER / STEP CONTROLS (Matching Image 2 Style) ── */}
-      <header className="relative z-10 max-w-7xl mx-auto w-full px-4 sm:px-6 pt-5 pb-2 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2.5 group">
-          <div className="w-10 h-8 flex items-center justify-center group-hover:scale-105 transition-transform duration-200">
-            <img 
-              src={logoIcon.src} 
-              alt="After Commerce Logo" 
-              className="w-full h-full object-contain select-none pointer-events-none" 
-            />
-          </div>
-          <span className="font-extrabold text-[15px] tracking-wider text-[#1A1A2E] font-['Poppins',sans-serif]">
-            AFTER COMMERCE
-          </span>
-        </Link>
-
-        {/* Phase step indicator */}
-        <div className="flex items-center gap-3">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/90 border border-slate-200/90 shadow-sm text-xs font-mono font-semibold text-slate-600">
-            <span>
-              {phase === 'auth' && 'Step 1 of 3 • Auth'}
-              {phase === 'category' && 'Step 2 of 3 • Destination'}
-              {(phase === 'course_selection' || phase === 'course_single') && 'Step 3 of 3 • Curriculum'}
-            </span>
-            <div className="flex items-center gap-1">
-              <span className={`w-2 h-2 rounded-full ${phase === 'auth' ? 'bg-[#FF6B35]' : 'bg-[#2B4788]'}`} />
-              <span className={`w-2 h-2 rounded-full ${phase === 'category' ? 'bg-[#2B4788]' : 'bg-slate-300'}`} />
-              <span className={`w-2 h-2 rounded-full ${phase.startsWith('course') ? 'bg-[#2B4788]' : 'bg-slate-300'}`} />
+      {/* ── STATIC NON-MOVABLE TOP HEADER (Fixed at viewport top) ── */}
+      <header className="sticky top-0 z-50 w-full bg-[#F8F9FC]/95 backdrop-blur-md border-b border-slate-200/60 shadow-[0_1px_3px_rgba(0,0,0,0.03)]">
+        <div className="max-w-7xl mx-auto w-full px-4 sm:px-8 h-16 sm:h-20 flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-2.5 group">
+            <div className="w-10 h-8 flex items-center justify-center group-hover:scale-105 transition-transform duration-200">
+              <img 
+                src={logoIcon.src} 
+                alt="After Commerce Logo" 
+                className="w-full h-full object-contain select-none pointer-events-none" 
+              />
             </div>
-          </div>
-
-          <Link
-            href="/"
-            className="text-xs font-semibold text-slate-500 hover:text-[#2B4788] transition-colors flex items-center gap-1.5 ml-2"
-          >
-            <span>Skip for now</span>
+            <span className="font-extrabold text-[15px] tracking-wider text-[#1A1A2E] font-['Poppins',sans-serif]">
+              AFTER COMMERCE
+            </span>
           </Link>
+
+          {/* Phase step indicator & Navigation controls */}
+          <div className="flex items-center gap-3 sm:gap-4">
+            <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-full bg-white/95 border border-slate-200 shadow-sm text-xs font-mono font-semibold text-slate-700">
+              <span>
+                {phase === 'auth' && 'Step 1 of 3 • Account'}
+                {phase === 'category' && 'Step 2 of 3 • Destination'}
+                {(phase === 'course_selection' || phase === 'course_single') && 'Step 3 of 3 • Curriculum'}
+              </span>
+              <div className="flex items-center gap-1.5 ml-1">
+                <span className={`w-2 h-2 rounded-full ${phase === 'auth' ? 'bg-[#FF6B35]' : 'bg-[#2B4788]'}`} />
+                <span className={`w-2 h-2 rounded-full ${phase === 'category' ? 'bg-[#FF6B35]' : (phase.startsWith('course') ? 'bg-[#2B4788]' : 'bg-slate-300')}`} />
+                <span className={`w-2 h-2 rounded-full ${phase.startsWith('course') ? 'bg-[#FF6B35]' : 'bg-slate-300'}`} />
+              </div>
+            </div>
+
+            <Link
+              href="/"
+              className="text-xs font-semibold text-slate-500 hover:text-[#2B4788] transition-colors flex items-center gap-1.5 ml-1"
+            >
+              <span>Skip for now</span>
+            </Link>
+          </div>
         </div>
       </header>
 
@@ -656,7 +661,9 @@ export default function OnboardingPage() {
                       <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[10px] font-mono font-semibold text-slate-500">
                         <span>{cat.trackTag || 'Track: Direct'}</span>
                         <span className="text-[#FF6B35] font-bold">
-                          {cat.courseCount ?? 1} {(cat.courseCount ?? 1) === 1 ? 'COURSE' : 'COURSES'}
+                          {cat.courseCount && cat.courseCount > 0
+                            ? `${cat.courseCount} ${cat.courseCount === 1 ? 'COURSE' : 'COURSES'}`
+                            : '0 COURSES'}
                         </span>
                       </div>
 
@@ -734,10 +741,44 @@ export default function OnboardingPage() {
         )}
 
         {/* ════════════════════════════════════════════════════════════════
-            PHASE 3A: MULTI-COURSE SELECTION GRID (Matching Image 3)
+            PHASE 3A: MULTI-COURSE SELECTION GRID OR EMPTY STATE
            ════════════════════════════════════════════════════════════════ */}
         {phase === 'course_selection' && (
-          <div className="w-full max-w-5xl mx-auto flex flex-col items-center animate-fade-in">
+          courses.length === 0 ? (
+            <div className="w-full max-w-xl mx-auto flex flex-col items-center text-center p-8 sm:p-12 rounded-3xl bg-white/95 backdrop-blur-md border border-slate-200/90 shadow-xl animate-fade-in">
+              <div className="w-20 h-20 rounded-2xl bg-orange-50 border border-orange-200 flex items-center justify-center text-3xl mb-5 shadow-inner">
+                🧭
+              </div>
+              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-slate-100 text-slate-600 font-mono text-[10px] font-bold uppercase tracking-wider mb-3">
+                CURRICULUM RADAR • CALIBRATION NOTE
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-[#1A1A2E] tracking-tight font-['Poppins',sans-serif]">
+                Sorry, there are no courses for you
+              </h2>
+              <p className="mt-3 text-sm text-slate-500 leading-relaxed max-w-md">
+                There are currently no active or launched courses available under this category. Our curriculum architects are crafting new cohorts soon.
+              </p>
+              
+              <div className="mt-8 flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
+                <button
+                  type="button"
+                  onClick={() => setPhase('category')}
+                  className="w-full sm:w-auto px-6 py-3 rounded-xl bg-[#2B4788] hover:bg-[#1E3494] text-white font-bold text-xs shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <span>←</span>
+                  <span>Choose another category</span>
+                </button>
+
+                <Link
+                  href="/"
+                  className="w-full sm:w-auto px-5 py-3 rounded-xl border border-slate-300 hover:border-slate-400 text-slate-600 font-semibold text-xs transition-colors flex items-center justify-center"
+                >
+                  Return to Home
+                </Link>
+              </div>
+            </div>
+          ) : (
+            <div className="w-full max-w-5xl mx-auto flex flex-col items-center animate-fade-in">
             {/* Header info */}
             <div className="text-center mb-7">
               <span className="inline-block px-3 py-1 rounded-full bg-blue-50 text-[#2B4788] font-mono text-[10px] font-bold uppercase tracking-wider mb-2 border border-blue-100">
@@ -956,6 +997,7 @@ export default function OnboardingPage() {
               </button>
             </div>
           </div>
+          )
         )}
 
         {/* ════════════════════════════════════════════════════════════════

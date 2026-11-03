@@ -62,11 +62,11 @@ Every model in `lmsapi/models/` and its schema purpose:
 ### Public Student Catalog Endpoints (`/api/public`)
 * `GET /api/public/categories-with-courses`:
   - **Access**: Public
-  - **Behavior**: Retrieves all non-deleted categories along with the count of active published courses per category.
+  - **Behavior**: Retrieves all active categories (`is_active: { $ne: false }`) along with the count of published courses (`is_published: true` or `status: 'published'`). Returns `{ success: true, data: [...] }`.
 * `GET /api/public/courses`:
   - **Access**: Public
   - **Query Params**: `?categoryId=<id>`
-  - **Behavior**: Retrieves published courses under a specific category or overall, populated with tutor and taxonomy metadata.
+  - **Behavior**: Retrieves published courses under a specific category or overall (`is_published: true` or `status: 'published'`), populated with category metadata. Returns `{ success: true, count, data: [...] }`. When none are published, cleanly returns `count: 0, data: []`.
 
 ### Admin Management (`/api/admin`)
 * `POST /api/admin/login`: Admin 2FA first-stage login, sends OTP.
@@ -86,8 +86,8 @@ Every model in `lmsapi/models/` and its schema purpose:
 
 | Page Route | File Path | Purpose & Key Features |
 | :--- | :--- | :--- |
-| `/` | `src/app/page.tsx` | **Landing Page**: Floating liquid glass navbar, interactive 4-stage convergence canvas (`HeroSection`), `FeaturedProgram` banner with mentor spotlight, 3D perspective coverflow carousel (`FeaturedCourses`), and call-to-action platform banner. All sections feature forward and reverse scroll animations. |
-| `/onboarding` | `src/app/onboarding/page.tsx` | **Student Onboarding & Login**: Dedicated liquid glass authentication portal. Defaults to new student registration ("Create your account") with name, email, optional phone, and password confirmation. Seamlessly toggles to student login via *"Already a student? Login here"*. Directs tokens to `localStorage` and `document.cookie` (`student_token`). |
+| `/` | `src/app/page.tsx` | **Landing Page**: Floating liquid glass navbar with responsive width contraction. Handles dynamic authentication state: shows "GET STARTED" when logged out, and replaces it with only the student profile icon when logged in. Profile icon toggles a liquid glass dropdown menu (Dashboard, My Courses, and Log Out). Clicking Log Out displays a confirmation modal, clears tokens/cookies/session from client storage, and refreshes the page. Features an interactive 4-stage convergence canvas (`HeroSection`), `FeaturedProgram` banner with mentor spotlight, 3D perspective coverflow carousel (`FeaturedCourses`), and forward/reverse scroll animations. |
+| `/onboarding` | `src/app/onboarding/page.tsx` | **Student Onboarding Portal**: 3-Phase guided flow with a static, non-movable top header (anchored `sticky top-0 z-50` with step indicator). Phase 1: Authentication (register/login with Atlas mascot companion). Phase 2: Category Boarding Pass selection ("Where are you headed?"). If only 1 category exists, auto-skips to courses; if multiple categories exist (e.g. 2 categories in DB), presents category tickets with "CHOSEN" stamp. Phase 3: Course Curriculum. If no courses are launched, displays high-fidelity empty state (*"Sorry, there are no courses for you"* with return to categories); if 1 course is published, displays direct enrollment + payment; if multiple courses exist, displays 3D isometric cards. |
 | `/admin-login` | `src/app/admin-login/page.tsx` | **Enterprise Admin Portal**: Restricted login screen supporting two-factor authentication (2FA) and first-time password setup for staff/administrators. |
 | `/admin` | `src/app/(admin)/admin/page.tsx` | **Admin Dashboard Root**: Executive metrics, active enrollments, recent transactions, quick actions. |
 | `/admin/courses` | `src/app/(admin)/admin/courses/page.tsx` | Course management table with status filtering, search, and action menus. |
