@@ -11,7 +11,11 @@ export enum LearningUnitType {
 }
 
 export interface VideoContentData {
-  vdo_cipher_id: string;
+  video_source_type?: 'vdocipher' | 'direct_upload';
+  vdo_cipher_id?: string;
+  direct_video_url?: string;
+  document_id?: string;
+  original_file_name?: string;
   duration_seconds?: number;
 }
 
@@ -80,4 +84,10 @@ export interface Course {
   featured_by?: any;
   thumbnail_url?: string;
   modules?: Module[];
+  pricing?: {
+    is_free?: boolean;
+    regular_price?: number;
+    inr?: number;
+    usd?: number;
+  };
 }

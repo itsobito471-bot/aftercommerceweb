@@ -430,8 +430,8 @@ export const updateProfile = async (data: { display_name?: string; avatar_doc_id
   return response.data;
 };
 
-export const getDocumentUrl = async (docId: string): Promise<{ success: boolean; data: { url: string } }> => {
-  const response = await adminApi.get<{ success: boolean; data: { url: string } }>(`/api/admin/documents/${docId}`);
+export const getDocumentUrl = async (docId: string): Promise<{ success: boolean; data: { url: string; direct_url?: string } }> => {
+  const response = await adminApi.get<{ success: boolean; data: { url: string; direct_url?: string } }>(`/api/admin/documents/${docId}?json=true`);
   return response.data;
 };
 

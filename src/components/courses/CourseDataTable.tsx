@@ -73,7 +73,7 @@ export const CourseDataTable: React.FC<CourseDataTableProps> = ({
                 <tr key={courseId} className="transition-colors hover:bg-black/5 dark:hover:bg-white/5 group">
                   <td className="p-4 font-semibold" style={{ color: 'var(--color-text-primary)' }}>{course.title}</td>
                   <td className="p-4 text-sm opacity-80" style={{ color: 'var(--color-text-primary)' }}>{categoryDisplay}</td>
-                  <td className="p-4 text-sm font-mono" style={{ color: 'var(--color-text-primary)' }}>${Number(course.price || 0).toFixed(2)}</td>
+                  <td className="p-4 text-sm font-mono" style={{ color: 'var(--color-text-primary)' }}>${Number(course?.pricing?.regular_price || 0).toFixed(2)}</td>
                   <td className="p-4">
                     {(() => {
                       const status = course.status || (course.is_published ? 'published' : 'in_progress');
