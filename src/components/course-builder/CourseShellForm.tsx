@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Course, StructureMode, CourseStatus } from '@/types/course';
-import { getCategories, getCategoryById, createCourseShell, updateCourseShell } from '@/services/adminApi';
+import { getCategories, getCategoryById, createCourseShell, updateCourseShell, toggleFeaturedCourse } from '@/services/adminApi';
 import { useCharacterStore } from '@/store/useCharacterStore';
 import { QuillEditor } from '@/components/common/QuillEditor';
 import { Modal } from '@/components/common/Modal';
@@ -27,6 +27,8 @@ export const CourseShellForm: React.FC<CourseShellFormProps> = ({ initialData, o
     description: initialData?.description || '',
   });
 
+  const [isFeatured, setIsFeatured] = useState<boolean>(Boolean(initialData?.is_featured));
+  const [isFeatureLoading, setIsFeatureLoading] = useState(false);
   const [issuesCertificate, setIssuesCertificate] = useState(false);
   const [showSavedModal, setShowSavedModal] = useState(false);
   const [publishValidationError, setPublishValidationError] = useState<string | null>(null);

@@ -57,21 +57,24 @@ export default function CourseBuilderOrchestrator() {
             validity_days: data.validity_days,
             structure_mode: data.structure_mode === 'flexible' ? StructureMode.FREE_FLEXIBLE : StructureMode.LINEAR,
             is_published: data.is_published,
+            is_featured: Boolean(data.is_featured),
             modules: (data.modules || []).map((m: any) => ({
-              id: m._id,
+              id: m._id || m.id,
               course_id: m.course_id,
-              title: m.title,
+              title: m.title || 'Untitled Module',
               description: m.description || '',
-              order_index: m.order_index,
-              unlock_days: m.unlock_days,
+              order_index: m.order_index || 0,
+              unlock_days: m.unlock_days || 0,
               units: (m.units || []).map((u: any) => ({
-                id: u._id,
-                module_id: u.module_id,
-                title: u.title,
+                id: u._id || u.id,
+                module_id: typeof u.module_id === 'object' && u.module_id !== null ? (u.module_id._id || u.module_id.id) : (u.module_id || m._id),
+                title: u.title || 'Untitled Unit',
                 type: u.type as LearningUnitType,
-                content_data: u.content_data,
-                order_index: u.order_index,
-                prerequisite_unit_id: u.prerequisite_unit_id
+                content_data: u.content_data || {},
+                order_index: u.order_index || 0,
+                prerequisite_unit_id: typeof u.prerequisite_unit_id === 'object' && u.prerequisite_unit_id !== null
+                  ? (u.prerequisite_unit_id._id || u.prerequisite_unit_id.id)
+                  : (u.prerequisite_unit_id || null)
               }))
             }))
           });
@@ -227,6 +230,7 @@ export default function CourseBuilderOrchestrator() {
               </p>
               
               <ModuleForm 
+                key={selectedModuleId}
                 courseId={courseData.id}
                 initialData={courseData.modules?.find(m => m.id === selectedModuleId)}
                 onSave={(data) => {
@@ -253,8 +257,15 @@ export default function CourseBuilderOrchestrator() {
               </p>
               
               <LearningUnitForm 
+                key={selectedUnitId}
                 moduleId={selectedModuleId}
                 initialData={courseData.modules?.find(m => m.id === selectedModuleId)?.units?.find(u => u.id === selectedUnitId)}
+                availableUnits={
+                  courseData.modules
+                    ?.flatMap(m => m.units || [])
+                    .filter(u => u.id !== selectedUnitId)
+                    .map(u => ({ id: u.id, title: u.title || 'Untitled Unit' })) || []
+                }
                 onSave={(data) => {
                   setCourseData(prev => ({
                     ...prev,

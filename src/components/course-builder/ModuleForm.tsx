@@ -5,6 +5,7 @@ import { Module } from '@/types/course';
 import { useCharacterStore } from '@/store/useCharacterStore';
 import { createModule, updateModule } from '@/services/adminApi';
 import { QuillEditor } from '@/components/common/QuillEditor';
+import { Modal } from '@/components/common/Modal';
 
 interface ModuleFormProps {
   courseId: string;
@@ -50,11 +51,41 @@ export const ModuleForm: React.FC<ModuleFormProps> = ({ courseId, initialData, o
 
   const [isLoading, setIsLoading] = useState(false);
 
+  // Modal notification state for success and errors
+  const [modalState, setModalState] = useState<{
+    isOpen: boolean;
+    type: 'success' | 'error' | 'warning';
+    title: string;
+    description: string;
+    details?: string;
+  }>({
+    isOpen: false,
+    type: 'success',
+    title: '',
+    description: ''
+  });
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (courseId.startsWith('course-')) {
+      setModalState({
+        isOpen: true,
+        type: 'warning',
+        title: 'Save Course Shell First',
+        description: 'Please save the parent Course Shell before creating and saving modules to it.'
+      });
       triggerCharacter('helper', 'Please save the Course Shell first before creating modules!');
+      return;
+    }
+
+    if (!formData.title?.trim()) {
+      setModalState({
+        isOpen: true,
+        type: 'error',
+        title: 'Module Title Required',
+        description: 'Please provide a title for this module before saving.'
+      });
       return;
     }
 
@@ -80,6 +111,14 @@ export const ModuleForm: React.FC<ModuleFormProps> = ({ courseId, initialData, o
         description: savedDescription
       }));
 
+      setModalState({
+        isOpen: true,
+        type: 'success',
+        title: 'Module Saved Successfully!',
+        description: `Module "${formData.title?.trim()}" has been saved to the course curriculum.`,
+        details: `Drip Delay: ${formData.unlock_days || 0} day(s) • Order Index: #${formData.order_index || 1}`
+      });
+
       triggerCharacter('celebrating', 'Module successfully saved!');
       
       if (onSave) {
@@ -89,8 +128,15 @@ export const ModuleForm: React.FC<ModuleFormProps> = ({ courseId, initialData, o
           description: savedDescription
         });
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to save module:', error);
+      const errorMsg = error?.response?.data?.message || error?.message || 'Failed to save module. Please check your connection and input fields.';
+      setModalState({
+        isOpen: true,
+        type: 'error',
+        title: 'Failed to Save Module',
+        description: errorMsg
+      });
       triggerCharacter('helper', 'Oops, failed to save module. Check your connection.');
     } finally {
       setIsLoading(false);
@@ -185,6 +231,26 @@ export const ModuleForm: React.FC<ModuleFormProps> = ({ courseId, initialData, o
           {isLoading ? 'Saving...' : 'Save Module'}
         </button>
       </div>
+
+      {/* ── REUSABLE MODAL FEEDBACK ── */}
+      <Modal
+        isOpen={modalState.isOpen}
+        onClose={() => setModalState(prev => ({ ...prev, isOpen: false }))}
+        title={modalState.title}
+        type={modalState.type}
+        description={modalState.description}
+        primaryAction={{
+          label: modalState.type === 'error' ? 'Dismiss' : 'Continue Editing ➔',
+          onClick: () => setModalState(prev => ({ ...prev, isOpen: false })),
+          variant: modalState.type === 'error' ? 'secondary' : 'primary'
+        }}
+      >
+        {modalState.details && (
+          <div className="mt-3 p-3 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-xs font-mono text-slate-600 dark:text-slate-300">
+            {modalState.details}
+          </div>
+        )}
+      </Modal>
     </form>
   );
 };

@@ -5,6 +5,7 @@ import { LearningUnit, LearningUnitType, VideoContentData } from '@/types/course
 import { useCharacterStore } from '@/store/useCharacterStore';
 import { createLearningUnit, updateLearningUnit } from '@/services/adminApi';
 import { QuillEditor } from '@/components/common/QuillEditor';
+import { Modal } from '@/components/common/Modal';
 
 interface LearningUnitFormProps {
   moduleId: string | null;
@@ -16,6 +17,7 @@ interface LearningUnitFormProps {
 export const LearningUnitForm: React.FC<LearningUnitFormProps> = ({ moduleId, initialData, availableUnits = [], onSave }) => {
   const triggerCharacter = useCharacterStore((state) => state.triggerCharacter);
 
+  const [unitId, setUnitId] = useState<string>(initialData?.id || '');
   const [activeType, setActiveType] = useState<LearningUnitType>(initialData?.type || LearningUnitType.VIDEO);
   const [title, setTitle] = useState(initialData?.title || '');
   const [prerequisiteId, setPrerequisiteId] = useState(initialData?.prerequisite_unit_id || '');
@@ -27,6 +29,7 @@ export const LearningUnitForm: React.FC<LearningUnitFormProps> = ({ moduleId, in
   // Synchronize internal state when switching between different units in curriculum tree
   useEffect(() => {
     if (initialData) {
+      setUnitId(initialData.id || '');
       setTitle(initialData.title || '');
       setActiveType(initialData.type || LearningUnitType.VIDEO);
       setPrerequisiteId(initialData.prerequisite_unit_id || '');
@@ -59,11 +62,51 @@ export const LearningUnitForm: React.FC<LearningUnitFormProps> = ({ moduleId, in
 
   const [isLoading, setIsLoading] = useState(false);
 
+  // Modal notification state for success and errors
+  const [modalState, setModalState] = useState<{
+    isOpen: boolean;
+    type: 'success' | 'error' | 'warning';
+    title: string;
+    description: string;
+    details?: string;
+  }>({
+    isOpen: false,
+    type: 'success',
+    title: '',
+    description: ''
+  });
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!moduleId || moduleId.startsWith('mod-')) {
+      setModalState({
+        isOpen: true,
+        type: 'warning',
+        title: 'Save Parent Module First',
+        description: 'Please save the parent Module to the database before adding and saving Learning Units under it.'
+      });
       triggerCharacter('helper', 'Please save the parent Module first before adding Learning Units!');
+      return;
+    }
+
+    if (!title.trim()) {
+      setModalState({
+        isOpen: true,
+        type: 'error',
+        title: 'Unit Title Required',
+        description: 'Please provide a title for this learning unit.'
+      });
+      return;
+    }
+
+    if (activeType === LearningUnitType.VIDEO && !vdoCipherId.trim()) {
+      setModalState({
+        isOpen: true,
+        type: 'error',
+        title: 'VdoCipher Video ID Required',
+        description: 'Please provide a valid VdoCipher Video ID for video lectures.'
+      });
       return;
     }
 
@@ -72,7 +115,7 @@ export const LearningUnitForm: React.FC<LearningUnitFormProps> = ({ moduleId, in
     try {
       let contentPayload: any = {};
       if (activeType === LearningUnitType.VIDEO) {
-        contentPayload = { vdo_cipher_id: vdoCipherId };
+        contentPayload = { vdo_cipher_id: vdoCipherId.trim() };
       } else if (activeType === LearningUnitType.NOTES) {
         contentPayload = { rich_text_content: notesContent };
       } else {
@@ -80,30 +123,58 @@ export const LearningUnitForm: React.FC<LearningUnitFormProps> = ({ moduleId, in
       }
 
       const payload: Partial<LearningUnit> = {
-        title,
+        title: title.trim(),
         type: activeType,
         prerequisite_unit_id: prerequisiteId || null,
         module_id: moduleId,
-        content_data: contentPayload
+        content_data: contentPayload,
+        order_index: initialData?.order_index || 0
       };
 
       let savedUnit;
-      if (initialData?.id && !initialData.id.startsWith('unit-')) {
-        savedUnit = await updateLearningUnit(initialData.id, payload);
+      const effectiveId = unitId || initialData?.id;
+      if (effectiveId && !effectiveId.startsWith('unit-')) {
+        savedUnit = await updateLearningUnit(effectiveId, payload);
       } else {
         savedUnit = await createLearningUnit(payload);
       }
+
+      const returnedUnit = (savedUnit?.data as any) || savedUnit;
+      const returnedId = returnedUnit?._id || returnedUnit?.id || effectiveId || '';
+      if (returnedId) {
+        setUnitId(returnedId);
+      }
+
+      setModalState({
+        isOpen: true,
+        type: 'success',
+        title: 'Learning Unit Saved Successfully!',
+        description: `Unit "${title.trim()}" has been saved and patched to the module curriculum.`,
+        details: activeType === LearningUnitType.VIDEO
+          ? `VdoCipher Video ID: ${vdoCipherId.trim()}`
+          : activeType === LearningUnitType.NOTES
+          ? `Lecture Notes: ${notesContent ? 'Rich HTML Content Stored' : 'Empty Draft'}`
+          : `Unit Type: ${activeType}`
+      });
 
       triggerCharacter('celebrating', 'Learning Unit successfully saved!');
 
       if (onSave) {
         onSave({
           ...payload,
-          id: (savedUnit?.data as any)?._id || (savedUnit?.data as any)?.id || initialData?.id || ''
+          id: returnedId,
+          content_data: returnedUnit?.content_data || contentPayload
         });
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to save learning unit:', error);
+      const errorMsg = error?.response?.data?.message || error?.message || 'Failed to save learning unit. Please check your connection and required inputs.';
+      setModalState({
+        isOpen: true,
+        type: 'error',
+        title: 'Failed to Save Learning Unit',
+        description: errorMsg
+      });
       triggerCharacter('helper', 'Failed to save learning unit. Check your connection.');
     } finally {
       setIsLoading(false);
@@ -218,7 +289,7 @@ export const LearningUnitForm: React.FC<LearningUnitFormProps> = ({ moduleId, in
         <button
           type="submit"
           disabled={isLoading}
-          className="px-6 py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-semibold transition-colors shadow-md active:scale-95 disabled:opacity-50 flex items-center gap-2"
+          className="px-6 py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-semibold transition-colors shadow-md active:scale-95 disabled:opacity-50 flex items-center gap-2 cursor-pointer"
         >
           {isLoading ? (
             <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
@@ -226,6 +297,26 @@ export const LearningUnitForm: React.FC<LearningUnitFormProps> = ({ moduleId, in
           {isLoading ? 'Saving...' : 'Save Learning Unit'}
         </button>
       </div>
+
+      {/* ── REUSABLE MODAL FEEDBACK ── */}
+      <Modal
+        isOpen={modalState.isOpen}
+        onClose={() => setModalState(prev => ({ ...prev, isOpen: false }))}
+        title={modalState.title}
+        type={modalState.type}
+        description={modalState.description}
+        primaryAction={{
+          label: modalState.type === 'error' ? 'Dismiss' : 'Continue Editing ➔',
+          onClick: () => setModalState(prev => ({ ...prev, isOpen: false })),
+          variant: modalState.type === 'error' ? 'secondary' : 'primary'
+        }}
+      >
+        {modalState.details && (
+          <div className="mt-3 p-3 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-xs font-mono text-slate-600 dark:text-slate-300">
+            {modalState.details}
+          </div>
+        )}
+      </Modal>
     </form>
   );
 };
