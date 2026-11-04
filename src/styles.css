@@ -2985,3 +2985,134 @@ app-root svg:not([fill]) {
 .db-profile-row:last-child { border-bottom: none; }
 .db-profile-key { font-size: 0.7rem; font-weight: 600; color: var(--color-text-subtle); }
 .db-profile-val { font-size: 0.78rem; font-weight: 700; color: var(--color-text-primary); text-transform: capitalize; }
+
+/* =========================================================
+   QUILL RICH TEXT EDITOR - Core Styles & High-Contrast Overrides
+   ========================================================= */
+
+.quill-editor-wrapper {
+  background-color: var(--color-bg-elevated);
+  border: 1px solid var(--glass-border);
+  border-radius: 0.75rem;
+  overflow: hidden;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.quill-editor-wrapper:focus-within {
+  border-color: rgba(99, 102, 241, 0.6) !important;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+}
+
+.quill-editor-wrapper .ql-toolbar.ql-snow {
+  border: none !important;
+  border-bottom: 1px solid var(--glass-border) !important;
+  background: rgba(0, 0, 0, 0.03);
+  padding: 8px 12px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 4px;
+}
+
+.dark .quill-editor-wrapper .ql-toolbar.ql-snow,
+[data-theme="dark"] .quill-editor-wrapper .ql-toolbar.ql-snow {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.quill-editor-wrapper .ql-toolbar.ql-snow button {
+  border-radius: 4px;
+  width: 28px;
+  height: 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.15s ease;
+}
+
+.quill-editor-wrapper .ql-toolbar.ql-snow button:hover {
+  background-color: rgba(0, 0, 0, 0.08);
+}
+
+.dark .quill-editor-wrapper .ql-toolbar.ql-snow button:hover,
+[data-theme="dark"] .quill-editor-wrapper .ql-toolbar.ql-snow button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.quill-editor-wrapper .ql-toolbar.ql-snow .ql-stroke {
+  stroke: #475569 !important;
+  stroke-width: 2;
+}
+
+.quill-editor-wrapper .ql-toolbar.ql-snow .ql-fill {
+  fill: #475569 !important;
+}
+
+.dark .quill-editor-wrapper .ql-toolbar.ql-snow .ql-stroke,
+[data-theme="dark"] .quill-editor-wrapper .ql-toolbar.ql-snow .ql-stroke {
+  stroke: #cbd5e1 !important;
+}
+
+.dark .quill-editor-wrapper .ql-toolbar.ql-snow .ql-fill,
+[data-theme="dark"] .quill-editor-wrapper .ql-toolbar.ql-snow .ql-fill {
+  fill: #cbd5e1 !important;
+}
+
+.quill-editor-wrapper .ql-toolbar.ql-snow .ql-picker {
+  color: #475569 !important;
+}
+
+.dark .quill-editor-wrapper .ql-toolbar.ql-snow .ql-picker,
+[data-theme="dark"] .quill-editor-wrapper .ql-toolbar.ql-snow .ql-picker {
+  color: #cbd5e1 !important;
+}
+
+.quill-editor-wrapper .ql-toolbar.ql-snow .ql-picker-label {
+  border: 1px solid transparent;
+  border-radius: 4px;
+}
+
+.quill-editor-wrapper .ql-toolbar.ql-snow .ql-picker-label:hover {
+  background-color: rgba(0, 0, 0, 0.08);
+}
+
+.dark .quill-editor-wrapper .ql-toolbar.ql-snow .ql-picker-label:hover,
+[data-theme="dark"] .quill-editor-wrapper .ql-toolbar.ql-snow .ql-picker-label:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.quill-editor-wrapper .ql-toolbar.ql-snow .ql-picker-options {
+  background-color: var(--color-bg-surface) !important;
+  border: 1px solid var(--glass-border) !important;
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  padding: 6px;
+}
+
+.quill-editor-wrapper .ql-container.ql-snow {
+  border: none !important;
+  font-family: inherit !important;
+  font-size: 14px;
+  background-color: var(--color-bg-elevated);
+}
+
+.quill-editor-wrapper .ql-editor {
+  padding: 16px !important;
+  line-height: 1.6 !important;
+  color: var(--color-text-primary) !important;
+  font-size: 14px !important;
+}
+
+.quill-editor-wrapper .ql-editor.ql-blank::before {
+  color: #94a3b8 !important;
+  font-style: normal !important;
+  font-size: 13px !important;
+  line-height: 1.6 !important;
+  left: 16px !important;
+  right: 16px !important;
+  top: 16px !important;
+}
+
+.dark .quill-editor-wrapper .ql-editor.ql-blank::before,
+[data-theme="dark"] .quill-editor-wrapper .ql-editor.ql-blank::before {
+  color: rgba(148, 163, 184, 0.6) !important;
+}
