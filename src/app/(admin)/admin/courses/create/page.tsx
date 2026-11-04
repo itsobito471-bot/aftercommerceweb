@@ -69,6 +69,7 @@ export default function CourseBuilderOrchestrator() {
                 id: u._id || u.id,
                 module_id: typeof u.module_id === 'object' && u.module_id !== null ? (u.module_id._id || u.module_id.id) : (u.module_id || m._id),
                 title: u.title || 'Untitled Unit',
+                description: u.description || '',
                 type: u.type as LearningUnitType,
                 content_data: u.content_data || {},
                 order_index: u.order_index || 0,
@@ -123,6 +124,7 @@ export default function CourseBuilderOrchestrator() {
       id: newUnitId,
       module_id: moduleId,
       title: 'New Unit',
+      description: '',
       type: LearningUnitType.VIDEO,
       content_data: { vdo_cipher_id: '' }, // Polymorphic wrapper defaults to Video
       order_index: 1, 

@@ -44,6 +44,7 @@ export interface LearningUnit {
   id: string;
   module_id: string;
   title: string;
+  description?: string;
   type: LearningUnitType;
   content_data: ContentData;
   order_index: number;

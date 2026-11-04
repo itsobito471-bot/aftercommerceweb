@@ -7,7 +7,7 @@ import { createLearningUnit, updateLearningUnit, uploadDocument } from '@/servic
 import { QuillEditor } from '@/components/common/QuillEditor';
 import { Modal } from '@/components/common/Modal';
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5001';
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:5001';
 
 interface LearningUnitFormProps {
   moduleId: string | null;
@@ -22,8 +22,12 @@ interface LearningUnitFormProps {
  */
 export const getFullVideoUrl = (pathOrUrl?: string): string => {
   if (!pathOrUrl) return '';
-  const trimmed = pathOrUrl.trim();
+  let trimmed = pathOrUrl.trim();
   if (!trimmed) return '';
+  // Clean up any accidental 'undefined' prefix
+  if (trimmed.startsWith('undefined')) {
+    trimmed = trimmed.replace(/^undefined/, '');
+  }
   if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
     return trimmed;
   }
@@ -38,7 +42,10 @@ export const getFullVideoUrl = (pathOrUrl?: string): string => {
  */
 export const toRelativeVideoPath = (urlOrPath?: string): string => {
   if (!urlOrPath) return '';
-  const trimmed = urlOrPath.trim();
+  let trimmed = urlOrPath.trim();
+  if (trimmed.startsWith('undefined')) {
+    trimmed = trimmed.replace(/^undefined/, '');
+  }
   const match = trimmed.match(/([0-9a-fA-F]{24})/);
   if (match) {
     return `/api/admin/documents/${match[1]}`;
@@ -60,6 +67,7 @@ export const LearningUnitForm: React.FC<LearningUnitFormProps> = ({ moduleId, in
   const [unitId, setUnitId] = useState<string>(initialData?.id || '');
   const [activeType, setActiveType] = useState<LearningUnitType>(initialData?.type || LearningUnitType.VIDEO);
   const [title, setTitle] = useState(initialData?.title || '');
+  const [description, setDescription] = useState(initialData?.description || '');
   const [prerequisiteId, setPrerequisiteId] = useState(initialData?.prerequisite_unit_id || '');
   
   // Video Source configuration: 'vdocipher' (DRM Protected) vs 'direct_upload' (Cloud Storage)
@@ -67,7 +75,7 @@ export const LearningUnitForm: React.FC<LearningUnitFormProps> = ({ moduleId, in
   const initialSource = initialVData?.video_source_type || (initialVData?.direct_video_url ? 'direct_upload' : 'vdocipher');
   const [videoSourceType, setVideoSourceType] = useState<'vdocipher' | 'direct_upload'>(initialSource);
   const [vdoCipherId, setVdoCipherId] = useState(initialVData?.vdo_cipher_id || '');
-  const [directVideoUrl, setDirectVideoUrl] = useState(`${process.env.NEXT_PUBLIC_BASE_URL}${initialVData?.direct_video_url || ''}`);
+  const [directVideoUrl, setDirectVideoUrl] = useState(initialVData?.direct_video_url ? getFullVideoUrl(initialVData.direct_video_url) : '');
   const [videoDocId, setVideoDocId] = useState(initialVData?.document_id || '');
   const [videoFileName, setVideoFileName] = useState(initialVData?.original_file_name || '');
   const [isUploadingVideo, setIsUploadingVideo] = useState(false);
@@ -81,6 +89,7 @@ export const LearningUnitForm: React.FC<LearningUnitFormProps> = ({ moduleId, in
     if (initialData) {
       setUnitId(initialData.id || '');
       setTitle(initialData.title || '');
+      setDescription(initialData.description || '');
       setActiveType(initialData.type || LearningUnitType.VIDEO);
       setPrerequisiteId(initialData.prerequisite_unit_id || '');
       
@@ -88,7 +97,7 @@ export const LearningUnitForm: React.FC<LearningUnitFormProps> = ({ moduleId, in
       const detectedSource = vData?.video_source_type || (vData?.direct_video_url ? 'direct_upload' : 'vdocipher');
       setVideoSourceType(detectedSource);
       setVdoCipherId(vData?.vdo_cipher_id || '');
-      setDirectVideoUrl(toRelativeVideoPath(vData?.direct_video_url) || '');
+      setDirectVideoUrl(vData?.direct_video_url ? getFullVideoUrl(vData.direct_video_url) : '');
       setVideoDocId(vData?.document_id || '');
       setVideoFileName(vData?.original_file_name || '');
       setNotesContent(vData?.rich_text_content || '');
@@ -96,6 +105,7 @@ export const LearningUnitForm: React.FC<LearningUnitFormProps> = ({ moduleId, in
   }, [
     initialData?.id, 
     initialData?.title, 
+    initialData?.description,
     initialData?.type, 
     initialData?.prerequisite_unit_id, 
     (initialData?.content_data as any)?.vdo_cipher_id,
@@ -126,8 +136,8 @@ export const LearningUnitForm: React.FC<LearningUnitFormProps> = ({ moduleId, in
       const res = await uploadDocument(file);
       if (res.success && res.data) {
         const doc = res.data;
-        const relativeUrl = doc.relative_url || `/api/admin/documents/${doc._id}`;
-        setDirectVideoUrl(relativeUrl);
+        const fullStreamUrl = `${BACKEND_URL}/api/admin/documents/${doc._id}`;
+        setDirectVideoUrl(fullStreamUrl);
         setVideoDocId(doc._id || '');
         setVideoFileName(doc.original_name || file.name);
         setUploadProgress(null);
@@ -253,6 +263,7 @@ export const LearningUnitForm: React.FC<LearningUnitFormProps> = ({ moduleId, in
 
       const payload: Partial<LearningUnit> = {
         title: title.trim(),
+        description: description || '',
         type: activeType,
         prerequisite_unit_id: prerequisiteId || null,
         module_id: moduleId,
@@ -367,6 +378,28 @@ export const LearningUnitForm: React.FC<LearningUnitFormProps> = ({ moduleId, in
             ))}
           </select>
         </div>
+      </div>
+
+      {/* ── UNIT DESCRIPTION (QUILL RICH TEXT EDITOR - OPTIONAL) ── */}
+      <div>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
+          <div className="flex items-center gap-2">
+            <label className={labelClass}>Unit Description & Student Instructions</label>
+            <span className="text-[10px] font-mono text-slate-400 font-normal">(Optional)</span>
+          </div>
+          <span className="font-mono text-[10px] px-2.5 py-0.5 rounded-full bg-indigo-500/10 text-indigo-500 font-bold border border-indigo-500/20 whitespace-nowrap shrink-0 self-start sm:self-auto">
+            Quill Rich HTML
+          </span>
+        </div>
+        <p className="text-xs opacity-70 mb-2 leading-relaxed">
+          Provide contextual overview, lesson guidelines, and helpful tips displayed directly to the student.
+        </p>
+        <QuillEditor
+          value={description}
+          onChange={(html) => setDescription(html)}
+          placeholder="Write unit objectives, summary, lesson instructions, and recommended reading for the student..."
+          minHeight="180px"
+        />
       </div>
 
       {/* Dynamic Content Rendering */}
@@ -513,25 +546,24 @@ export const LearningUnitForm: React.FC<LearningUnitFormProps> = ({ moduleId, in
                     type="text"
                     value={directVideoUrl}
                     onChange={(e) => {
-                      const val = e.target.value.trim();
+                      const val = e.target.value;
+                      const trimmed = val.trim();
                       // Auto-resolve if raw MongoDB Document ID is pasted
-                      if (/^[0-9a-fA-F]{24}$/.test(val)) {
-                        setDirectVideoUrl(`${process.env.NEXT_PUBLIC_BASE_URL}/api/admin/documents/${val}`);
-                        setVideoDocId(val);
+                      if (/^[0-9a-fA-F]{24}$/.test(trimmed)) {
+                        setDirectVideoUrl(`${BACKEND_URL}/api/admin/documents/${trimmed}`);
+                        setVideoDocId(trimmed);
                       } else {
-                        const match = val.match(/([0-9a-fA-F]{24})/);
+                        setDirectVideoUrl(val);
+                        const match = trimmed.match(/([0-9a-fA-F]{24})/);
                         if (match) {
                           setVideoDocId(match[1]);
-                          setDirectVideoUrl(`${process.env.NEXT_PUBLIC_BASE_URL}/api/admin/documents/${match[1]}`);
-                        } else {
-                          setDirectVideoUrl(toRelativeVideoPath(e.target.value));
                         }
                       }
                       if (!videoFileName) setVideoFileName('Direct Video Stream');
                     }}
                     className={inputClass}
                     style={{ backgroundColor: 'var(--color-bg-elevated)', borderColor: 'var(--glass-border)' }}
-                    placeholder="e.g. /api/admin/documents/6aeb7eeea3f90898bef28c72 or paste ID"
+                    placeholder={`e.g. ${BACKEND_URL}/api/admin/documents/6aeb7eeea3f90898bef28c72`}
                   />
                   <p className="text-[11px] opacity-60 mt-1">
                     Saved to database as relative path (<code className="font-mono text-emerald-600">/api/admin/documents/:id</code>) so server migrations never break playback.
